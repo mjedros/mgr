@@ -1,0 +1,8 @@
+*.out
+nbproject/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+CMakeFiles/
+compile_commands.json
+Mgr
