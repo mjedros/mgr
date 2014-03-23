@@ -6,3 +6,5 @@ Makefile
 CMakeFiles/
 compile_commands.json
 Mgr
+build-*
+*.pro.user

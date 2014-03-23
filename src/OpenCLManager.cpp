@@ -5,7 +5,6 @@
 using namespace cv;
 using namespace cl;
 using namespace std;
-OpenCLManager::OpenCLManager(int a) { std::cout << "construct Manager" << a<< std::endl; }
 
 OpenCLManager::~OpenCLManager() {}
 
@@ -62,6 +61,7 @@ void OpenCLManager::ChooseDevice() {
       std::string name;
       devices[i].getInfo((cl_device_info) CL_DEVICE_NAME,&name);
       cout<<i<<". Device name: " <<name<<endl;
+      
   }
   cout<< "Choose number"<<endl;
   int number;
@@ -74,3 +74,34 @@ void OpenCLManager::ChooseDevice() {
   
 
 }
+  std::vector<std::string> OpenCLManager::ListPlatforms() {
+      std::vector<Platform> platforms;
+      Platform::get(&platforms);
+     std::vector<std::string> devicesInfo;
+     for(unsigned int i=0 ; i<platforms.size();++i) {
+      std::string name,version;
+      platforms[i].getInfo((cl_platform_info) CL_PLATFORM_NAME,&name);
+      platforms[i].getInfo((cl_platform_info) CL_PLATFORM_VERSION,&version);
+      
+      
+      cl_context_properties context_properties[3] = {
+        CL_CONTEXT_PLATFORM, (cl_context_properties)(platforms[i])(), 0
+        };      
+        cl::Context contextP = Context(CL_DEVICE_TYPE_ALL,context_properties);
+        std::vector<cl::Device> devicesP = contextP.getInfo<CL_CONTEXT_DEVICES>();
+        cl_device_type deviceType;        
+        devicesP[0].getInfo((cl_device_info) CL_DEVICE_TYPE, &deviceType);
+        std::string deviceT="";
+        if(deviceType == 4)
+        {
+            deviceT="GPU";
+        }
+        devicesInfo.push_back(std::to_string(i)+". "+deviceT + "-"+name+","+version);
+     }
+     
+     return devicesInfo;
+  }
+  
+  void OpenCLManager::SetDevicesList() {
+      if(devices.empty())   devices = context.getInfo<CL_CONTEXT_DEVICES>();
+  }

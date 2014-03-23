@@ -13,16 +13,17 @@ private:
   std::vector<cl::Device> devices;
   cl::Device processingDevice;
   cl::Buffer outBuffer;
+  void SetDevicesList();
   void CreateContext();
   void ChooseDevice();
   void ReadPrograms(std::string kernelFileName);
 
 public:
-  OpenCLManager(int);
   cl::Context context;
   cl::CommandQueue queue;
   cl::Program program;
   void Configure(std::string kernelFileName);
+  std::vector<std::string> ListPlatforms();
   virtual ~OpenCLManager();
 };
 
