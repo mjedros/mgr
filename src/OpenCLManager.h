@@ -20,9 +20,10 @@ public:
   cl::Context context;
   cl::CommandQueue queue;
   cl::Program program;
-  void Configure(std::string kernelFileName);
+  void Configure(std::string kernelFileName, unsigned int platformId,
+                 unsigned int deviceId);
   std::vector<std::string> ListPlatforms();
-    void ChooseDevice(const unsigned int platformId,const unsigned int DeviceId);
+  void ChooseDevice(const unsigned int platformId, const unsigned int DeviceId);
   OpenCLManager();
   virtual ~OpenCLManager();
 };
