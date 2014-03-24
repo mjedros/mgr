@@ -9,13 +9,11 @@
 
 class OpenCLManager {
 private:
-
-  std::vector<cl::Device> devices;
   cl::Device processingDevice;
   cl::Buffer outBuffer;
-  void SetDevicesList();
-  void CreateContext();
-  void ChooseDevice();
+  std::vector<cl::Platform> platforms;
+
+  void CreateContext(int platformId);
   void ReadPrograms(std::string kernelFileName);
 
 public:
@@ -24,6 +22,8 @@ public:
   cl::Program program;
   void Configure(std::string kernelFileName);
   std::vector<std::string> ListPlatforms();
+    void ChooseDevice(const unsigned int platformId,const unsigned int DeviceId);
+  OpenCLManager();
   virtual ~OpenCLManager();
 };
 

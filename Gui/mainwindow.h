@@ -15,6 +15,12 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private slots:
+
+
+    void on_ChoosePlatform_currentIndexChanged(const QString &arg1);
+    void setPlatformsList(void);
+
 private:
     Ui::MainWindow *ui;
 };

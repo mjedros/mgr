@@ -21,8 +21,8 @@ HEADERS  += mainwindow.h\
 
 FORMS    += mainwindow.ui
 CONFIG += c++11
-
-LIBS += -L$$PWD/../../../../usr/lib/ -lOpenCL
+QMAKE_CXXFLAGS += -Werror
+LIBS += -L/usr/lib/ -lOpenCL
 
 INCLUDEPATH += /usr/include
 DEPENDPATH += /usr/include
