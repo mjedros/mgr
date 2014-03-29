@@ -3,7 +3,6 @@
 
 #define __CL_ENABLE_EXCEPTIONS
 #include <CL/cl.hpp>
-//#include <opencv2/opencv.hpp>
 #include <memory>
 #include <string>
 

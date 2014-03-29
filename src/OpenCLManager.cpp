@@ -11,31 +11,37 @@ OpenCLManager::~OpenCLManager() {}
 
 void OpenCLManager::Configure(std::string kernelFileName,
                               unsigned int platformId, unsigned int deviceId) {
-  ChooseDevice(platformId, deviceId);
-  CreateContext(platformId);
-  ReadPrograms(kernelFileName);
-  queue = CommandQueue(context, processingDevice);
+  try {
+    ChooseDevice(platformId, deviceId);
+    CreateContext(platformId);
+    ReadPrograms(kernelFileName);
+    queue = CommandQueue(context, processingDevice);
+  }
+  catch (std::string e) {
+    cout << "Configure error: " << e << endl;
+  }
 }
 
 void OpenCLManager::ReadPrograms(std::string kernelFileName) {
   ifstream file(kernelFileName);
   if (!file.is_open()) {
-    cout << "Kernel file not loaded" << endl;
-    throw new exception();
+    throw std::string("Kernel file not loaded");
   }
+
   std::string prog(istreambuf_iterator<char>(file),
                    (istreambuf_iterator<char>()));
   Program::Sources source =
       Program::Sources(1, make_pair(prog.c_str(), prog.length() + 1));
   program = Program(context, source);
   try {
-    std::vector<Device> devices = {processingDevice};
+    std::vector<Device> devices; // = {processingDevice};
+    platforms[0].getDevices(CL_DEVICE_TYPE_GPU, &devices);
     program.build(devices, "");
   }
   catch (Error &e) {
     std::string buildLog =
         program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(processingDevice);
-    cout << "Build error:" << endl << buildLog << endl;
+    throw std::string("Build error:" + buildLog);
   }
 }
 
@@ -52,7 +58,7 @@ void OpenCLManager::ChooseDevice(const unsigned int platformId,
                                  const unsigned int DeviceId) {
 
   std::vector<Device> devices;
-  platforms[platformId].getDevices(CL_DEVICE_TYPE_ALL, &devices);
+  platforms[platformId].getDevices(CL_DEVICE_TYPE_GPU, &devices);
   processingDevice = devices[DeviceId];
 }
 

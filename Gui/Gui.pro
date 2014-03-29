@@ -12,9 +12,10 @@ TARGET = Gui
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
+SOURCES +=\
         mainwindow.cpp\
-        ../src/OpenCLManager.cpp
+        ../src/OpenCLManager.cpp \
+    ../src/Application.cpp
 
 HEADERS  += mainwindow.h\
         ../src/OpenCLManager.h

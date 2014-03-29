@@ -1,3 +1,4 @@
+cmake_minimum_required (VERSION 2.6)
 add_executable(Mgr 
   Application.cpp
   OpenCLManager.h 
@@ -17,7 +18,7 @@ find_path(OPENCL_INC
 include_directories("${OPENCL_INC}")
 
 find_path(OPENCV_INC
-		NAMES "opencv2/opencv.hpp"
+	 	NAMES "opencv2/opencv.hpp"
 		PATHS "$ENV{OPENCV_DIR}/build/include"
 		)
 include_directories("${OPENCV_INC}")
@@ -51,10 +52,10 @@ target_link_libraries (Mgr ${OPENCV_CORE_LIB})
 target_link_libraries (Mgr ${OPENCV_IMGPROC_LIB})
 target_link_libraries (Mgr ${OPENCV_HIGHGUI_LIB})
 target_link_libraries (Mgr ${OPENCV_VIDEO_LIB})
-	
+add_definitions(-DQT_NOT_DEFINED)
 
 if(NOT MSVC)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++11")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -std=c++11" )
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -Wextra")
 endif(NOT MSVC)
 
