@@ -18,10 +18,8 @@ void MainWindow::on_ChoosePlatform_currentIndexChanged(const QString &arg1) {
 
 void MainWindow::setPlatformsList() {
   OpenCLManager openCLManager;
-  openCLManager.ChooseDevice(0, 2);
   std::vector<std::string> ListPlatforms = openCLManager.ListPlatforms();
   for (unsigned int i = 0; i < ListPlatforms.size(); ++i) {
     ui->ChoosePlatform->addItem(QString::fromStdString(ListPlatforms[i]));
   }
-  openCLManager.Configure("./HelloWorld.cl", 0, 0);
 }

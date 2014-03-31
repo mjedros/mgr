@@ -3,6 +3,7 @@ add_executable(Mgr
   Application.cpp
   OpenCLManager.h 
   OpenCLManager.cpp 
+  ProcessingImage.cpp
 )
 
 find_library(OPENCL_LIB 

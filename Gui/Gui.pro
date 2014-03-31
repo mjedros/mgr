@@ -15,15 +15,17 @@ TEMPLATE = app
 SOURCES +=\
         mainwindow.cpp\
         ../src/OpenCLManager.cpp \
-    ../src/Application.cpp
+    ../src/Application.cpp \
+    ../src/ProcessingImage.cpp
 
 HEADERS  += mainwindow.h\
-        ../src/OpenCLManager.h
+        ../src/OpenCLManager.h \
+    ../src/ProcessingImage.h
 
 FORMS    += mainwindow.ui
 CONFIG += c++11
 QMAKE_CXXFLAGS += -Werror
-LIBS += -L/usr/lib/ -lOpenCL
-
+LIBS += -L/usr/lib/ -lOpenCL -lopencv_highgui -lopencv_core -lopencv_imgproc
+#-lopencv_calib3d
 INCLUDEPATH += /usr/include
 DEPENDPATH += /usr/include

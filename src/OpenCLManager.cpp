@@ -7,17 +7,20 @@ using namespace cl;
 
 OpenCLManager::OpenCLManager() { Platform::get(&platforms); }
 
-OpenCLManager::~OpenCLManager() {}
+OpenCLManager::~OpenCLManager() {
+   platforms.clear();
+   std::cout << "OpenCLManager destructor" << std::endl;
+}
 
-void OpenCLManager::Configure(std::string kernelFileName, unsigned int platformId,
-                              unsigned int deviceId) {
+void OpenCLManager::Configure(const std::string kernelFileName, const unsigned int platformId,
+                              const unsigned int deviceId) {
    try {
       ChooseDevice(platformId, deviceId);
       CreateContext(platformId);
       ReadPrograms(kernelFileName);
       queue = CommandQueue(context, processingDevice);
    }
-   catch (std::string e) {
+   catch (std::string &e) {
       cout << "Configure error: " << e << endl;
    }
 }
@@ -32,8 +35,7 @@ void OpenCLManager::ReadPrograms(std::string kernelFileName) {
    Program::Sources source = Program::Sources(1, make_pair(prog.c_str(), prog.length() + 1));
    program = Program(context, source);
    try {
-      std::vector<Device> devices; // = {processingDevice};
-      platforms[0].getDevices(CL_DEVICE_TYPE_GPU, &devices);
+      std::vector<Device> devices = {processingDevice};
       program.build(devices, "");
    }
    catch (Error &e) {
@@ -54,7 +56,7 @@ void OpenCLManager::CreateContext(int platformId) {
 void OpenCLManager::ChooseDevice(const unsigned int platformId, const unsigned int DeviceId) {
 
    std::vector<Device> devices;
-   platforms[platformId].getDevices(CL_DEVICE_TYPE_GPU, &devices);
+   platforms[platformId].getDevices(CL_DEVICE_TYPE_ALL, &devices);
    processingDevice = devices[DeviceId];
 }
 
