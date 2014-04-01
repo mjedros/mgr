@@ -23,9 +23,24 @@ HEADERS  += mainwindow.h\
     ../src/ProcessingImage.h
 
 FORMS    += mainwindow.ui
-CONFIG += c++11
-QMAKE_CXXFLAGS += -Werror
-LIBS += -L/usr/lib/ -lOpenCL -lopencv_highgui -lopencv_core -lopencv_imgproc
-#-lopencv_calib3d
-INCLUDEPATH += /usr/include
-DEPENDPATH += /usr/include
+CONFIG += c++0x
+QMAKE_CXXFLAGS += -std=c++0x
+unix:QMAKE_CXXFLAGS += -Werror
+
+unix {
+    LIBS += -L/usr/lib/ -lOpenCL -lopencv_highgui -lopencv_core -lopencv_imgproc
+    INCLUDEPATH += /usr/include
+    DEPENDPATH += /usr/include
+}
+win32 {
+INCLUDEPATH += "$$(CUDA_PATH)"/include
+DEPENDPATH += "$$(CUDA_PATH)"/lib/Win32
+
+ LIBS += -L"$$(CUDA_PATH)"/lib/Win32 -lOpenCL
+ LIBS += -L$$(OPENCV2.4.6_DIR)/build/x86/mingw/bin/ -lopencv_core246 -lopencv_highgui246 -lopencv_imgproc246
+
+
+INCLUDEPATH += $(OPENCV2.4.6_DIR)/build/include
+
+}
+

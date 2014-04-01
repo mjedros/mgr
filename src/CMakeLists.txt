@@ -25,26 +25,26 @@ find_path(OPENCV_INC
 include_directories("${OPENCV_INC}")
 
 find_library(OPENCV_CALIB3D_LIB
-		NAMES opencv_calib3d246 opencv_calib3d
-		PATHS "$ENV{OPENCV_DIR}/build/x86/vc11/lib"
+		NAMES opencv_calib3d248 opencv_calib3d
+		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib"
 		)
 		
 find_library(OPENCV_CORE_LIB
-		NAMES opencv_core246d opencv_core
-		PATHS "$ENV{OPENCV_DIR}/build/x86/vc11/lib"
+		NAMES opencv_core248d opencv_core
+		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib"
 		)
 		
 find_library(OPENCV_HIGHGUI_LIB
-		NAMES opencv_highgui246d opencv_highgui
-		PATHS "$ENV{OPENCV_DIR}/build/x86/vc11/lib"
+		NAMES opencv_highgui248d opencv_highgui
+		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib"
 		)
 find_library(OPENCV_IMGPROC_LIB
-		NAMES opencv_imgproc246d opencv_imgproc
-		PATHS "$ENV{OPENCV_DIR}/build/x86/vc11/lib"
+		NAMES opencv_imgproc248d opencv_imgproc
+		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib"
 		)
 find_library(OPENCV_VIDEO_LIB
-		NAMES opencv_video246d opencv_video
-		PATHS "$ENV{OPENCV_DIR}/build/x86/vc11/lib"
+		NAMES opencv_video248d opencv_video
+		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib"
 		)	
 
 
@@ -56,7 +56,7 @@ target_link_libraries (Mgr ${OPENCV_VIDEO_LIB})
 add_definitions(-DQT_NOT_DEFINED)
 
 if(NOT MSVC)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -std=c++11" )
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -Wextra")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++11" )
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
 endif(NOT MSVC)
 
