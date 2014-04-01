@@ -14,7 +14,7 @@ __kernel void threshold(__read_only image2d_t imageIn, __write_only image2d_t im
    }
    write_imagef(imageOut, image_coord, out_color);
 }
-__constant int squareSize = 15;
+__constant int squareSize = 10;
 __kernel void Dilate(__read_only image2d_t imageIn, __write_only image2d_t imageOut,
                      const float3 ellipseParams) {
    int2 image_coord = (int2) {get_global_id(0), get_global_id(1)};

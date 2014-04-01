@@ -17,7 +17,7 @@ class ProcessingImage {
    cv::Mat GetImage();
    void SetImageToProcess(cv::Mat img);
    ~ProcessingImage();
-   ProcessingImage(cv::Mat, OpenCLManager openCLManager);
+   ProcessingImage(OpenCLManager openCLManager);
 };
 
 #endif // IMAGE_H

@@ -6,6 +6,7 @@
 #include "OpenCLManager.h"
 #include "ProcessingImage.h"
 #include <opencv2/opencv.hpp>
+#include "SourceFactory.h"
 using namespace cl;
 using namespace cv;
 
@@ -20,40 +21,29 @@ int main(int argc, char *argv[]) {
 #else
 int main(/*int argc, char *argv[]*/) {
    OpenCLManager openCLManager;
+   auto imageSource = std::unique_ptr<IImageSource>(new FileVideo("../Data/768x576.avi"));
+   imageSource->Start();
    try {
-      openCLManager.Configure("../../Kernels/Kernels.cl", 0, 0);
-      Mat ColorImage = imread("../background.png");
-      Mat imageIn;
-      cvtColor(ColorImage, imageIn, CV_BGR2GRAY);
-      std::unique_ptr<ProcessingImage> img(new ProcessingImage(imageIn, openCLManager));
+      openCLManager.Configure("../Kernels/Kernels.cl", 0, 0);
+      std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
+      for (Mat im = imageSource->Get(); !im.empty(); im = imageSource->Get()) {
+          Mat imageIn;
+          imshow("normal",im);
+          cvtColor(im, imageIn, CV_BGR2GRAY);
+            img->SetImageToProcess(imageIn);
+            img->Threshold(0.45);
+            img->Erode();
+            img->Dilate();
+            imshow("Processed",imageIn);
+            int key = cv::waitKey(1);
+            if(key != -1)
+                break;
 
-      imshow("normal", img->GetImage());
-      img->Threshold(0.35f);
-      imshow("threshold", img->GetImage());
-      for (int i = 0; i < 2; i++) {
-
-         img->Dilate();
-         imshow("dilated", img->GetImage());
-         cv::waitKey(1);
       }
-      img->Erode();
-      imshow("erode", img->GetImage());
-      Mat otherimg = imread("../lena.jpg");
-      Mat othergray;
 
-      cvtColor(otherimg, otherimg, CV_BGR2GRAY);
-      img->SetImageToProcess(otherimg);
-      std::cout << "done" << std::endl;
-      img->Threshold(0.35f);
-      img->Dilate();
-      img->Dilate();
-      img->Erode();
-      imshow("other", img->GetImage());
-      ;
    }
    catch (Error &e) {
       std::cout << e.what() << " error, number= " << e.err() << std::endl;
    }
-   cv::waitKey(0);
 }
 #endif

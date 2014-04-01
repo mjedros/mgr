@@ -4,6 +4,10 @@ add_executable(Mgr
   OpenCLManager.h 
   OpenCLManager.cpp 
   ProcessingImage.cpp
+  IImageSource.h
+  FileVideo.h
+  FileVideo.cpp
+  SourceFactory.h
 )
 
 find_library(OPENCL_LIB 

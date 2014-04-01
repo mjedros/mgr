@@ -1,8 +1,8 @@
 #include "ProcessingImage.h"
 using namespace cv;
-ProcessingImage::ProcessingImage(cv::Mat img, OpenCLManager _openCLManager) {
+ProcessingImage::ProcessingImage( OpenCLManager _openCLManager) {
    openCLManager = _openCLManager;
-   SetImageToProcess(img);
+   origin[0] = origin[1] = origin[2] = 0;
 }
 
 ProcessingImage::~ProcessingImage() {
@@ -14,11 +14,10 @@ Mat ProcessingImage::GetImage() { return image; }
 void ProcessingImage::SetImageToProcess(cv::Mat img) {
    image.release();
    image = img;
-   origin[0] = origin[1] = origin[2] = 0;
    region[0] = image.cols;
    region[1] = image.rows;
    region[2] = 1;
-   localRange = {15, 5};
+   localRange = {32, 16};
 }
 
 void ProcessingImage::Dilate() {
