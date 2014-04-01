@@ -9,6 +9,7 @@ class ProcessingImage {
    cl::size_t<3> origin;
    cl::size_t<3> region;
    cl::NDRange localRange;
+   void Process(cl::Kernel &kernel, cl::Image2D &image_out);
 
  public:
    void Threshold(const float threshold = 0.5);
