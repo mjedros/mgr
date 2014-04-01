@@ -26,7 +26,7 @@ void ProcessingImage::Dilate() {
    cl::Image2D image_in(openCLManager.context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
                         image.cols, image.rows, 0, image.data);
    cl::Image2D image_out(openCLManager.context, CL_MEM_WRITE_ONLY, format, image.cols, image.rows);
-   cl_float3 ellipseparams;// = (cl_float3) { { 0, 2, 2 } };
+   cl_float3 ellipseparams = (cl_float3) { { 0, 2, 2 } };
    ellipseparams.s[0] = 0;
    ellipseparams.s[1] = 2;
    ellipseparams.s[2] = 2;
@@ -45,10 +45,7 @@ void ProcessingImage::Erode() {
    cl::Image2D image_in(openCLManager.context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
                         image.cols, image.rows, 0, image.data);
    cl::Image2D image_out(openCLManager.context, CL_MEM_WRITE_ONLY, format, image.cols, image.rows);
-   cl_float3 ellipseparams;// = (cl_float3) { { 0, 2, 2 } };
-   ellipseparams.s[0] = 0;
-   ellipseparams.s[1] = 2;
-   ellipseparams.s[2] = 2;
+   cl_float3 ellipseparams = (cl_float3) { { 0, 2, 2 } };
    kernel.setArg(0, image_in);
    kernel.setArg(1, image_out);
    kernel.setArg(2, ellipseparams);
