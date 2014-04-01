@@ -33,14 +33,12 @@ unix {
     DEPENDPATH += /usr/include
 }
 win32 {
-INCLUDEPATH += "$$(CUDA_PATH)"/include
-DEPENDPATH += "$$(CUDA_PATH)"/lib/Win32
+    INCLUDEPATH += "$$(CUDA_PATH)"/include
+    DEPENDPATH += "$$(CUDA_PATH)"/lib/Win32
 
- LIBS += -L"$$(CUDA_PATH)"/lib/Win32 -lOpenCL
- LIBS += -L$$(OPENCV2.4.6_DIR)/build/x86/mingw/bin/ -lopencv_core246 -lopencv_highgui246 -lopencv_imgproc246
+    LIBS += -L"$$(CUDA_PATH)"/lib/Win32 -lOpenCL
+    LIBS += -L$$(OPENCV2.4.6_DIR)/build/x86/mingw/bin/ -lopencv_core246 -lopencv_highgui246 -lopencv_imgproc246
 
-
-INCLUDEPATH += $(OPENCV2.4.6_DIR)/build/include
-
+    INCLUDEPATH += $(OPENCV2.4.6_DIR)/build/include
 }
 
