@@ -41,8 +41,8 @@ win32 {
     DEPENDPATH += "$$(CUDA_PATH)"/lib/Win32
 
     LIBS += -L"$$(CUDA_PATH)"/lib/Win32 -lOpenCL
-    LIBS += -L$$(OPENCV2.4.6_DIR)/build/x86/mingw/bin/ -lopencv_core246 -lopencv_highgui246 -lopencv_imgproc246
+    LIBS += -L$$(OPENCV_DIR)/sources/mingw/bin -llibopencv_core248 -llibopencv_highgui248 -llibopencv_imgproc248
 
-    INCLUDEPATH += $(OPENCV2.4.6_DIR)/build/include
+    INCLUDEPATH += $(OPENCV_DIR)/build/include
 }
 
