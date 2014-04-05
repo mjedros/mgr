@@ -1,6 +1,5 @@
 language: cpp
-compiler: 
- - clang
+compiler: clang
 script:
  - cd Gui
  - qmake -qt=qt5 -v
