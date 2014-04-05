@@ -1,3 +1,4 @@
+//#define QT_NOT_DEFINED
 #ifndef QT_NOT_DEFINED
 #include "../Gui/mainwindow.h"
 #include <QApplication>
@@ -10,22 +11,26 @@
 using namespace cl;
 using namespace cv;
 #ifndef QT_NOT_DEFINED
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
    QApplication a(argc, argv);
    MainWindow w;
    w.show();
    return a.exec();
 }
 #else
-int main(/*int argc, char *argv[]*/) {
+int main(/*int argc, char *argv[]*/)
+{
    OpenCLManager openCLManager;
    std::unique_ptr<IImageSource> imageSource =
        SourceFactory::GetImageSource(VideoFile, "../Data/768x576.avi");
    imageSource->Start();
-   try {
+   try
+   {
       openCLManager.Configure("../Kernels/Kernels.cl", 0, 0);
       std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
-      for (Mat im = imageSource->Get(); !im.empty(); im = imageSource->Get()) {
+      for (Mat im = imageSource->Get(); !im.empty(); im = imageSource->Get())
+      {
          Mat imageIn;
          imshow("normal", im);
          cvtColor(im, imageIn, CV_BGR2GRAY);
@@ -39,8 +44,7 @@ int main(/*int argc, char *argv[]*/) {
             break;
       }
    }
-   catch (Error &e) {
-      std::cout << e.what() << " error, number= " << e.err() << std::endl;
-   }
+   catch (Error &e)
+   { std::cout << e.what() << " error, number= " << e.err() << std::endl; }
 }
 #endif

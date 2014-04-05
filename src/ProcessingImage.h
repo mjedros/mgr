@@ -2,7 +2,8 @@
 #define IMAGE_H
 #include <opencv2/opencv.hpp>
 #include "OpenCLManager.h"
-class ProcessingImage {
+class ProcessingImage
+{
  private:
    cv::Mat image;
    OpenCLManager openCLManager;

@@ -2,7 +2,8 @@
 
 #include <string>
 #include <memory>
-class FileVideo : public IImageSource {
+class FileVideo : public IImageSource
+{
    std::string fileName;
    std::unique_ptr<cv::VideoCapture> videoCapture;
 

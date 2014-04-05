@@ -3,24 +3,28 @@
 
 #include <QMainWindow>
 
-namespace Ui {
+namespace Ui
+{
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow {
-  Q_OBJECT
+class MainWindow : public QMainWindow
+{
+   Q_OBJECT
 
-public:
-  explicit MainWindow(QWidget *parent = 0);
-  ~MainWindow();
+ public:
+   explicit MainWindow(QWidget *parent = 0);
+   ~MainWindow();
 
-private slots:
+ private slots:
 
-  void on_ChoosePlatform_currentIndexChanged(const QString &arg1);
-  void setPlatformsList(void);
+   void on_ChoosePlatform_currentIndexChanged(const QString &arg1);
+   void setPlatformsList(void);
 
-private:
-  Ui::MainWindow *ui;
+ private:
+   std::pair<int, int> ChosenDevice;
+   std::vector<std::tuple<int, int, std::string> > ListPlatforms;
+   Ui::MainWindow *ui;
 };
 
 #endif // MAINWINDOW_H
