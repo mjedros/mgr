@@ -30,6 +30,7 @@ FORMS    += mainwindow.ui
 CONFIG += c++0x
 QMAKE_CXXFLAGS += -std=c++0x
 unix:QMAKE_CXXFLAGS += -Werror
+win32:QMAKE_CXXFLAGS += -fpermissive
 
 unix {
     LIBS += -L/usr/lib/ -lOpenCL -lopencv_highgui -lopencv_core -lopencv_imgproc
