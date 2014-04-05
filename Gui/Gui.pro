@@ -17,18 +17,21 @@ SOURCES +=\
         ../src/OpenCLManager.cpp \
     ../src/Application.cpp \
     ../src/ProcessingImage.cpp \
-    ../src/FileVideo.cpp
+    ../src/FileVideo.cpp \
+    ../src/ApplicationManager.cpp
 
 HEADERS  += mainwindow.h\
         ../src/OpenCLManager.h \
     ../src/ProcessingImage.h \
     ../src/FileVideo.h \
     ../src/SourceFactory.h \
-    ../src/IImageSource.h
+    ../src/IImageSource.h \
+    ../src/ApplicationManager.h
 
 FORMS    += mainwindow.ui
 CONFIG += c++0x
 QMAKE_CXXFLAGS += -std=c++0x
+
 unix:QMAKE_CXXFLAGS += -Werror
 win32:QMAKE_CXXFLAGS += -fpermissive
 

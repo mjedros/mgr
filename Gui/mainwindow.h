@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
+#include "../src/OpenCLManager.h"
 namespace Ui
 {
 class MainWindow;
@@ -18,12 +18,14 @@ class MainWindow : public QMainWindow
 
  private slots:
 
-   void on_ChoosePlatform_currentIndexChanged(const QString &arg1);
+   void on_ChoosePlatform_currentIndexChanged(const QString &description);
    void setPlatformsList(void);
+   void on_pushButton_clicked();
 
- private:
+private:
    std::pair<int, int> ChosenDevice;
    std::vector<std::tuple<int, int, std::string> > ListPlatforms;
+   OpenCLManager openCLManager;
    Ui::MainWindow *ui;
 };
 
