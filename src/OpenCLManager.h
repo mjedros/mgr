@@ -26,6 +26,12 @@ class OpenCLManager
    void ChooseDevice(const unsigned int platformId,
                      const unsigned int DeviceId);
    OpenCLManager();
+   static OpenCLManager & GetInstance()
+   {
+        static OpenCLManager openClManager;
+        return openClManager;
+   }
+
    virtual ~OpenCLManager();
 };
 

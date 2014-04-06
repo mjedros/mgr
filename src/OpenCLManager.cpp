@@ -7,7 +7,8 @@ using namespace cl;
 
 OpenCLManager::OpenCLManager() { Platform::get(&platforms); }
 
-OpenCLManager::~OpenCLManager() {}
+OpenCLManager::~OpenCLManager()
+{ std::cout << "OpenCLManager destructor" << std::endl; }
 
 void OpenCLManager::Configure(const std::string kernelFileName,
                               const unsigned int platformId,
@@ -63,7 +64,6 @@ void OpenCLManager::CreateContext(int platformId)
 void OpenCLManager::ChooseDevice(const unsigned int platformId,
                                  const unsigned int DeviceId)
 {
-
    std::vector<Device> devices;
    platforms[platformId].getDevices(CL_DEVICE_TYPE_ALL, &devices);
    processingDevice = devices[DeviceId];

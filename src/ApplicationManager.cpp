@@ -1,14 +1,14 @@
 #include "ApplicationManager.h"
 #include <opencv2/opencv.hpp>
 using namespace cv;
-ApplicationManager::ApplicationManager(OpenCLManager &openCLManager)
+ApplicationManager::ApplicationManager()
 {
- openCLManager = openCLManager;
+
 }
 
 void ApplicationManager::DoSth()
 {
-    std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
+    std::unique_ptr<ProcessingImage> img(new ProcessingImage());
     std::unique_ptr<IImageSource> imageSource =
         SourceFactory::GetImageSource(VideoFile, "../Data/768x576.avi");
     imageSource->Start();

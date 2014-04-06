@@ -6,7 +6,6 @@ class ProcessingImage
 {
  private:
    cv::Mat image;
-   OpenCLManager openCLManager;
    cl::size_t<3> origin;
    cl::size_t<3> region;
    cl::NDRange localRange;
@@ -19,7 +18,7 @@ class ProcessingImage
    cv::Mat GetImage();
    void SetImageToProcess(cv::Mat img);
    ~ProcessingImage();
-   ProcessingImage(OpenCLManager openCLManager);
+   ProcessingImage();
 };
 
 #endif // IMAGE_H

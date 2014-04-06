@@ -7,9 +7,8 @@
 
 class ApplicationManager
 {
-    OpenCLManager openCLManager;
 public:
-    ApplicationManager(OpenCLManager &);
+    ApplicationManager();
     void DoSth();
 };
 

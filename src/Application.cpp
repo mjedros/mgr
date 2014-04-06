@@ -19,8 +19,13 @@ int main(int argc, char *argv[])
 #else
 int main(/*int argc, char *argv[]*/)
 {
-   OpenCLManager openCLManager;
-   try { openCLManager.Configure("../Kernels/Kernels.cl", 0, 0); }
+   try
+   {
+      OpenCLManager::GetInstance().Configure("../Kernels/Kernels.cl", 0, 0);
+      ApplicationManager appman;
+      appman.DoSth();
+   }
+
    catch (Error &e)
    { std::cout << e.what() << " error, number= " << e.err() << std::endl; }
 }
