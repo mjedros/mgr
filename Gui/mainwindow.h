@@ -25,7 +25,6 @@ class MainWindow : public QMainWindow
 private:
    std::pair<int, int> ChosenDevice;
    std::vector<std::tuple<int, int, std::string> > ListPlatforms;
-   OpenCLManager openCLManager;
    Ui::MainWindow *ui;
 };
 

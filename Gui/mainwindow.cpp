@@ -23,7 +23,7 @@ MainWindow::on_ChoosePlatform_currentIndexChanged(const QString &description)
 
 void MainWindow::setPlatformsList()
 {
-   ListPlatforms = openCLManager.ListPlatforms();
+   ListPlatforms = OpenCLManager::GetInstance().ListPlatforms();
    std::for_each(ListPlatforms.begin(), ListPlatforms.end(),
                  [this](std::tuple<int, int, std::string> &platform)
    {
@@ -34,8 +34,8 @@ void MainWindow::setPlatformsList()
 
 void MainWindow::on_pushButton_clicked()
 {
-    openCLManager.Configure("../Kernels/Kernels.cl", ChosenDevice.first, ChosenDevice.second);
-    ApplicationManager appManager(openCLManager);
+    OpenCLManager::GetInstance().Configure("../Kernels/Kernels.cl", ChosenDevice.first, ChosenDevice.second);
+    ApplicationManager appManager;
     ui->pushButton->hide();
     appManager.DoSth();
 }
