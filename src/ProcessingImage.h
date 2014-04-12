@@ -10,7 +10,7 @@ class ProcessingImage
    cl::size_t<3> region;
    cl::NDRange localRange;
    void Process(cl::Kernel &kernel, cl::Image2D &image_out);
-   OpenCLManager *openCLManager;
+   const std::shared_ptr<OpenCLManager> openCLManager;
 
  public:
    void Threshold(const float threshold = 0.5);
@@ -19,7 +19,7 @@ class ProcessingImage
    cv::Mat GetImage();
    void SetImageToProcess(cv::Mat img);
    ~ProcessingImage();
-   ProcessingImage(OpenCLManager *openCLManager);
+   ProcessingImage(const std::shared_ptr<OpenCLManager> &openCLManagerPtr);
 };
 
 #endif // IMAGE_H

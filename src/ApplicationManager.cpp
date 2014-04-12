@@ -1,9 +1,9 @@
 #include "ApplicationManager.h"
 #include <opencv2/opencv.hpp>
 using namespace cv;
-ApplicationManager::ApplicationManager(OpenCLManager *openCLManagerArg)
+ApplicationManager::ApplicationManager(const std::shared_ptr<OpenCLManager> &openCLManagerPtr)
+    : openCLManager(openCLManagerPtr)
 {
-   this->openCLManager = openCLManagerArg;
 }
 
 void ApplicationManager::DoSth()

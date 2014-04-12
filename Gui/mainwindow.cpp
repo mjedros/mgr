@@ -4,7 +4,7 @@
 #include "../src/ApplicationManager.h"
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
-   openCLManager = new OpenCLManager();
+   openCLManager = std::make_shared<OpenCLManager>();
    ui->setupUi(this);
    setPlatformsList();
 }
@@ -12,7 +12,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow()
 {
    delete ui;
-   delete openCLManager;
 }
 
 void MainWindow::on_ChoosePlatform_currentIndexChanged(const QString &description)

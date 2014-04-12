@@ -8,10 +8,10 @@
 class ApplicationManager
 {
  private:
-   OpenCLManager *openCLManager;
+   const std::shared_ptr<OpenCLManager> openCLManager;
 
  public:
-   ApplicationManager(OpenCLManager *openCLManager);
+   ApplicationManager(const std::shared_ptr<OpenCLManager> &openCLManager);
    void DoSth();
 };
 
