@@ -22,11 +22,11 @@ class MainWindow : public QMainWindow
    void setPlatformsList(void);
    void on_pushButton_clicked();
 
-private:
+ private:
    std::pair<int, int> ChosenDevice;
-   std::vector<std::tuple<int, int, std::string> > ListPlatforms;
+   std::vector<std::tuple<int, int, std::string>> ListPlatforms;
    Ui::MainWindow *ui;
-   OpenCLManager * openCLManager;
+   OpenCLManager *openCLManager;
 };
 
 #endif // MAINWINDOW_H

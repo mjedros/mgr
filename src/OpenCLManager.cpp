@@ -7,11 +7,9 @@ using namespace cl;
 
 OpenCLManager::OpenCLManager() { Platform::get(&platforms); }
 
-OpenCLManager::~OpenCLManager()
-{ std::cout << "OpenCLManager destructor" << std::endl; }
+OpenCLManager::~OpenCLManager() { std::cout << "OpenCLManager destructor" << std::endl; }
 
-void OpenCLManager::Configure(const std::string kernelFileName,
-                              const unsigned int platformId,
+void OpenCLManager::Configure(const std::string kernelFileName, const unsigned int platformId,
                               const unsigned int deviceId)
 {
    try
@@ -32,10 +30,8 @@ void OpenCLManager::ReadPrograms(std::string kernelFileName)
       throw std::string("Kernel file not loaded");
    }
 
-   std::string prog(istreambuf_iterator<char>(file),
-                    (istreambuf_iterator<char>()));
-   Program::Sources source =
-       Program::Sources(1, make_pair(prog.c_str(), prog.length() + 1));
+   std::string prog(istreambuf_iterator<char>(file), (istreambuf_iterator<char>()));
+   Program::Sources source = Program::Sources(1, make_pair(prog.c_str(), prog.length() + 1));
    program = Program(context, source);
    try
    {
@@ -44,8 +40,7 @@ void OpenCLManager::ReadPrograms(std::string kernelFileName)
    }
    catch (Error &e)
    {
-      std::string buildLog =
-          program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(processingDevice);
+      std::string buildLog = program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(processingDevice);
       throw std::string("Build error:" + buildLog + e.what());
    }
 }
@@ -54,24 +49,22 @@ void OpenCLManager::CreateContext(int platformId)
 {
 
    cl_context_properties context_properties[3] = {
-       CL_CONTEXT_PLATFORM, (cl_context_properties)(platforms[platformId])(),
-       0};
+       CL_CONTEXT_PLATFORM, (cl_context_properties)(platforms[platformId])(), 0};
    cl_device_type deviceType;
    processingDevice.getInfo((cl_device_info)CL_DEVICE_TYPE, &deviceType);
    context = Context(deviceType, context_properties);
 }
 
-void OpenCLManager::ChooseDevice(const unsigned int platformId,
-                                 const unsigned int DeviceId)
+void OpenCLManager::ChooseDevice(const unsigned int platformId, const unsigned int DeviceId)
 {
    std::vector<Device> devices;
    platforms[platformId].getDevices(CL_DEVICE_TYPE_ALL, &devices);
    processingDevice = devices[DeviceId];
 }
 
-std::vector<std::tuple<int, int, std::string> > OpenCLManager::ListPlatforms()
+std::vector<std::tuple<int, int, std::string>> OpenCLManager::ListPlatforms()
 {
-   std::vector<std::tuple<int, int, std::string> > devicesInfo;
+   std::vector<std::tuple<int, int, std::string>> devicesInfo;
    for (unsigned int id = 0; id < platforms.size(); id++)
    {
       std::string name, version;
@@ -84,8 +77,7 @@ std::vector<std::tuple<int, int, std::string> > OpenCLManager::ListPlatforms()
       {
          devices[DeviceId].getInfo((cl_device_info)CL_DEVICE_TYPE, &deviceType);
          std::string deviceT = "";
-         devicesInfo.push_back(
-             make_tuple(id, DeviceId, deviceT + "-" + name + "," + version));
+         devicesInfo.push_back(make_tuple(id, DeviceId, deviceT + "-" + name + "," + version));
       }
    }
    return devicesInfo;

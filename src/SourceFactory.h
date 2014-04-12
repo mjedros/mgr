@@ -10,8 +10,8 @@ enum SourceType
 class SourceFactory
 {
  public:
-   static std::unique_ptr<IImageSource>
-   GetImageSource(SourceType sourceType, const std::string &fileName = "")
+   static std::unique_ptr<IImageSource> GetImageSource(SourceType sourceType,
+                                                       const std::string &fileName = "")
    {
       switch (sourceType)
       {

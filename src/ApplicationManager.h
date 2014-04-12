@@ -7,11 +7,12 @@
 
 class ApplicationManager
 {
-private:
-    OpenCLManager * openCLManager;
-public:
-    ApplicationManager(OpenCLManager *openCLManager);
-    void DoSth();
+ private:
+   OpenCLManager *openCLManager;
+
+ public:
+   ApplicationManager(OpenCLManager *openCLManager);
+   void DoSth();
 };
 
 #endif // APPLICATIONMANAGER_H

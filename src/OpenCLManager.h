@@ -20,11 +20,10 @@ class OpenCLManager
    cl::Context context;
    cl::CommandQueue queue;
    cl::Program program;
-   void Configure(const std::string kernelFileName,
-                  const unsigned int platformId, const unsigned int deviceId);
-   std::vector<std::tuple<int, int, std::string> > ListPlatforms();
-   void ChooseDevice(const unsigned int platformId,
-                     const unsigned int DeviceId);
+   void Configure(const std::string kernelFileName, const unsigned int platformId,
+                  const unsigned int deviceId);
+   std::vector<std::tuple<int, int, std::string>> ListPlatforms();
+   void ChooseDevice(const unsigned int platformId, const unsigned int DeviceId);
    OpenCLManager();
 
    virtual ~OpenCLManager();

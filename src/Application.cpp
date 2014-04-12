@@ -21,7 +21,7 @@ int main(/*int argc, char *argv[]*/)
 {
    try
    {
-      OpenCLManager * openCLManager = new OpenCLManager();
+      OpenCLManager *openCLManager = new OpenCLManager();
       openCLManager->Configure("../Kernels/Kernels.cl", 0, 0);
 
       ApplicationManager appman(openCLManager);
@@ -29,7 +29,6 @@ int main(/*int argc, char *argv[]*/)
       delete openCLManager;
    }
 
-   catch (Error &e)
-   { std::cout << e.what() << " error, number= " << e.err() << std::endl; }
+   catch (Error &e) { std::cout << e.what() << " error, number= " << e.err() << std::endl; }
 }
 #endif
