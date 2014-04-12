@@ -21,9 +21,12 @@ int main(/*int argc, char *argv[]*/)
 {
    try
    {
-      OpenCLManager::GetInstance().Configure("../Kernels/Kernels.cl", 0, 0);
-      ApplicationManager appman;
+      OpenCLManager * openCLManager = new OpenCLManager();
+      openCLManager->Configure("../Kernels/Kernels.cl", 0, 0);
+
+      ApplicationManager appman(openCLManager);
       appman.DoSth();
+      delete openCLManager;
    }
 
    catch (Error &e)

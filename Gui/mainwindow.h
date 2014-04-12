@@ -26,6 +26,7 @@ private:
    std::pair<int, int> ChosenDevice;
    std::vector<std::tuple<int, int, std::string> > ListPlatforms;
    Ui::MainWindow *ui;
+   OpenCLManager * openCLManager;
 };
 
 #endif // MAINWINDOW_H

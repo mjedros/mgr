@@ -5,12 +5,15 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
-
+openCLManager = new OpenCLManager();
    ui->setupUi(this);
    setPlatformsList();
 }
 
-MainWindow::~MainWindow() { delete ui; }
+MainWindow::~MainWindow() {
+    delete ui;
+    delete openCLManager;
+}
 
 void
 MainWindow::on_ChoosePlatform_currentIndexChanged(const QString &description)
@@ -23,7 +26,7 @@ MainWindow::on_ChoosePlatform_currentIndexChanged(const QString &description)
 
 void MainWindow::setPlatformsList()
 {
-   ListPlatforms = OpenCLManager::GetInstance().ListPlatforms();
+   ListPlatforms = openCLManager->ListPlatforms();
    std::for_each(ListPlatforms.begin(), ListPlatforms.end(),
                  [this](std::tuple<int, int, std::string> &platform)
    {
@@ -34,8 +37,9 @@ void MainWindow::setPlatformsList()
 
 void MainWindow::on_pushButton_clicked()
 {
-    OpenCLManager::GetInstance().Configure("../Kernels/Kernels.cl", ChosenDevice.first, ChosenDevice.second);
-    ApplicationManager appManager;
+
+    openCLManager->Configure("../Kernels/Kernels.cl", ChosenDevice.first, ChosenDevice.second);
+    ApplicationManager appManager(openCLManager);
     ui->pushButton->hide();
     appManager.DoSth();
 }
