@@ -5,6 +5,8 @@ script:
  - qmake -qt=qt5 -v
  - qmake -qt=qt5
  - make
+ - cd ../Tests/ProcessingImages
+ - qmake -qt=qt5 && make && ./tst_processingimagestest
 branches:
   only:
     - master
