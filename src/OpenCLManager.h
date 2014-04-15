@@ -1,5 +1,11 @@
 #ifndef OPENCLMANAGER_H_
 #define OPENCLMANAGER_H_
+#define LOGGING_ON
+#ifdef LOGGING_ON
+#define LOG(x) std::cout<<x<<std::endl;
+#else
+#define LOG(x) ;
+#endif
 
 #define __CL_ENABLE_EXCEPTIONS
 #include <CL/cl.hpp>
@@ -13,15 +19,15 @@ class OpenCLManager
    cl::Buffer outBuffer;
    std::vector<cl::Platform> platforms;
 
-   void CreateContext(int platformId);
+   void CreateContext(const unsigned int platformId);
    void ReadPrograms(std::string kernelFileName);
 
  public:
    cl::Context context;
    cl::CommandQueue queue;
    cl::Program program;
-   void Configure(const std::string kernelFileName, const unsigned int platformId,
-                  const unsigned int deviceId);
+   void Configure(const std::string kernelFileName,
+                  const std::pair<unsigned int, unsigned int> ChosenDevice);
    std::vector<std::tuple<int, int, std::string>> ListPlatforms();
    void ChooseDevice(const unsigned int platformId, const unsigned int DeviceId);
    OpenCLManager();

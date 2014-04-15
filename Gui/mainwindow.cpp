@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow()
 {
    delete ui;
+   openCLManager.reset();
 }
 
 void MainWindow::on_ChoosePlatform_currentIndexChanged(const QString &description)
@@ -32,9 +33,10 @@ void MainWindow::setPlatformsList()
 
 void MainWindow::on_pushButton_clicked()
 {
+      openCLManager->Configure("../Kernels/K2ernels.cl", ChosenDevice);
+      ApplicationManager appManager(openCLManager);
+      ui->pushButton->hide();
+      appManager.DoSth();
 
-   openCLManager->Configure("../Kernels/Kernels.cl", ChosenDevice.first, ChosenDevice.second);
-   ApplicationManager appManager(openCLManager);
-   ui->pushButton->hide();
-   appManager.DoSth();
+   ui->pushButton->show();
 }

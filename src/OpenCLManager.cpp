@@ -7,19 +7,19 @@ using namespace cl;
 
 OpenCLManager::OpenCLManager() { Platform::get(&platforms); }
 
-OpenCLManager::~OpenCLManager() { std::cout << "OpenCLManager destructor" << std::endl; }
+OpenCLManager::~OpenCLManager() { LOG("OpenCLManager destructor"); }
 
-void OpenCLManager::Configure(const std::string kernelFileName, const unsigned int platformId,
-                              const unsigned int deviceId)
+void OpenCLManager::Configure(const std::string kernelFileName,
+                              const std::pair<unsigned int, unsigned int> ChosenDevice)
 {
    try
    {
-      ChooseDevice(platformId, deviceId);
-      CreateContext(platformId);
+      ChooseDevice(ChosenDevice.first, ChosenDevice.second);
+      CreateContext(ChosenDevice.first);
       ReadPrograms(kernelFileName);
       queue = CommandQueue(context, processingDevice);
    }
-   catch (std::string &e) { cout << "Configure error: " << e << endl; }
+   catch (std::string &e) { throw std::string("Configure error: " + e ); }
 }
 
 void OpenCLManager::ReadPrograms(std::string kernelFileName)
@@ -45,7 +45,7 @@ void OpenCLManager::ReadPrograms(std::string kernelFileName)
    }
 }
 
-void OpenCLManager::CreateContext(int platformId)
+void OpenCLManager::CreateContext(const unsigned int platformId)
 {
 
    cl_context_properties context_properties[3] = {
@@ -62,9 +62,9 @@ void OpenCLManager::ChooseDevice(const unsigned int platformId, const unsigned i
    processingDevice = devices[DeviceId];
 }
 
-std::vector<std::tuple<int, int, std::string>> OpenCLManager::ListPlatforms()
+std::vector<tuple<int, int, std::string>> OpenCLManager::ListPlatforms()
 {
-   std::vector<std::tuple<int, int, std::string>> devicesInfo;
+   std::vector<tuple<int, int, std::string>> devicesInfo;
    for (unsigned int id = 0; id < platforms.size(); id++)
    {
       std::string name, version;

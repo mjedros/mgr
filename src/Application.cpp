@@ -13,9 +13,16 @@ using namespace cl;
 int main(int argc, char *argv[])
 {
    QApplication a(argc, argv);
-   MainWindow w;
-   w.show();
-   return a.exec();
+   try
+   {
+      MainWindow w;
+      w.show();
+      return a.exec();
+   }
+   catch (std::string &e) { LOG(" error, number= " + e); }
+   catch (cl::Error &e) { LOG(" error, number= " + e.err()); }
+   std::terminate();
+
 }
 #else
 int main(/*int argc, char *argv[]*/)
@@ -23,12 +30,12 @@ int main(/*int argc, char *argv[]*/)
    try
    {
       std::shared_ptr<OpenCLManager> openCLManager(new OpenCLManager);
-      openCLManager->Configure("../Kernels/Kernels.cl", 0, 0);
+      openCLManager->Configure("../Kernels/Kernels2.cl", std::make_pair(0, 0));
 
       ApplicationManager appman(openCLManager);
       appman.DoSth();
    }
-
-   catch (Error &e) { std::cout << e.what() << " error, number= " << e.err() << std::endl; }
+   catch (std::string &e) { LOG(" error, number= " + e); }
+   catch (cl::Error &e) { LOG(" error, number= " + e.err()); }
 }
 #endif

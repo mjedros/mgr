@@ -16,7 +16,7 @@ void ProcessingImage::SetImageToProcess(cv::Mat img)
    region[0] = image.cols;
    region[1] = image.rows;
    region[2] = 1;
-   localRange = {32, 16};
+   localRange = {2,2};
 }
 
 void ProcessingImage::Dilate()
@@ -50,6 +50,7 @@ void ProcessingImage::Erode()
 void ProcessingImage::Threshold(const float threshold)
 {
    cl::Kernel kernel = cl::Kernel(openCLManager->program, "threshold");
+
    cl::ImageFormat format(CL_LUMINANCE, CL_UNORM_INT8);
    cl::Image2D image_in(openCLManager->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
                         image.cols, image.rows, 0, image.data);
@@ -58,6 +59,7 @@ void ProcessingImage::Threshold(const float threshold)
    kernel.setArg(1, image_out);
    kernel.setArg(2, threshold);
    Process(kernel, image_out);
+
 }
 
 void ProcessingImage::Process(cl::Kernel &kernel, cl::Image2D &image_out)
