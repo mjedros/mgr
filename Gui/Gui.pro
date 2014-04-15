@@ -34,7 +34,6 @@ QMAKE_CXXFLAGS += -std=c++0x
 
 unix {
     QMAKE_CXXFLAGS += -Werror
-    QMAKE_CXX = clang++
 }
 win32:QMAKE_CXXFLAGS += -fpermissive
 
