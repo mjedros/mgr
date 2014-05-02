@@ -19,7 +19,7 @@ void OpenCLManager::Configure(const std::string kernelFileName,
       ReadPrograms(kernelFileName);
       queue = CommandQueue(context, processingDevice);
    }
-   catch (std::string &e) { throw std::string("Configure error: " + e ); }
+   catch (std::string &e) { throw std::string("Configure error: " + e); }
 }
 
 void OpenCLManager::ReadPrograms(std::string kernelFileName)

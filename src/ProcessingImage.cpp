@@ -16,35 +16,66 @@ void ProcessingImage::SetImageToProcess(cv::Mat img)
    region[0] = image.cols;
    region[1] = image.rows;
    region[2] = 1;
-   localRange = {2,2};
+   localRange = {16, 16};
 }
 
 void ProcessingImage::Dilate()
 {
-   cl::Kernel kernel = cl::Kernel(openCLManager->program, "Dilate");
+   cl::Kernel kernel = cl::Kernel(openCLManager->program, "DilateRect");
    cl::ImageFormat format(CL_LUMINANCE, CL_UNORM_INT8);
    cl::Image2D image_in(openCLManager->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
                         image.cols, image.rows, 0, image.data);
    cl::Image2D image_out(openCLManager->context, CL_MEM_WRITE_ONLY, format, image.cols, image.rows);
-   cl_float3 ellipseparams = (cl_float3) {{0.3, 1.5, 2}};
+   cl_int2 rectParams = (cl_int2) {{1, 1}};
    kernel.setArg(0, image_in);
    kernel.setArg(1, image_out);
-   kernel.setArg(2, ellipseparams);
+   kernel.setArg(2, rectParams);
    Process(kernel, image_out);
 }
 
 void ProcessingImage::Erode()
 {
-   cl::Kernel kernel = cl::Kernel(openCLManager->program, "Erode");
+
+   cl::Kernel kernel = cl::Kernel(openCLManager->program, "ErodeRect");
    cl::ImageFormat format(CL_LUMINANCE, CL_UNORM_INT8);
    cl::Image2D image_in(openCLManager->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
                         image.cols, image.rows, 0, image.data);
    cl::Image2D image_out(openCLManager->context, CL_MEM_WRITE_ONLY, format, image.cols, image.rows);
-   cl_float3 ellipseparams = (cl_float3) {{0, 2, 2}};
+   cl_int2 rectParams = (cl_int2) {{1, 1}};
+
    kernel.setArg(0, image_in);
    kernel.setArg(1, image_out);
-   kernel.setArg(2, ellipseparams);
+   kernel.setArg(2, rectParams);
    Process(kernel, image_out);
+}
+
+void ProcessingImage::Contour()
+{
+   Erode();
+   cv::Mat temp = image.clone();
+   Dilate();
+   image -= temp;
+}
+
+void ProcessingImage::Skeletonize()
+{
+   cv::Mat skel(image.size(), CV_8U, cv::Scalar(0));
+   cv::Mat eroded;
+   cv::Mat img;
+   bool done;
+   do
+   {
+      image.copyTo(img);
+      Erode();
+      eroded = image.clone();
+      Dilate();
+      img -= image;
+      done = (cv::countNonZero(image) < 100);
+      cv::bitwise_or(skel, img, skel);
+
+      image = eroded;
+   } while (!done);
+   image = skel;
 }
 
 void ProcessingImage::Threshold(const float threshold)
@@ -59,7 +90,6 @@ void ProcessingImage::Threshold(const float threshold)
    kernel.setArg(1, image_out);
    kernel.setArg(2, threshold);
    Process(kernel, image_out);
-
 }
 
 void ProcessingImage::Process(cl::Kernel &kernel, cl::Image2D &image_out)

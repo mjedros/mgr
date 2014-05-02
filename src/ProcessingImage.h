@@ -16,6 +16,8 @@ class ProcessingImage
    void Threshold(const float threshold = 0.5);
    void Dilate();
    void Erode();
+   void Contour();
+   void Skeletonize();
    cv::Mat GetImage();
    void SetImageToProcess(cv::Mat img);
    ~ProcessingImage();

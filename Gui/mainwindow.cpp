@@ -33,10 +33,11 @@ void MainWindow::setPlatformsList()
 
 void MainWindow::on_pushButton_clicked()
 {
-      openCLManager->Configure("../Kernels/K2ernels.cl", ChosenDevice);
-      ApplicationManager appManager(openCLManager);
-      ui->pushButton->hide();
-      appManager.DoSth();
+   openCLManager->Configure("../Kernels/Kernels.cl", ChosenDevice);
+   ApplicationManager appManager(openCLManager);
+   ui->pushButton->hide();
+   appManager.DoSth();
 
    ui->pushButton->show();
+   this->close();
 }

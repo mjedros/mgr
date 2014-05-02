@@ -20,9 +20,8 @@ int main(int argc, char *argv[])
       return a.exec();
    }
    catch (std::string &e) { LOG(" error, number= " + e); }
-   catch (cl::Error &e) { LOG(" error, number= " + e.err()); }
+   catch (cl::Error &e) { LOG(" error, number= " + (int)e.err()); }
    std::terminate();
-
 }
 #else
 int main(/*int argc, char *argv[]*/)
@@ -36,6 +35,6 @@ int main(/*int argc, char *argv[]*/)
       appman.DoSth();
    }
    catch (std::string &e) { LOG(" error, number= " + e); }
-   catch (cl::Error &e) { LOG(" error, number= " + e.err()); }
+   catch (cl::Error &e) { LOG(" error, number= " + (int)e.err()); }
 }
 #endif
