@@ -13,6 +13,7 @@ class ProcessingImagesTest : public QObject
    void EmptyImageTest();
    void SimpleImageTest();
    void BinarizeTest();
+   void DilateCrossTest();
 };
 
 ProcessingImagesTest::ProcessingImagesTest() : openCLManager(new OpenCLManager) {}
@@ -39,13 +40,31 @@ void ProcessingImagesTest::SimpleImageTest()
 
 void ProcessingImagesTest::BinarizeTest()
 {
-   openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
-   std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
-   cv::Mat ones = cv::Mat::ones(10, 10, 1);
-   img->SetImageToProcess(ones.clone());
-   img->Threshold(1);
-   cv::Mat zeros = cv::Mat::zeros(ones.cols, ones.rows, 1);
-   QCOMPARE(*zeros.data, *(img->GetImage()).data);
+
+}
+
+void ProcessingImagesTest::DilateCrossTest()
+{
+    openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
+    std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
+    cv::Mat image = cv::imread("../../Data/napis.jpg");
+    cv::cvtColor(image, image, CV_BGR2GRAY);
+    img->SetImageToProcess(image.clone());
+    img->Threshold(0.5);
+
+    cv::Mat dilated;
+    cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
+
+    cv::dilate(img->GetImage(), dilated, element);
+    cv::Mat result;
+    img->Dilate();
+    cv::compare(dilated,img->GetImage(),result,cv::CMP_EQ);
+    cv::imwrite("../../Data/wynikOpencv.jpg",dilated);
+    cv::imwrite("../../Data/wynik.jpg",img->GetImage());
+    cv::imwrite("../../Data/minus.jpg",dilated-img->GetImage());
+    int nz = cv::countNonZero(result);
+    std::cout<<image.cols*image.rows<< "  -  "<<nz << " = "<< image.cols*image.rows- nz <<std::endl;
+    QVERIFY(nz == image.cols*image.rows);
 }
 
 QTEST_APPLESS_MAIN(ProcessingImagesTest)

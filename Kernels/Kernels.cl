@@ -79,7 +79,7 @@ __kernel void Dilate(__read_only image2d_t imageIn, __write_only image2d_t image
 }
 
 __kernel void ErodeRect(__read_only image2d_t imageIn, __write_only image2d_t imageOut,
-                          const int2 rectangle)
+                        const int2 rectangle)
 {
    int2 image_coord = (int2) {get_global_id(0), get_global_id(1)};
    for (int i = -rectangle.x; i <= rectangle.x; i++)
@@ -98,7 +98,7 @@ __kernel void ErodeRect(__read_only image2d_t imageIn, __write_only image2d_t im
    write_imagef(imageOut, image_coord, 1);
 }
 __kernel void DilateRect(__read_only image2d_t imageIn, __write_only image2d_t imageOut,
-                           const int2 rectangle)
+                         const int2 rectangle)
 {
    int2 image_coord = (int2) {get_global_id(0), get_global_id(1)};
    for (int i = -rectangle.x; i <= rectangle.x; i++)
@@ -115,4 +115,52 @@ __kernel void DilateRect(__read_only image2d_t imageIn, __write_only image2d_t i
       }
    }
    write_imagef(imageOut, image_coord, 0);
+}
+
+__kernel void ErodeCross(__read_only image2d_t imageIn, __write_only image2d_t imageOut,
+                         const int2 rectangle)
+{
+   int2 image_coord = (int2) {get_global_id(0), get_global_id(1)};
+   write_imagef(imageOut, image_coord, 1);
+   for (int i = -rectangle.x; i <= rectangle.x; i++)
+   {
+      int hor = 0;
+      if (i == 0)
+      {
+         hor = rectangle.y;
+      }
+
+      for (int j = -hor; j <= hor; j++)
+      {
+         if (read_imagef(imageIn, sampler, image_coord + (int2) {i, j}).x == 0)
+         {
+            write_imagef(imageOut, image_coord, 0);
+            return;
+         }
+      }
+   }
+}
+
+__kernel void DilateCross(__read_only image2d_t imageIn, __write_only image2d_t imageOut,
+                          const int2 rectangle)
+{
+   int2 image_coord = (int2) {get_global_id(0), get_global_id(1)};
+   write_imagef(imageOut, image_coord, 0);
+   for (int i = -rectangle.x; i <= rectangle.x; i++)
+   {
+      int hor = 0;
+      if (i == 0)
+      {
+         hor = rectangle.y;
+      }
+
+      for (int j = -hor; j <= hor; j++)
+      {
+         if (read_imagef(imageIn, sampler, image_coord + (int2) {i, j}).x == 1)
+         {
+            write_imagef(imageOut, image_coord, 1);
+            return;
+         }
+      }
+   }
 }
