@@ -21,31 +21,28 @@ void ProcessingImage::SetImageToProcess(cv::Mat img)
 
 void ProcessingImage::Dilate()
 {
-   cl::Kernel kernel = cl::Kernel(openCLManager->program, "DilateRect");
+   cl::Kernel kernel = cl::Kernel(openCLManager->program, "DilateCross");
    cl::ImageFormat format(CL_LUMINANCE, CL_UNORM_INT8);
    cl::Image2D image_in(openCLManager->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
                         image.cols, image.rows, 0, image.data);
    cl::Image2D image_out(openCLManager->context, CL_MEM_WRITE_ONLY, format, image.cols, image.rows);
-   cl_int2 rectParams = (cl_int2) {{1, 1}};
    kernel.setArg(0, image_in);
    kernel.setArg(1, image_out);
-   kernel.setArg(2, rectParams);
+   SetStructuralElementArgument(kernel,structuralElementType,structuralElementParams);
    Process(kernel, image_out);
 }
 
 void ProcessingImage::Erode()
 {
 
-   cl::Kernel kernel = cl::Kernel(openCLManager->program, "ErodeRect");
+   cl::Kernel kernel = cl::Kernel(openCLManager->program, "ErodeCross");
    cl::ImageFormat format(CL_LUMINANCE, CL_UNORM_INT8);
    cl::Image2D image_in(openCLManager->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
                         image.cols, image.rows, 0, image.data);
    cl::Image2D image_out(openCLManager->context, CL_MEM_WRITE_ONLY, format, image.cols, image.rows);
-   cl_int2 rectParams = (cl_int2) {{1, 1}};
-
    kernel.setArg(0, image_in);
    kernel.setArg(1, image_out);
-   kernel.setArg(2, rectParams);
+   SetStructuralElementArgument(kernel,structuralElementType,structuralElementParams);
    Process(kernel, image_out);
 }
 
@@ -76,6 +73,26 @@ void ProcessingImage::Skeletonize()
       image = eroded;
    } while (!done);
    image = skel;
+}
+
+void ProcessingImage::SetStructuralElement(StructuralElement element, std::vector<float> params)
+{
+    structuralElementType = element;
+    structuralElementParams = params;
+}
+
+void ProcessingImage::SetStructuralElementArgument(cl::Kernel &kernel, StructuralElement element, std::vector<float> params)
+{
+    switch(element)
+    {
+    case cross:
+    {
+        cl_int2 rectParams = (cl_int2) {{(int)params[0], (int)params[1]}};
+        kernel.setArg(2, rectParams);
+    }
+   default:
+     break;
+    }
 }
 
 void ProcessingImage::Threshold(const float threshold)

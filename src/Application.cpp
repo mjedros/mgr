@@ -1,4 +1,4 @@
-//#define QT_NOT_DEFINED
+#define QT_NOT_DEFINED
 #ifndef QT_NOT_DEFINED
 #include "../Gui/mainwindow.h"
 #include <QApplication>
@@ -29,7 +29,7 @@ int main(/*int argc, char *argv[]*/)
    try
    {
       std::shared_ptr<OpenCLManager> openCLManager(new OpenCLManager);
-      openCLManager->Configure("../Kernels/Kernels2.cl", std::make_pair(0, 0));
+      openCLManager->Configure("../Kernels/Kernels.cl", std::make_pair(0, 0));
 
       ApplicationManager appman(openCLManager);
       appman.DoSth();

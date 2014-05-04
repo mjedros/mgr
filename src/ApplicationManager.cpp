@@ -11,13 +11,14 @@ void ApplicationManager::DoSth()
 
    std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
    std::unique_ptr<IImageSource> imageSource =
-       SourceFactory::GetImageSource(VideoFile, "../Data/napis.jpg");
+       SourceFactory::GetImageSource(VideoFile, "../Data/768x576.avi");
    imageSource->Start();
    for (Mat im = imageSource->Get(); !im.empty(); im = imageSource->Get())
    {
       Mat imageIn;
 
       cvtColor(im, imageIn, CV_BGR2GRAY);
+      img->SetStructuralElement(cross,{1,1});
       img->SetImageToProcess(imageIn.clone());
       img->Threshold(0.35);
       // img->Dilate();
@@ -29,8 +30,8 @@ void ApplicationManager::DoSth()
       img->Contour();
       imshow("Contour", img->GetImage());
       imshow("normal", im);
-      cv::waitKey(0);
-      // if (key != -1)
-      // break;
+      int key = cv::waitKey(1);
+      if (key != -1)
+       break;
    }
 }
