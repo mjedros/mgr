@@ -1,5 +1,8 @@
 #include "ProcessingImage.h"
+using namespace CLProcessingImage;
 using namespace cv;
+std::map<StructuralElement, std::string> StrElementMap = {
+    {ELLIPSE, "Ellipse"}, {CROSS, "Cross"}, {RECTANGLE, "Rectangle"}};
 ProcessingImage::ProcessingImage(const std::shared_ptr<OpenCLManager> &openCLManagerPtr)
     : openCLManager(openCLManagerPtr)
 {
@@ -16,33 +19,34 @@ void ProcessingImage::SetImageToProcess(cv::Mat img)
    region[0] = image.cols;
    region[1] = image.rows;
    region[2] = 1;
-   localRange = {16, 16};
+   localRange = {4, 4};
 }
 
 void ProcessingImage::Dilate()
 {
-   cl::Kernel kernel = cl::Kernel(openCLManager->program, "DilateCross");
+   std::string kernelName = "Dilate" + StrElementMap[structuralElementType];
+   cl::Kernel kernel = cl::Kernel(openCLManager->program, kernelName.c_str());
    cl::ImageFormat format(CL_LUMINANCE, CL_UNORM_INT8);
    cl::Image2D image_in(openCLManager->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
                         image.cols, image.rows, 0, image.data);
    cl::Image2D image_out(openCLManager->context, CL_MEM_WRITE_ONLY, format, image.cols, image.rows);
    kernel.setArg(0, image_in);
    kernel.setArg(1, image_out);
-   SetStructuralElementArgument(kernel,structuralElementType,structuralElementParams);
+   SetStructuralElementArgument(kernel);
    Process(kernel, image_out);
 }
 
 void ProcessingImage::Erode()
 {
-
-   cl::Kernel kernel = cl::Kernel(openCLManager->program, "ErodeCross");
+   std::string kernelName = "Erode" + StrElementMap[structuralElementType];
+   cl::Kernel kernel = cl::Kernel(openCLManager->program, kernelName.c_str());
    cl::ImageFormat format(CL_LUMINANCE, CL_UNORM_INT8);
    cl::Image2D image_in(openCLManager->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
                         image.cols, image.rows, 0, image.data);
    cl::Image2D image_out(openCLManager->context, CL_MEM_WRITE_ONLY, format, image.cols, image.rows);
    kernel.setArg(0, image_in);
    kernel.setArg(1, image_out);
-   SetStructuralElementArgument(kernel,structuralElementType,structuralElementParams);
+   SetStructuralElementArgument(kernel);
    Process(kernel, image_out);
 }
 
@@ -67,9 +71,8 @@ void ProcessingImage::Skeletonize()
       eroded = image.clone();
       Dilate();
       img -= image;
-      done = (cv::countNonZero(image) < 100);
+      done = (cv::countNonZero(image) == 0);
       cv::bitwise_or(skel, img, skel);
-
       image = eroded;
    } while (!done);
    image = skel;
@@ -77,22 +80,36 @@ void ProcessingImage::Skeletonize()
 
 void ProcessingImage::SetStructuralElement(StructuralElement element, std::vector<float> params)
 {
-    structuralElementType = element;
-    structuralElementParams = params;
+   structuralElementType = element;
+   structuralElementParams = params;
 }
 
-void ProcessingImage::SetStructuralElementArgument(cl::Kernel &kernel, StructuralElement element, std::vector<float> params)
+void ProcessingImage::SetStructuralElementArgument(cl::Kernel &kernel)
 {
-    switch(element)
-    {
-    case cross:
-    {
-        cl_int2 rectParams = (cl_int2) {{(int)params[0], (int)params[1]}};
-        kernel.setArg(2, rectParams);
-    }
+   switch (structuralElementType)
+   {
+   case ELLIPSE:
+   {
+      cl_float3 ellipseParams = (cl_float3) {{structuralElementParams[0], structuralElementParams[1], structuralElementParams[2]}};
+      kernel.setArg(2, ellipseParams);
+      break;
+   }
+   case RECTANGLE:
+   {
+      cl_int2 rectParams = (cl_int2) {{(int)structuralElementParams[0], (int)structuralElementParams[1]}};
+      kernel.setArg(2, rectParams);
+      break;
+   }
+   case CROSS:
+   {
+      cl_int2 rectParams = (cl_int2) {{(int)structuralElementParams[0], (int)structuralElementParams[1]}};
+      kernel.setArg(2, rectParams);
+      break;
+   }
+
    default:
-     break;
-    }
+      break;
+   }
 }
 
 void ProcessingImage::Threshold(const float threshold)

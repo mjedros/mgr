@@ -5,7 +5,6 @@
 #endif
 #include <iostream>
 #include "OpenCLManager.h"
-
 #include "ApplicationManager.h"
 using namespace cl;
 
@@ -28,8 +27,24 @@ int main(/*int argc, char *argv[]*/)
 {
    try
    {
+
       std::shared_ptr<OpenCLManager> openCLManager(new OpenCLManager);
-      openCLManager->Configure("../Kernels/Kernels.cl", std::make_pair(0, 0));
+      std::vector<std::tuple<int, int, std::string>> ListPlatforms = openCLManager->ListPlatforms();
+      {
+         std::vector<std::string> ChoosePlatform;
+         std::for_each(
+             ListPlatforms.begin(), ListPlatforms.end(),
+             [&](decltype(*ListPlatforms.begin()) &platform)
+             { std::cout << std::get<1>(platform) << (std::get<2>(platform)) << std::endl; });
+
+         for (auto &allplatforms : ChoosePlatform)
+         {
+            std::cout << allplatforms << std::endl;
+         }
+      }
+      int a;
+      std::cin >> a;
+      openCLManager->Configure("../Kernels/Kernels.cl", std::make_pair(a, a));
 
       ApplicationManager appman(openCLManager);
       appman.DoSth();

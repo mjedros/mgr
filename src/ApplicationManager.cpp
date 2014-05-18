@@ -1,6 +1,7 @@
 #include "ApplicationManager.h"
 #include <opencv2/opencv.hpp>
 using namespace cv;
+using namespace CLProcessingImage;
 ApplicationManager::ApplicationManager(const std::shared_ptr<OpenCLManager> &openCLManagerPtr)
     : openCLManager(openCLManagerPtr)
 {
@@ -18,18 +19,19 @@ void ApplicationManager::DoSth()
       Mat imageIn;
 
       cvtColor(im, imageIn, CV_BGR2GRAY);
-      img->SetStructuralElement(cross,{1,1});
+      img->SetStructuralElement(CLProcessingImage::RECTANGLE,{2,2});
       img->SetImageToProcess(imageIn.clone());
       img->Threshold(0.35);
-      // img->Dilate();
-      //  img->Erode();
+      img->Dilate();
+      img->Erode();
+      img->SetStructuralElement(CLProcessingImage::CROSS,{1,1});
       img->Skeletonize();
       imshow("Processed", img->GetImage());
       img->SetImageToProcess(imageIn);
       img->Threshold(0.35);
       img->Contour();
       imshow("Contour", img->GetImage());
-      imshow("normal", im);
+      //imshow("normal", im);
       int key = cv::waitKey(1);
       if (key != -1)
        break;

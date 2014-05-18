@@ -3,12 +3,12 @@
 #include <opencv2/opencv.hpp>
 #include "OpenCLManager.h"
 
-enum StructuralElement
+namespace CLProcessingImage
 {
-    elipse,
-    cross,
-    rectangle
-};
+enum StructuralElement
+{ ELLIPSE,
+  CROSS,
+  RECTANGLE };
 
 class ProcessingImage
 {
@@ -21,7 +21,7 @@ class ProcessingImage
    const std::shared_ptr<OpenCLManager> openCLManager;
    StructuralElement structuralElementType;
    std::vector<float> structuralElementParams;
-   void SetStructuralElementArgument(cl::Kernel &kernel, StructuralElement element,std::vector<float> params);
+   void SetStructuralElementArgument(cl::Kernel &kernel);
 
  public:
    void Threshold(const float threshold = 0.5);
@@ -38,3 +38,4 @@ class ProcessingImage
 };
 
 #endif // IMAGE_H
+}

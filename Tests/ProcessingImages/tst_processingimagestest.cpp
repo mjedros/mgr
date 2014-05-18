@@ -2,11 +2,13 @@
 #include <QtTest>
 #include "../../src/ProcessingImage.h"
 #include "../../src/OpenCLManager.h"
+using namespace CLProcessingImage;
 class ProcessingImagesTest : public QObject
 {
    Q_OBJECT
    std::shared_ptr<OpenCLManager> openCLManager;
-   void CheckImagesEqual(cv::Mat one,cv::Mat two);
+   void CheckImagesEqual(cv::Mat one, cv::Mat two);
+
  public:
    ProcessingImagesTest();
  private Q_SLOTS:
@@ -15,14 +17,16 @@ class ProcessingImagesTest : public QObject
    void BinarizeTest();
    void DilateCrossTest();
    void ErodeCrossTest();
+   void DilateRectangleTest();
+   void ErodeRectangleTest();
 };
 
 void ProcessingImagesTest::CheckImagesEqual(cv::Mat one, cv::Mat two)
 {
-    cv::Mat result;
-    cv::compare(one,two,result,cv::CMP_EQ);
-    int nz = cv::countNonZero(result);
-    QVERIFY(nz == one.cols*one.rows);
+   cv::Mat result;
+   cv::compare(one, two, result, cv::CMP_EQ);
+   int nz = cv::countNonZero(result);
+   QVERIFY(nz == one.cols * one.rows);
 }
 
 ProcessingImagesTest::ProcessingImagesTest() : openCLManager(new OpenCLManager) {}
@@ -37,7 +41,6 @@ void ProcessingImagesTest::EmptyImageTest()
 
 void ProcessingImagesTest::SimpleImageTest()
 {
-
    std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
    cv::Mat eye = cv::Mat::eye({10, 10}, 2);
    img->SetImageToProcess(eye.clone());
@@ -49,47 +52,79 @@ void ProcessingImagesTest::SimpleImageTest()
 
 void ProcessingImagesTest::BinarizeTest()
 {
-    openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
-    std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
-    cv::Mat image = cv::imread("../../Data/napis.jpg");
-    cv::cvtColor(image, image, CV_BGR2GRAY);
-    img->SetImageToProcess(image.clone());
-    img->Threshold(0.5);
-    cv::Mat thresholded;
-    cv::threshold(image,thresholded,127,255,cv::THRESH_BINARY_INV);
-    CheckImagesEqual(thresholded,img->GetImage());
+   openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
+   std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
+   cv::Mat image = cv::imread("../../Data/napis.jpg");
+   cv::cvtColor(image, image, CV_BGR2GRAY);
+   img->SetImageToProcess(image.clone());
+   img->Threshold(0.5);
+   cv::Mat thresholded;
+   cv::threshold(image, thresholded, 127, 255, cv::THRESH_BINARY_INV);
+   CheckImagesEqual(thresholded, img->GetImage());
 }
 
 void ProcessingImagesTest::DilateCrossTest()
 {
-    openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
-    std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
-    cv::Mat image = cv::imread("../../Data/napis.jpg");
-    cv::cvtColor(image, image, CV_BGR2GRAY);
-    img->SetImageToProcess(image.clone());
-    img->Threshold(0.5);
-    cv::Mat dilated;
-    cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
-    cv::dilate(img->GetImage(), dilated, element);
-    img->SetStructuralElement(cross,{1,1});
-    img->Dilate();
-    CheckImagesEqual(dilated, img->GetImage());
+   openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
+   std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
+   cv::Mat image = cv::imread("../../Data/napis.jpg");
+   cv::cvtColor(image, image, CV_BGR2GRAY);
+   img->SetImageToProcess(image.clone());
+   img->Threshold(0.5);
+   cv::Mat dilated;
+   cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
+   cv::dilate(img->GetImage(), dilated, element);
+   img->SetStructuralElement(CROSS, {1, 1});
+   img->Dilate();
+   CheckImagesEqual(dilated, img->GetImage());
 }
 
 void ProcessingImagesTest::ErodeCrossTest()
 {
-    openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
-    std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
-    cv::Mat image = cv::imread("../../Data/napis.jpg");
-    cv::cvtColor(image, image, CV_BGR2GRAY);
-    img->SetImageToProcess(image.clone());
-    img->Threshold(0.5);
-    cv::Mat eroded;
-    cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
-    cv::erode(img->GetImage(), eroded, element);
-    img->SetStructuralElement(cross,{1,1});
-    img->Erode();
-    CheckImagesEqual(eroded, img->GetImage());
+   openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
+   std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
+   cv::Mat image = cv::imread("../../Data/napis.jpg");
+   cv::cvtColor(image, image, CV_BGR2GRAY);
+   img->SetImageToProcess(image.clone());
+   img->Threshold(0.5);
+   cv::Mat eroded;
+   cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(5, 5));
+   cv::erode(img->GetImage(), eroded, element);
+   img->SetStructuralElement(CROSS, {2, 2});
+   img->Erode();
+   CheckImagesEqual(eroded, img->GetImage());
+}
+
+void ProcessingImagesTest::DilateRectangleTest()
+{
+   openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
+   std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
+   cv::Mat image = cv::imread("../../Data/napis.jpg");
+   cv::cvtColor(image, image, CV_BGR2GRAY);
+   img->SetImageToProcess(image.clone());
+   img->Threshold(0.5);
+   cv::Mat dilated;
+   cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
+   cv::dilate(img->GetImage(), dilated, element);
+   img->SetStructuralElement(RECTANGLE, {2, 2});
+   img->Dilate();
+   CheckImagesEqual(dilated, img->GetImage());
+}
+
+void ProcessingImagesTest::ErodeRectangleTest()
+{
+   openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
+   std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
+   cv::Mat image = cv::imread("../../Data/napis.jpg");
+   cv::cvtColor(image, image, CV_BGR2GRAY);
+   img->SetImageToProcess(image.clone());
+   img->Threshold(0.5);
+   cv::Mat dilated;
+   cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
+   cv::erode(img->GetImage(), dilated, element);
+   img->SetStructuralElement(RECTANGLE, {2, 2});
+   img->Erode();
+   CheckImagesEqual(dilated, img->GetImage());
 }
 
 QTEST_APPLESS_MAIN(ProcessingImagesTest)
