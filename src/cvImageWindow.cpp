@@ -7,20 +7,24 @@
 
 #include <opencv/cv.h>
 
-cvImageWindow::cvImageWindow() : _image(NULL) { setWindowTitle(tr("Processed image")); }
+cvImageWindow::cvImageWindow() : image(NULL)
+{
+   closed = false;
+   setWindowTitle(tr("Processed image"));
+}
 
 cvImageWindow::~cvImageWindow()
 {
-   if (_image)
-      delete _image;
+   if (image)
+      delete image;
 }
 
 void cvImageWindow::paintEvent(QPaintEvent *e)
 {
    QPainter painter(this);
-   if (!_image)
+   if (!image)
       return;
-   painter.drawImage(QPoint(0, 0), *_image);
+   painter.drawImage(QPoint(0, 0), *image);
    QWidget::paintEvent(e);
 }
 
@@ -31,15 +35,12 @@ void cvImageWindow::closeEvent(QCloseEvent *e)
 }
 void cvImageWindow::draw(cv::Mat img)
 {
-   if (_image)
+   if (image)
    {
-      delete _image;
+      delete image;
    }
-   else
-   {
-      resize(img.size().width, img.size().height);
-   }
+   resize(img.size().width, img.size().height);
    cv::cvtColor(img, img, CV_GRAY2RGB);
-   _image = new QImage(img.data, img.cols, img.rows, img.step, QImage::Format_RGB888);
+   image = new QImage(img.data, img.cols, img.rows, img.step, QImage::Format_RGB888);
    update();
 }
