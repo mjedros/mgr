@@ -8,7 +8,7 @@ class ProcessingImagesTest : public QObject
    Q_OBJECT
    std::shared_ptr<OpenCLManager> openCLManager;
    void CheckImagesEqual(cv::Mat one, cv::Mat two);
-
+   cv::Mat SkeletonizeOpenCV(cv::Mat img);
  public:
    ProcessingImagesTest();
  private Q_SLOTS:
@@ -19,6 +19,7 @@ class ProcessingImagesTest : public QObject
    void ErodeCrossTest();
    void DilateRectangleTest();
    void ErodeRectangleTest();
+   void SkeletonizeTest();
 };
 
 void ProcessingImagesTest::CheckImagesEqual(cv::Mat one, cv::Mat two)
@@ -27,6 +28,28 @@ void ProcessingImagesTest::CheckImagesEqual(cv::Mat one, cv::Mat two)
    cv::compare(one, two, result, cv::CMP_EQ);
    int nz = cv::countNonZero(result);
    QVERIFY(nz == one.cols * one.rows);
+}
+
+cv::Mat ProcessingImagesTest::SkeletonizeOpenCV(cv::Mat img)
+{
+    cv::Mat skel(img.size(), CV_8UC1, cv::Scalar(0));
+    cv::Mat temp;
+    cv::Mat eroded;
+
+    cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
+
+    bool done;
+    do
+    {
+      cv::erode(img, eroded, element);
+      cv::dilate(eroded, temp, element);
+      cv::subtract(img, temp, temp);
+      cv::bitwise_or(skel, temp, skel);
+      eroded.copyTo(img);
+
+      done = (cv::countNonZero(img) == 0);
+    } while (!done);
+    return skel;
 }
 
 ProcessingImagesTest::ProcessingImagesTest() : openCLManager(new OpenCLManager) {}
@@ -125,6 +148,20 @@ void ProcessingImagesTest::ErodeRectangleTest()
    img->SetStructuralElement(RECTANGLE, {2, 2});
    img->Erode();
    CheckImagesEqual(dilated, img->GetImage());
+}
+
+void ProcessingImagesTest::SkeletonizeTest()
+{
+    openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
+    std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
+    cv::Mat image = cv::imread("../../Data/napis.jpg");
+    cv::cvtColor(image, image, CV_BGR2GRAY);
+    img->SetImageToProcess(image.clone());
+    img->Threshold(0.5);
+    cv::Mat skeletonized = SkeletonizeOpenCV((img->GetImage()).clone());
+    img->SetStructuralElement(CROSS, {1, 1});
+    img->Skeletonize();
+    CheckImagesEqual(skeletonized, img->GetImage());
 }
 
 QTEST_APPLESS_MAIN(ProcessingImagesTest)
