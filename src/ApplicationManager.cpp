@@ -31,7 +31,6 @@ void ApplicationManager::DoSth()
       img->SetStructuralElement(CROSS, {1, 1});
       img->Skeletonize();
       win.draw(img->GetImage());
-      cv::imshow("",img->GetImage());
       img->Threshold(0.35);
       img->Contour();
 

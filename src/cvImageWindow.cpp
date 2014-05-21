@@ -27,7 +27,7 @@ void cvImageWindow::paintEvent(QPaintEvent *e)
 void cvImageWindow::closeEvent(QCloseEvent *e)
 {
    closed = true;
-  // QWidget::closeEvent(e);
+   QWidget::closeEvent(e);
 }
 void cvImageWindow::draw(cv::Mat img)
 {
