@@ -7,33 +7,44 @@ ApplicationManager::ApplicationManager(const std::shared_ptr<OpenCLManager> &ope
 {
 }
 
+void ApplicationManager::SetFileToProcess(std::string filename)
+{
+    sourceFilename = filename;
+}
+
 void ApplicationManager::DoSth()
 {
+   cvImageWindow win;
+   win.show();
 
    std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
    std::unique_ptr<IImageSource> imageSource =
-       SourceFactory::GetImageSource(VideoFile, "../Data/768x576.avi");
+       SourceFactory::GetImageSource(VideoFile, sourceFilename);
    imageSource->Start();
    for (Mat im = imageSource->Get(); !im.empty(); im = imageSource->Get())
    {
       Mat imageIn;
 
       cvtColor(im, imageIn, CV_BGR2GRAY);
-      img->SetStructuralElement(CLProcessingImage::RECTANGLE,{2,2});
       img->SetImageToProcess(imageIn.clone());
       img->Threshold(0.35);
-      img->Dilate();
-      img->Erode();
-      img->SetStructuralElement(CLProcessingImage::CROSS,{1,1});
+      img->SetStructuralElement(CROSS, {1, 1});
       img->Skeletonize();
-      imshow("Processed", img->GetImage());
-      img->SetImageToProcess(imageIn);
+      win.draw(img->GetImage());
+      cv::imshow("",img->GetImage());
       img->Threshold(0.35);
       img->Contour();
-      imshow("Contour", img->GetImage());
-      //imshow("normal", im);
-      int key = cv::waitKey(1);
-      if (key != -1)
-       break;
+
+      // imshow("s",imageIn);
+      // imshow("normal", im);
+      cv::waitKey(1);
+      if (win.closed)
+      {
+         break;
+      }
+   }
+   while(!win.closed)
+   {
+      cv::waitKey(1);
    }
 }

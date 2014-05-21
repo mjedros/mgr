@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>447</width>
+    <height>220</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,17 +24,27 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="Process">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>180</y>
+      <x>350</x>
+      <y>30</y>
       <width>75</width>
-      <height>23</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>Process</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="ChooseOperation">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>70</y>
+      <width>321</width>
+      <height>31</height>
+     </rect>
     </property>
    </widget>
   </widget>
@@ -43,8 +53,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>400</width>
-     <height>21</height>
+     <width>447</width>
+     <height>20</height>
     </rect>
    </property>
   </widget>

@@ -59,7 +59,6 @@ void ProcessingImage::Skeletonize()
    cv::Mat skel(image.size(), CV_8U, cv::Scalar(0));
    cv::Mat eroded;
    cv::Mat img;
-   bool done;
    do
    {
       image.copyTo(img);
@@ -67,10 +66,10 @@ void ProcessingImage::Skeletonize()
       eroded = image.clone();
       Dilate();
       img -= image;
-      done = (cv::countNonZero(image) == 0);
+
       cv::bitwise_or(skel, img, skel);
       image = eroded;
-   } while (!done);
+   } while (!(cv::countNonZero(eroded) == 0));
    image = skel;
 }
 

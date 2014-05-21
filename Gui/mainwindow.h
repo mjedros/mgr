@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QMenuBar>
 #include "../src/OpenCLManager.h"
 namespace Ui
 {
@@ -20,13 +21,17 @@ class MainWindow : public QMainWindow
 
    void on_ChoosePlatform_currentIndexChanged(const QString &description);
    void setPlatformsList(void);
-   void on_pushButton_clicked();
+   void on_Process_clicked();
+   void openFileToProcess();
 
  private:
    std::pair<int, int> ChosenDevice;
    std::vector<std::tuple<int, int, std::string>> ListPlatforms;
    Ui::MainWindow *ui;
    std::shared_ptr<OpenCLManager> openCLManager;
+   QMenu *menu;
+   QMenuBar menu_bar;
+   QString filename;
 };
 
 #endif // MAINWINDOW_H

@@ -1,10 +1,24 @@
-#ifndef CVIMAGEWINDOW_H
-#define CVIMAGEWINDOW_H
+#pragma once
+#include <QMainWindow>
+#include <QMenu>
+#include <QMenuBar>
+#include <QImage>
+#include <QKeyEvent>
 
-class cvImageWindow
+#include <opencv/highgui.h>
+
+
+class cvImageWindow : public QMainWindow
 {
-public:
-    cvImageWindow();
-};
+    Q_OBJECT
 
-#endif // CVIMAGEWINDOW_H
+public:
+    bool closed = false;
+    cvImageWindow();
+    ~cvImageWindow();
+    void paintEvent(QPaintEvent* e);
+    void closeEvent(QCloseEvent *e);
+void draw(cv::Mat image);
+private:
+    QImage* _image;
+};

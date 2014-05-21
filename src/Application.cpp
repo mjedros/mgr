@@ -1,4 +1,4 @@
-#define QT_NOT_DEFINED
+//#define QT_NOT_DEFINED
 #ifndef QT_NOT_DEFINED
 #include "../Gui/mainwindow.h"
 #include <QApplication>

@@ -4,9 +4,15 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+TEMPLATE = app
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT      += core gui
+
+contains(QT_VERSION, ^5\\.[0-8]\\..*) {
+        message("* Using Qt $${QT_VERSION}.")
+        QT += widgets
+}
+
 
 TARGET = Gui
 TEMPLATE = app
@@ -18,7 +24,8 @@ SOURCES +=\
     ../src/Application.cpp \
     ../src/ProcessingImage.cpp \
     ../src/FileVideo.cpp \
-    ../src/ApplicationManager.cpp
+    ../src/ApplicationManager.cpp \
+    ../src/cvImageWindow.cpp
 
 HEADERS  += mainwindow.h\
         ../src/OpenCLManager.h \
@@ -26,14 +33,15 @@ HEADERS  += mainwindow.h\
     ../src/FileVideo.h \
     ../src/SourceFactory.h \
     ../src/IImageSource.h \
-    ../src/ApplicationManager.h
+    ../src/ApplicationManager.h \
+    ../src/cvImageWindow.h
 
 FORMS    += mainwindow.ui
 CONFIG += c++0x
 QMAKE_CXXFLAGS += -std=c++0x
 
 unix {
-    QMAKE_CXXFLAGS += -Werror
+   # QMAKE_CXXFLAGS += -Werror
 }
 win32:QMAKE_CXXFLAGS += -fpermissive
 
