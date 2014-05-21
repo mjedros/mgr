@@ -7,18 +7,18 @@
 
 #include <opencv/highgui.h>
 
-
 class cvImageWindow : public QMainWindow
 {
-    Q_OBJECT
+   Q_OBJECT
 
-public:
-    bool closed;
-    cvImageWindow();
-    ~cvImageWindow();
-    void paintEvent(QPaintEvent* e);
-    void closeEvent(QCloseEvent *e);
-void draw(cv::Mat image);
-private:
-    QImage* image;
+ public:
+   bool closed;
+   cvImageWindow();
+   ~cvImageWindow();
+   void paintEvent(QPaintEvent *e);
+   void closeEvent(QCloseEvent *e);
+   void draw(cv::Mat image);
+
+ private:
+   QImage *image;
 };

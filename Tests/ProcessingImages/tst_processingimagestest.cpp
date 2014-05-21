@@ -9,6 +9,7 @@ class ProcessingImagesTest : public QObject
    std::shared_ptr<OpenCLManager> openCLManager;
    void CheckImagesEqual(cv::Mat one, cv::Mat two);
    cv::Mat SkeletonizeOpenCV(cv::Mat img);
+
  public:
    ProcessingImagesTest();
  private Q_SLOTS:
@@ -32,15 +33,15 @@ void ProcessingImagesTest::CheckImagesEqual(cv::Mat one, cv::Mat two)
 
 cv::Mat ProcessingImagesTest::SkeletonizeOpenCV(cv::Mat img)
 {
-    cv::Mat skel(img.size(), CV_8UC1, cv::Scalar(0));
-    cv::Mat temp;
-    cv::Mat eroded;
+   cv::Mat skel(img.size(), CV_8UC1, cv::Scalar(0));
+   cv::Mat temp;
+   cv::Mat eroded;
 
-    cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
+   cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
 
-    bool done;
-    do
-    {
+   bool done;
+   do
+   {
       cv::erode(img, eroded, element);
       cv::dilate(eroded, temp, element);
       cv::subtract(img, temp, temp);
@@ -48,8 +49,8 @@ cv::Mat ProcessingImagesTest::SkeletonizeOpenCV(cv::Mat img)
       eroded.copyTo(img);
 
       done = (cv::countNonZero(img) == 0);
-    } while (!done);
-    return skel;
+   } while (!done);
+   return skel;
 }
 
 ProcessingImagesTest::ProcessingImagesTest() : openCLManager(new OpenCLManager) {}
@@ -152,16 +153,16 @@ void ProcessingImagesTest::ErodeRectangleTest()
 
 void ProcessingImagesTest::SkeletonizeTest()
 {
-    openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
-    std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
-    cv::Mat image = cv::imread("../../Data/napis.jpg");
-    cv::cvtColor(image, image, CV_BGR2GRAY);
-    img->SetImageToProcess(image.clone());
-    img->Threshold(0.5);
-    cv::Mat skeletonized = SkeletonizeOpenCV((img->GetImage()).clone());
-    img->SetStructuralElement(CROSS, {1, 1});
-    img->Skeletonize();
-    CheckImagesEqual(skeletonized, img->GetImage());
+   openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
+   std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
+   cv::Mat image = cv::imread("../../Data/napis.jpg");
+   cv::cvtColor(image, image, CV_BGR2GRAY);
+   img->SetImageToProcess(image.clone());
+   img->Threshold(0.5);
+   cv::Mat skeletonized = SkeletonizeOpenCV((img->GetImage()).clone());
+   img->SetStructuralElement(CROSS, {1, 1});
+   img->Skeletonize();
+   CheckImagesEqual(skeletonized, img->GetImage());
 }
 
 QTEST_APPLESS_MAIN(ProcessingImagesTest)

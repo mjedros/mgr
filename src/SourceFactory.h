@@ -3,9 +3,7 @@
 #include "FileVideo.h"
 
 enum SourceType
-{
-   VideoFile
-};
+{ VideoFile };
 
 class SourceFactory
 {

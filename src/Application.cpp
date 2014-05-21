@@ -34,7 +34,7 @@ int main(/*int argc, char *argv[]*/)
          std::vector<std::string> ChoosePlatform;
          std::for_each(
              ListPlatforms.begin(), ListPlatforms.end(),
-             [&](decltype(*ListPlatforms.begin()) &platform)
+             [&](decltype(*ListPlatforms.begin()) & platform)
              { std::cout << std::get<1>(platform) << (std::get<2>(platform)) << std::endl; });
 
          for (auto &allplatforms : ChoosePlatform)

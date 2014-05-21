@@ -7,10 +7,7 @@ ApplicationManager::ApplicationManager(const std::shared_ptr<OpenCLManager> &ope
 {
 }
 
-void ApplicationManager::SetFileToProcess(std::string filename)
-{
-    sourceFilename = filename;
-}
+void ApplicationManager::SetFileToProcess(std::string filename) { sourceFilename = filename; }
 
 void ApplicationManager::DoSth()
 {
@@ -42,7 +39,7 @@ void ApplicationManager::DoSth()
          break;
       }
    }
-   while(!win.closed)
+   while (!win.closed)
    {
       cv::waitKey(1);
    }
