@@ -17,7 +17,7 @@ class ProcessingImage
    cl::size_t<3> origin;
    cl::size_t<3> region;
    cl::NDRange localRange;
-   void Process(cl::Kernel &kernel, cl::Image2D &image_out);
+   void Process(cl::Kernel &kernel, cl::Image2D &image_in, cl::Image2D &image_out);
    const std::shared_ptr<OpenCLManager> openCLManager;
    StructuralElement structuralElementType;
    std::vector<float> structuralElementParams;
