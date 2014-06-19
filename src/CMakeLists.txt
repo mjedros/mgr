@@ -56,7 +56,7 @@ find_library(OPENCV_VIDEO_LIB
 find_package(wxWidgets REQUIRED html adv core base net aui xrc qa richtext )
 include(${wxWidgets_USE_FILE})
 
-target_link_libraries*(Mgr ${wxWidgets_LIBRARIES})
+target_link_libraries (Mgr ${wxWidgets_LIBRARIES})
 target_link_libraries (Mgr ${OPENCV_CALIB3D_LIB})
 target_link_libraries (Mgr ${OPENCV_CORE_LIB})
 target_link_libraries (Mgr ${OPENCV_IMGPROC_LIB})

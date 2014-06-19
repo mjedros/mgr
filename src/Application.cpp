@@ -6,7 +6,17 @@
 #include <iostream>
 #include "OpenCLManager.h"
 #include "ApplicationManager.h"
+#include "GUI/wxImagesProcessing.h"
+#include <wx/wx.h>
 using namespace cl;
+
+class wxWidgetsApp : public wxApp
+{
+public:
+
+    wxWidgetsApp();
+    virtual bool OnInit();
+};
 
 #ifndef QT_NOT_DEFINED
 int main(int argc, char *argv[])
@@ -23,7 +33,8 @@ int main(int argc, char *argv[])
    std::terminate();
 }
 #else
-int main(/*int argc, char *argv[]*/)
+IMPLEMENT_APP(wxWidgetsApp)
+int App(/*int argc, char *argv[]*/)
 {
    try
    {
@@ -52,5 +63,19 @@ int main(/*int argc, char *argv[]*/)
    }
    catch (std::string &e) { LOG(" error, number= " + e); }
    catch (cl::Error &e) { LOG(" error, number= " + (int)e.err()); }
+   return 0;
 }
 #endif
+
+
+wxWidgetsApp::wxWidgetsApp()
+{
+
+}
+
+bool wxWidgetsApp::OnInit()
+{
+    GUI *gui = new GUI((wxWindow*)NULL);
+    gui->Show();
+    return true;
+}
