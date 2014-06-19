@@ -1,9 +1,14 @@
 #include "OpenCLManager.h"
 #include <fstream>
 #include <iostream>
+#include <map>
 
 using namespace std;
 using namespace cl;
+
+std::map <cl_device_type,std::string> DeviceNameToStringMap = {
+    {CL_DEVICE_TYPE_GPU, "GPU"}, {CL_DEVICE_TYPE_CPU, "CPU"}, {CL_DEVICE_TYPE_ACCELERATOR, "Accelerator"}};
+
 
 OpenCLManager::OpenCLManager() { Platform::get(&platforms); }
 
@@ -61,7 +66,6 @@ void OpenCLManager::ChooseDevice(const unsigned int platformId, const unsigned i
    platforms[platformId].getDevices(CL_DEVICE_TYPE_ALL, &devices);
    processingDevice = devices[DeviceId];
 }
-
 std::vector<tuple<int, int, std::string>> OpenCLManager::ListPlatforms()
 {
    std::vector<tuple<int, int, std::string>> devicesInfo;
@@ -76,8 +80,7 @@ std::vector<tuple<int, int, std::string>> OpenCLManager::ListPlatforms()
       for (unsigned int DeviceId = 0; DeviceId < devices.size(); DeviceId++)
       {
          devices[DeviceId].getInfo((cl_device_info)CL_DEVICE_TYPE, &deviceType);
-         std::string deviceT = "";
-         devicesInfo.push_back(make_tuple(id, DeviceId, deviceT + "-" + name + "," + version));
+         devicesInfo.push_back(make_tuple(id, DeviceId, DeviceNameToStringMap[deviceType] + "-" + name + "," + version));
       }
    }
    return devicesInfo;
