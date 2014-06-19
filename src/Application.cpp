@@ -47,6 +47,7 @@ int main(/*int argc, char *argv[]*/)
       openCLManager->Configure("../Kernels/Kernels.cl", std::make_pair(a, a));
 
       ApplicationManager appman(openCLManager);
+      appman.SetFileToProcess("/home/michal/mgr/Data/768x576.avi");
       appman.DoSth();
    }
    catch (std::string &e) { LOG(" error, number= " + e); }

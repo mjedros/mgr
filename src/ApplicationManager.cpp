@@ -11,13 +11,12 @@ void ApplicationManager::SetFileToProcess(std::string filename) { sourceFilename
 
 void ApplicationManager::DoSth()
 {
-   cvImageWindow win;
-   win.show();
-
+   LOG("Starting do sth")
    std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
    std::unique_ptr<IImageSource> imageSource =
        SourceFactory::GetImageSource(VideoFile, sourceFilename);
    imageSource->Start();
+   int key;
    for (Mat im = imageSource->Get(); !im.empty(); im = imageSource->Get())
    {
       Mat imageIn;
@@ -27,20 +26,20 @@ void ApplicationManager::DoSth()
       img->Threshold(0.35);
       img->SetStructuralElement(CROSS, {1, 1});
       img->Skeletonize();
-      win.draw(img->GetImage());
-      img->Threshold(0.35);
-      img->Contour();
-
-      // imshow("s",imageIn);
-      // imshow("normal", im);
-      cv::waitKey(1);
-      if (win.closed)
+      imshow("processed",img->GetImage());
+      key = cv::waitKey(1);
+      if(key != -1)
       {
-         break;
+          break;
       }
    }
-   while (!win.closed)
+   for( ; ; )
    {
-      cv::waitKey(1);
+       if(key != -1)
+       {
+           break;
+       }
+       key = cv::waitKey(1);
    }
+
 }

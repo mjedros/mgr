@@ -1,6 +1,6 @@
 #ifndef APPLICATIONMANAGER_H
 #define APPLICATIONMANAGER_H
-#include "cvImageWindow.h"
+//#include "cvImageWindow.h"
 #include "ProcessingImage.h"
 #include "OpenCLManager.h"
 #include "SourceFactory.h"

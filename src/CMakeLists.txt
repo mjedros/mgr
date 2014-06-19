@@ -1,9 +1,11 @@
 cmake_minimum_required (VERSION 2.6)
 add_executable(Mgr 
   Application.cpp
+  ApplicationManager.cpp
   OpenCLManager.h 
   OpenCLManager.cpp 
   ProcessingImage.cpp
+  GUI/wxImagesProcessing.cpp
   IImageSource.h
   FileVideo.h
   FileVideo.cpp
@@ -19,8 +21,8 @@ find_path(OPENCL_INC
 	NAMES "CL/cl.hpp"
 	PATHS "$ENV{AMDAPPSDKROOT}/include" "$ENV{CUDA_PATH}/include" "../include"
 )
-
 include_directories("${OPENCL_INC}")
+
 
 find_path(OPENCV_INC
 	 	NAMES "opencv2/opencv.hpp"
@@ -51,7 +53,10 @@ find_library(OPENCV_VIDEO_LIB
 		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib"
 		)	
 
+find_package(wxWidgets REQUIRED html adv core base net aui xrc qa richtext )
+include(${wxWidgets_USE_FILE})
 
+target_link_libraries*(Mgr ${wxWidgets_LIBRARIES})
 target_link_libraries (Mgr ${OPENCV_CALIB3D_LIB})
 target_link_libraries (Mgr ${OPENCV_CORE_LIB})
 target_link_libraries (Mgr ${OPENCV_IMGPROC_LIB})
