@@ -1,41 +1,73 @@
-#ifndef IMAGE_H
-#define IMAGE_H
+#ifndef PROCESSINGIMAGE_H
+#define PROCESSINGIMAGE_H
 #include <opencv2/opencv.hpp>
 #include "OpenCLManager.h"
 
-namespace CLProcessingImage
-{
-enum StructuralElement
-{ ELLIPSE,
-  CROSS,
-  RECTANGLE };
+namespace CLProcessingImage {
+enum StructuralElement : u_int8_t { ELLIPSE, CROSS, RECTANGLE };
+/**
+ * @brief Class representing image that is being processed with OpenCL
+ */
+class ProcessingImage {
+  private:
+    cv::Mat image;
+    cl::size_t<3> origin;
+    cl::size_t<3> region;
+    cl::NDRange localRange;
+    void Process(cl::Kernel &kernel, const cl::Image2D &image_in,
+                 cl::Image2D &image_out);
+    std::shared_ptr<OpenCLManager> openCLManager;
+    StructuralElement structuralElementType;
+    std::vector<float> structuralElementParams;
+    void SetStructuralElementArgument(cl::Kernel &kernel);
+    /**
+     * @brief Performs specific morphological operation
+     * @param Operation - name of operation in kernel file
+     */
+    void PerformMorphologicalOperation(const std::string &Operation);
 
-class ProcessingImage
-{
- private:
-   cv::Mat image;
-   cl::size_t<3> origin;
-   cl::size_t<3> region;
-   cl::NDRange localRange;
-   void Process(cl::Kernel &kernel, cl::Image2D &image_in, cl::Image2D &image_out);
-   const std::shared_ptr<OpenCLManager> openCLManager;
-   StructuralElement structuralElementType;
-   std::vector<float> structuralElementParams;
-   void SetStructuralElementArgument(cl::Kernel &kernel);
-
- public:
-   void Threshold(const float threshold = 0.5);
-   void Dilate();
-   void Erode();
-   void Contour();
-   void Skeletonize();
-
-   void SetStructuralElement(StructuralElement element, std::vector<float> params);
-   cv::Mat GetImage();
-   void SetImageToProcess(cv::Mat img);
-   ~ProcessingImage();
-   ProcessingImage(const std::shared_ptr<OpenCLManager> &openCLManagerPtr);
+  public:
+    /**
+     * @brief Performs binary operation with mininum and maximum value
+     * @param minimum
+     * @param maximum
+     */
+    void Binarize(const unsigned int &minumum = 127,
+                  const unsigned int &maximum = 255);
+    /**
+     * @brief Performs dilation
+     */
+    void Dilate();
+    /**
+     * @brief Performs erosion
+     */
+    void Erode();
+    /**
+     * @brief Derives contour of binary image
+     */
+    void Contour();
+    /**
+     * @brief Performs skeletonization
+     */
+    void Skeletonize();
+    /**
+     * @brief Set structural element for morphological operations
+     * @param element - Type of element
+     * @param params - sizes of element
+     */
+    void SetStructuralElement(const StructuralElement &element,
+                              const std::vector<float> &params);
+    /**
+     * @brief Image getter
+     * @return Image data
+     */
+    cv::Mat GetImage();
+    /**
+     * @brief Set image data
+     * @param img - image sent to process
+     */
+    void SetImageToProcess(cv::Mat img);
+    ProcessingImage(std::shared_ptr<OpenCLManager> openCLManagerPtr);
 };
-
-#endif // IMAGE_H
 }
+#endif // PROCESSINGIMAGE_H

@@ -11,3 +11,15 @@ build-*
 *.o
 moc_*
 ui_*
+*.moc
+*moc.*
+*.user
+*.jpg
+*.png
+*.avi
+Tests
+html/
+latex/
+Paths.h
+Data/*
+*/Debug/*

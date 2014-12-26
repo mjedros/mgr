@@ -8,6 +8,7 @@ class ProcessingImagesTest : public QObject
    Q_OBJECT
    std::shared_ptr<OpenCLManager> openCLManager;
    void CheckImagesEqual(cv::Mat one, cv::Mat two);
+   std::unique_ptr<ProcessingImage>  img;
    cv::Mat SkeletonizeOpenCV(cv::Mat img);
 
  public:
@@ -16,6 +17,7 @@ class ProcessingImagesTest : public QObject
    void EmptyImageTest();
    void SimpleImageTest();
    void BinarizeTest();
+   void BinarizeTestTwoThresholds();
    void DilateCrossTest();
    void ErodeCrossTest();
    void DilateRectangleTest();
@@ -53,11 +55,14 @@ cv::Mat ProcessingImagesTest::SkeletonizeOpenCV(cv::Mat img)
    return skel;
 }
 
-ProcessingImagesTest::ProcessingImagesTest() : openCLManager(new OpenCLManager) {}
+ProcessingImagesTest::ProcessingImagesTest() : openCLManager(new OpenCLManager)
+{
+    openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
+    img = std::unique_ptr<ProcessingImage>(new ProcessingImage(openCLManager));
+}
 
 void ProcessingImagesTest::EmptyImageTest()
 {
-   std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
    cv::Mat img1 = img->GetImage();
    cv::Mat empty;
    QCOMPARE(img1.data, empty.data);
@@ -65,7 +70,6 @@ void ProcessingImagesTest::EmptyImageTest()
 
 void ProcessingImagesTest::SimpleImageTest()
 {
-   std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
    cv::Mat eye = cv::Mat::eye({10, 10}, 2);
    img->SetImageToProcess(eye.clone());
 
@@ -76,25 +80,32 @@ void ProcessingImagesTest::SimpleImageTest()
 
 void ProcessingImagesTest::BinarizeTest()
 {
-   openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
-   std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
+
    cv::Mat image = cv::imread("../../Data/napis.jpg");
    cv::cvtColor(image, image, CV_BGR2GRAY);
    img->SetImageToProcess(image.clone());
-   img->Threshold(0.5);
+   img->Binarize(127);
    cv::Mat thresholded;
    cv::threshold(image, thresholded, 127, 255, cv::THRESH_BINARY_INV);
    CheckImagesEqual(thresholded, img->GetImage());
 }
-
-void ProcessingImagesTest::DilateCrossTest()
+void ProcessingImagesTest::BinarizeTestTwoThresholds()
 {
-   openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
-   std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
+
    cv::Mat image = cv::imread("../../Data/napis.jpg");
    cv::cvtColor(image, image, CV_BGR2GRAY);
    img->SetImageToProcess(image.clone());
-   img->Threshold(0.5);
+   img->Binarize(127,255);
+   cv::Mat thresholded;
+   cv::threshold(image, thresholded, 127, 255, cv::THRESH_BINARY_INV);
+   CheckImagesEqual(thresholded, img->GetImage());
+}
+void ProcessingImagesTest::DilateCrossTest()
+{
+   cv::Mat image = cv::imread("../../Data/napis.jpg");
+   cv::cvtColor(image, image, CV_BGR2GRAY);
+   img->SetImageToProcess(image.clone());
+   img->Binarize(127);
    cv::Mat dilated;
    cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
    cv::dilate(img->GetImage(), dilated, element);
@@ -105,12 +116,10 @@ void ProcessingImagesTest::DilateCrossTest()
 
 void ProcessingImagesTest::ErodeCrossTest()
 {
-   openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
-   std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
    cv::Mat image = cv::imread("../../Data/napis.jpg");
    cv::cvtColor(image, image, CV_BGR2GRAY);
    img->SetImageToProcess(image.clone());
-   img->Threshold(0.5);
+   img->Binarize(127);
    cv::Mat eroded;
    cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(5, 5));
    cv::erode(img->GetImage(), eroded, element);
@@ -121,12 +130,10 @@ void ProcessingImagesTest::ErodeCrossTest()
 
 void ProcessingImagesTest::DilateRectangleTest()
 {
-   openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
-   std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
    cv::Mat image = cv::imread("../../Data/napis.jpg");
    cv::cvtColor(image, image, CV_BGR2GRAY);
    img->SetImageToProcess(image.clone());
-   img->Threshold(0.5);
+   img->Binarize(127);
    cv::Mat dilated;
    cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
    cv::dilate(img->GetImage(), dilated, element);
@@ -137,12 +144,10 @@ void ProcessingImagesTest::DilateRectangleTest()
 
 void ProcessingImagesTest::ErodeRectangleTest()
 {
-   openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
-   std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
    cv::Mat image = cv::imread("../../Data/napis.jpg");
    cv::cvtColor(image, image, CV_BGR2GRAY);
    img->SetImageToProcess(image.clone());
-   img->Threshold(0.5);
+   img->Binarize(127);
    cv::Mat dilated;
    cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
    cv::erode(img->GetImage(), dilated, element);
@@ -153,12 +158,10 @@ void ProcessingImagesTest::ErodeRectangleTest()
 
 void ProcessingImagesTest::SkeletonizeTest()
 {
-   openCLManager->Configure("../../Kernels/Kernels.cl", std::make_pair(0, 0));
-   std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
    cv::Mat image = cv::imread("../../Data/napis.jpg");
    cv::cvtColor(image, image, CV_BGR2GRAY);
    img->SetImageToProcess(image.clone());
-   img->Threshold(0.5);
+   img->Binarize(127);
    cv::Mat skeletonized = SkeletonizeOpenCV((img->GetImage()).clone());
    img->SetStructuralElement(CROSS, {1, 1});
    img->Skeletonize();

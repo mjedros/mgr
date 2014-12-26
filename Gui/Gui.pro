@@ -19,29 +19,31 @@ TEMPLATE = app
 
 
 SOURCES +=\
-        mainwindow.cpp\
+        ../src/GUI/mainwindow.cpp\
         ../src/OpenCLManager.cpp \
     ../src/Application.cpp \
     ../src/ProcessingImage.cpp \
     ../src/FileVideo.cpp \
     ../src/ApplicationManager.cpp \
-    ../src/cvImageWindow.cpp
+    ../src/GUI/cvImageWindow.cpp \
+    ../src/Image3d.cpp
 
-HEADERS  += mainwindow.h\
+HEADERS  += ../src/GUI/mainwindow.h\
         ../src/OpenCLManager.h \
     ../src/ProcessingImage.h \
     ../src/FileVideo.h \
     ../src/SourceFactory.h \
     ../src/IImageSource.h \
     ../src/ApplicationManager.h \
-    ../src/cvImageWindow.h
+    ../src/GUI/cvImageWindow.h \
+    ../src/Image3d.h
 
-FORMS    += mainwindow.ui
+FORMS    += ../src/GUI/mainwindow.ui
 CONFIG += c++0x
 QMAKE_CXXFLAGS += -std=c++0x
 
 unix {
-   # QMAKE_CXXFLAGS += -Werror
+    QMAKE_CXXFLAGS += -Werror
 }
 win32:QMAKE_CXXFLAGS += -fpermissive
 

@@ -12,27 +12,27 @@
 #include <memory>
 #include <string>
 
-class OpenCLManager
-{
- private:
-   cl::Device processingDevice;
-   cl::Buffer outBuffer;
-   std::vector<cl::Platform> platforms;
+class OpenCLManager {
+  private:
+    cl::Device processingDevice;
+    cl::Buffer outBuffer;
+    std::vector<cl::Platform> platforms;
 
-   void CreateContext(const unsigned int platformId);
-   void ReadPrograms(std::string kernelFileName);
+    void CreateContext(const unsigned int &platformId);
+    void ReadPrograms(const std::string &kernelFileName);
 
- public:
-   cl::Context context;
-   cl::CommandQueue queue;
-   cl::Program program;
-   void Configure(const std::string kernelFileName,
-                  const std::pair<unsigned int, unsigned int> ChosenDevice);
-   std::vector<std::tuple<int, int, std::string>> ListPlatforms();
-   void ChooseDevice(const unsigned int platformId, const unsigned int DeviceId);
-   OpenCLManager();
+  public:
+    cl::Context context;
+    cl::CommandQueue queue;
+    cl::Program program;
+    void Configure(const std::string &kernelFileName,
+                   const std::pair<unsigned int, unsigned int> &ChosenDevice);
+    std::vector<std::tuple<int, int, std::string> > ListPlatforms() const;
+    void ChooseDevice(const unsigned int &platformId,
+                      const unsigned int &DeviceId);
+    OpenCLManager();
 
-   virtual ~OpenCLManager();
+    virtual ~OpenCLManager();
 };
 
 #endif /* OpenCLManager_H_ */

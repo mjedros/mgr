@@ -1,5 +1,4 @@
 constant sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_REPEAT | CLK_FILTER_NEAREST;
-
 __kernel void threshold(__read_only image2d_t imageIn, __write_only image2d_t imageOut,
                         const float threshold)
 {
@@ -17,6 +16,21 @@ __kernel void threshold(__read_only image2d_t imageIn, __write_only image2d_t im
       out_color = 1;
    }
    write_imagef(imageOut, image_coord, out_color);
+}
+__kernel void Binarize(__read_only image2d_t imageIn, __write_only image2d_t imageOut,
+                        const uint min, const uint max)
+{
+
+
+   int2 image_coord = (int2) {get_global_id(0), get_global_id(1)};
+
+   uint4 pixel = read_imageui(imageIn, sampler, image_coord);
+   uint out_color = 255;
+   if (pixel.s3 > min && pixel.s3 <= max)
+   {
+      out_color = 0;
+   }
+   write_imageui(imageOut, image_coord,  convert_uint4(out_color));
 }
 __constant int squareSize = 10;
 __kernel void ErodeEllipse(__read_only image2d_t imageIn, __write_only image2d_t imageOut,
