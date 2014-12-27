@@ -3,13 +3,13 @@ using namespace CLProcessingImage;
 using namespace cv;
 using namespace cl;
 
-std::map<StructuralElement, std::string> StrElementMap = {
-    { ELLIPSE, "Ellipse" }, { CROSS, "Cross" }, { RECTANGLE, "Rectangle" }
+std::map<std::string, StructuralElement> StrElementMap = {
+    { "Ellipse", ELLIPSE }, { "Cross", CROSS }, { "Rectangle", RECTANGLE }
 };
 
 void
 ProcessingImage::PerformMorphologicalOperation(const std::string &Operation) {
-    std::string kernelName = Operation + StrElementMap[structuralElementType];
+    std::string kernelName = Operation + structuralElementType;
     Kernel kernel(openCLManager->program, kernelName.c_str());
     ImageFormat format(CL_LUMINANCE, CL_UNORM_INT8);
     Image2D image_in(openCLManager->context,
@@ -69,14 +69,18 @@ void ProcessingImage::Skeletonize() {
     image = skel;
 }
 
-void ProcessingImage::SetStructuralElement(const StructuralElement &element,
+void ProcessingImage::SetStructuralElement(const std::string &element,
                                            const std::vector<float> &params) {
+    if (StrElementMap.find(element.c_str()) == StrElementMap.end()) {
+        throw std::string("Not existing structural element");
+    }
+
     structuralElementType = element;
     structuralElementParams = params;
 }
 
 void ProcessingImage::SetStructuralElementArgument(cl::Kernel &kernel) {
-    switch (structuralElementType) {
+    switch (StrElementMap[structuralElementType.c_str()]) {
     case ELLIPSE: {
         cl_float3 ellipseParams =
             (cl_float3) { { structuralElementParams[0],

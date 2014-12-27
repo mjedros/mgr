@@ -10,12 +10,14 @@
 #include <QEvent>
 
 enum class OBJECT : uint8_t { MOVIE, DIRECTORY };
+enum class OPERATION : uint8_t { DILATION, EROSION, CONTOUR, SKELETONIZATION };
 class ApplicationManager : public QObject {
     Q_OBJECT
   private:
     std::shared_ptr<OpenCLManager> openCLManager;
     std::string sourceFilename;
     std::unique_ptr<Image3d> image3d;
+    std::unique_ptr<Image3d> processedImage3d;
     std::unique_ptr<cvImageWindow> processedWindow;
     std::unique_ptr<cvImageWindow> originalWindow;
     std::unique_ptr<cvImageWindow> colsProcessed;
@@ -32,6 +34,8 @@ class ApplicationManager : public QObject {
     void LoadFile3dImage(const std::string &filename);
     void InitWindows(const OBJECT &object, const std::string &name);
     void ShowImages();
+    void Process(const OPERATION &operation,
+                 const std::string &StructuralElement);
   public slots:
     void sliderValueChanged(const int &value, const QString &title);
 };

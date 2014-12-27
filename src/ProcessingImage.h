@@ -5,6 +5,7 @@
 
 namespace CLProcessingImage {
 enum StructuralElement : u_int8_t { ELLIPSE, CROSS, RECTANGLE };
+
 /**
  * @brief Class representing image that is being processed with OpenCL
  */
@@ -17,7 +18,7 @@ class ProcessingImage {
     void Process(cl::Kernel &kernel, const cl::Image2D &image_in,
                  cl::Image2D &image_out);
     std::shared_ptr<OpenCLManager> openCLManager;
-    StructuralElement structuralElementType;
+    std::string structuralElementType;
     std::vector<float> structuralElementParams;
     void SetStructuralElementArgument(cl::Kernel &kernel);
     /**
@@ -55,7 +56,7 @@ class ProcessingImage {
      * @param element - Type of element
      * @param params - sizes of element
      */
-    void SetStructuralElement(const StructuralElement &element,
+    void SetStructuralElement(const std::string &element,
                               const std::vector<float> &params);
     /**
      * @brief Image getter

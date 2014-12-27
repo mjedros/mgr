@@ -16,7 +16,6 @@ class MainWindow : public QMainWindow {
     ~MainWindow();
   private slots:
     void on_ChoosePlatform_currentIndexChanged(const QString &description);
-    void on_ChooseOperation_currentIndexChanged(const QString &operation);
     void on_Process_clicked();
     void on_LoadImages_clicked();
     void on_ShowWindows_clicked();

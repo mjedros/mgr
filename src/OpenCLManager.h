@@ -31,8 +31,7 @@ class OpenCLManager {
     void ChooseDevice(const unsigned int &platformId,
                       const unsigned int &DeviceId);
     OpenCLManager();
-
-    virtual ~OpenCLManager();
+    ~OpenCLManager();
 };
 
 #endif /* OpenCLManager_H_ */

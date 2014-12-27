@@ -5,19 +5,26 @@
 #include <QFileDialog>
 #include "../src/include/Paths.h"
 
+std::map<QString, OPERATION> OperationMap = {
+    { "Dilation", OPERATION::DILATION },
+    { "Erosion", OPERATION::EROSION },
+    { "Contour", OPERATION::CONTOUR },
+    { "Skeletonize", OPERATION::SKELETONIZATION }
+};
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), menu(new QMenu("File")),
       openCLManager(new OpenCLManager()),
       appManager(new ApplicationManager(openCLManager)) {
+    this->setFixedSize(this->size());
     ui->setupUi(this);
     setPlatformsList();
     menu->addAction("Open file to process", this, SLOT(openFileToProcess()));
     menu->addAction("Open directory to process", this,
                     SLOT(openDirToProcess()));
     menu_bar.addMenu(menu);
-    ui->ChooseOperation->addItem("Dilation");
-    ui->ChooseOperation->addItem("Erosion");
-    ui->ChooseOperation->addItem("Contour");
+    ui->ChooseOperation->addItems(
+        { "Dilation", "Erosion", "Contour", "Skeletonize" });
+    ui->MorphologicalElementType->addItems({ "Ellipse", "Cross", "Rectangle" });
     setMenuBar(&menu_bar);
 }
 
@@ -35,10 +42,6 @@ MainWindow::on_ChoosePlatform_currentIndexChanged(const QString &description) {
     ChosenDevice = std::make_pair(std::get<0>(*it), std::get<1>(*it));
 }
 
-void
-MainWindow::on_ChooseOperation_currentIndexChanged(const QString &operation) {
-    ui->ChooseOperation->addItem(operation);
-}
 void MainWindow::setPlatformsList() {
     ListPlatforms = openCLManager->ListPlatforms();
     std::for_each(ListPlatforms.begin(), ListPlatforms.end(),
@@ -49,10 +52,14 @@ void MainWindow::setPlatformsList() {
 }
 
 void MainWindow::on_Process_clicked() {
-
+    ui->ProcessingProgress->setEnabled(true);
+    ui->ProcessingProgress->setText("In progress");
     ui->Process->hide();
-    appManager->ShowImages();
+    appManager->Process(
+        OperationMap[ui->ChooseOperation->currentText()],
+        ui->MorphologicalElementType->currentText().toStdString());
     ui->Process->show();
+    ui->ProcessingProgress->setText("Done");
 }
 
 void MainWindow::openFileToProcess() {
@@ -68,13 +75,16 @@ void MainWindow::on_LoadImages_clicked() {
     openCLManager->Configure(std::string(KERNELS_DIR) + "Kernels.cl",
                              ChosenDevice);
     if (ui->File->isChecked()) {
-        if (filename.size() != 0)
+        if (filename.size() != 0) {
             appManager->InitWindows(OBJECT::MOVIE, filename.toStdString());
-
+            ui->ImagesLoaded->setText("Images Loaded");
+        }
     } else {
-        if (directory.size() != 0)
+        if (directory.size() != 0) {
             appManager->InitWindows(OBJECT::DIRECTORY,
                                     directory.toStdString() + "/");
+            ui->ImagesLoaded->setText("Images Loaded");
+        }
     }
 }
 
