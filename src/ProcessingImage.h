@@ -15,17 +15,17 @@ class ProcessingImage {
     cl::size_t<3> origin;
     cl::size_t<3> region;
     cl::NDRange localRange;
-    void Process(cl::Kernel &kernel, const cl::Image2D &image_in,
+    void process(cl::Kernel &kernel, const cl::Image2D &image_in,
                  cl::Image2D &image_out);
     std::shared_ptr<OpenCLManager> openCLManager;
     std::string structuralElementType;
     std::vector<float> structuralElementParams;
-    void SetStructuralElementArgument(cl::Kernel &kernel);
+    void setStructuralElementArgument(cl::Kernel &kernel);
     /**
      * @brief Performs specific morphological operation
      * @param Operation - name of operation in kernel file
      */
-    void PerformMorphologicalOperation(const std::string &Operation);
+    void performMorphologicalOperation(const std::string &Operation);
 
   public:
     /**
@@ -33,41 +33,41 @@ class ProcessingImage {
      * @param minimum
      * @param maximum
      */
-    void Binarize(const unsigned int &minumum = 127,
+    void binarize(const unsigned int &minumum = 127,
                   const unsigned int &maximum = 255);
     /**
      * @brief Performs dilation
      */
-    void Dilate();
+    void dilate();
     /**
      * @brief Performs erosion
      */
-    void Erode();
+    void erode();
     /**
      * @brief Derives contour of binary image
      */
-    void Contour();
+    void contour();
     /**
      * @brief Performs skeletonization
      */
-    void Skeletonize();
+    void skeletonize();
     /**
      * @brief Set structural element for morphological operations
      * @param element - Type of element
      * @param params - sizes of element
      */
-    void SetStructuralElement(const std::string &element,
+    void setStructuralElement(const std::string &element,
                               const std::vector<float> &params);
     /**
      * @brief Image getter
      * @return Image data
      */
-    cv::Mat GetImage();
+    cv::Mat getImage();
     /**
      * @brief Set image data
      * @param img - image sent to process
      */
-    void SetImageToProcess(cv::Mat img);
+    void setImageToProcess(cv::Mat img);
     ProcessingImage(std::shared_ptr<OpenCLManager> openCLManagerPtr);
 };
 }

@@ -24,8 +24,8 @@ class MainWindow : public QMainWindow {
 
   private:
     virtual void closeEvent(QCloseEvent *event);
-    std::pair<int, int> ChosenDevice;
-    std::vector<std::tuple<int, int, std::string> > ListPlatforms;
+    std::pair<int, int> chosenDevice;
+    std::vector<std::tuple<int, int, std::string> > listPlatforms;
     Ui::MainWindow *ui;
     QMenu *menu;
     QMenuBar menu_bar;

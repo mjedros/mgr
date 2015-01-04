@@ -30,11 +30,11 @@ class ApplicationManager : public QObject {
 
   public:
     ApplicationManager(std::shared_ptr<OpenCLManager> openCLManager);
-    void LoadDir3dImage(const std::string &Directory);
-    void LoadFile3dImage(const std::string &filename);
-    void InitWindows(const OBJECT &object, const std::string &name);
-    void ShowImages();
-    void Process(const OPERATION &operation,
+    void loadDir3dImage(const std::string &Directory);
+    void loadFile3dImage(const std::string &filename);
+    void initWindows(const OBJECT &object, const std::string &name);
+    void showImages();
+    void process(const OPERATION &operation,
                  const std::string &StructuralElement);
   public slots:
     void sliderValueChanged(const int &value, const QString &title);

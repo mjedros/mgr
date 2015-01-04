@@ -67,7 +67,7 @@ std::set<std::string> readDir(const std::string &directory) {
     return filenames;
 }
 }
-void ApplicationManager::LoadDir3dImage(const string &Directory) {
+void ApplicationManager::loadDir3dImage(const string &Directory) {
     auto files = readDir(Directory);
     cv::Mat image2d = cv::imread(Directory + *files.begin());
     cv::cvtColor(image2d, image2d, CV_BGR2GRAY);
@@ -79,7 +79,7 @@ void ApplicationManager::LoadDir3dImage(const string &Directory) {
     }
 }
 
-void ApplicationManager::LoadFile3dImage(const std::string &filename) {
+void ApplicationManager::loadFile3dImage(const std::string &filename) {
 
     unique_ptr<IImageSource> imageSource =
         SourceFactory::GetImageSource(VideoFile, filename);
@@ -95,27 +95,27 @@ void ApplicationManager::LoadFile3dImage(const std::string &filename) {
     }
 }
 
-void ApplicationManager::InitWindows(const OBJECT &object,
+void ApplicationManager::initWindows(const OBJECT &object,
                                      const std::string &name) {
     switch (object) {
     case OBJECT::DIRECTORY:
-        LoadDir3dImage(name);
+        loadDir3dImage(name);
         break;
     case OBJECT::MOVIE:
-        LoadFile3dImage(name);
+        loadFile3dImage(name);
         break;
     }
     processedImage3d = std::unique_ptr<Image3d>(new Image3d(*image3d));
     LOG(processedImage3d->getDepth());
     for (auto i = 0; i < processedImage3d->getDepth(); i++) {
         unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
-        img->SetImageToProcess(processedImage3d->getImageAtDepth(i).clone());
-        img->Binarize(70, 255);
-        processedImage3d->setImageAtDepth(i, img->GetImage());
+        img->setImageToProcess(processedImage3d->getImageAtDepth(i).clone());
+        img->binarize(70, 255);
+        processedImage3d->setImageAtDepth(i, img->getImage());
     }
 }
 
-void ApplicationManager::ShowImages() {
+void ApplicationManager::showImages() {
     originalWindow.reset(new cvImageWindow("Depth Original", this));
     processedWindow.reset(new cvImageWindow("Depth Processed", this));
     colsOriginal.reset(new cvImageWindow("Cols Original", this));
@@ -125,30 +125,30 @@ void ApplicationManager::ShowImages() {
     showCols(image3d->getCols() / 2);
 }
 
-void ApplicationManager::Process(const OPERATION &operation,
+void ApplicationManager::process(const OPERATION &operation,
                                  const std::string &StructuralElement) {
     cv::waitKey(1);
     unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
-    img->SetStructuralElement(StructuralElement, { 4, 3, 2 });
+    img->setStructuralElement(StructuralElement, { 4, 3, 2 });
     void (ProcessingImage::*pointerToProcessingMethod)();
     switch (operation) {
     case OPERATION::DILATION:
-        pointerToProcessingMethod = &ProcessingImage::Dilate;
+        pointerToProcessingMethod = &ProcessingImage::dilate;
         break;
     case OPERATION::EROSION:
-        pointerToProcessingMethod = &ProcessingImage::Erode;
+        pointerToProcessingMethod = &ProcessingImage::erode;
         break;
     case OPERATION::CONTOUR:
-        pointerToProcessingMethod = &ProcessingImage::Contour;
+        pointerToProcessingMethod = &ProcessingImage::contour;
         break;
     case OPERATION::SKELETONIZATION:
-        pointerToProcessingMethod = &ProcessingImage::Skeletonize;
+        pointerToProcessingMethod = &ProcessingImage::skeletonize;
         break;
     }
 
     for (auto i = 0; i < processedImage3d->getDepth(); i++) {
-        img->SetImageToProcess(processedImage3d->getImageAtDepth(i).clone());
+        img->setImageToProcess(processedImage3d->getImageAtDepth(i).clone());
         (img.get()->*pointerToProcessingMethod)();
-        processedImage3d->setImageAtDepth(i, img->GetImage());
+        processedImage3d->setImageAtDepth(i, img->getImage());
     }
 }

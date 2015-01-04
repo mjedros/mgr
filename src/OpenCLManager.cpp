@@ -25,13 +25,13 @@ OpenCLManager::OpenCLManager() {
 
 OpenCLManager::~OpenCLManager() { LOG("OpenCLManager destructor"); }
 
-void OpenCLManager::Configure(
+void OpenCLManager::configure(
     const std::string &kernelFileName,
     const std::pair<unsigned int, unsigned int> &ChosenDevice) {
     try {
-        ChooseDevice(ChosenDevice.first, ChosenDevice.second);
-        CreateContext(ChosenDevice.first);
-        ReadPrograms(kernelFileName);
+        chooseDevice(ChosenDevice.first, ChosenDevice.second);
+        createContext(ChosenDevice.first);
+        readPrograms(kernelFileName);
         queue = CommandQueue(context, processingDevice);
     }
     catch (std::string &e) {
@@ -42,7 +42,7 @@ void OpenCLManager::Configure(
     }
 }
 
-void OpenCLManager::ReadPrograms(const std::string &kernelFileName) {
+void OpenCLManager::readPrograms(const std::string &kernelFileName) {
     ifstream file(kernelFileName);
     if (!file.is_open()) {
         throw std::string("Kernel file not loaded");
@@ -64,7 +64,7 @@ void OpenCLManager::ReadPrograms(const std::string &kernelFileName) {
     }
 }
 
-void OpenCLManager::CreateContext(const unsigned int &platformId) {
+void OpenCLManager::createContext(const unsigned int &platformId) {
 
     cl_context_properties context_properties[3] = {
         CL_CONTEXT_PLATFORM, (cl_context_properties)(platforms[platformId])(), 0
@@ -74,14 +74,14 @@ void OpenCLManager::CreateContext(const unsigned int &platformId) {
     context = Context(deviceType, context_properties);
 }
 
-void OpenCLManager::ChooseDevice(const unsigned int &platformId,
+void OpenCLManager::chooseDevice(const unsigned int &platformId,
                                  const unsigned int &DeviceId) {
     std::vector<Device> devices;
     platforms[platformId].getDevices(CL_DEVICE_TYPE_ALL, &devices);
     processingDevice = devices[DeviceId];
 }
 std::vector<tuple<int, int, std::string> >
-OpenCLManager::ListPlatforms() const {
+OpenCLManager::listPlatforms() const {
     std::vector<tuple<int, int, std::string> > devicesInfo;
     for (unsigned int id = 0; id < platforms.size(); id++) {
         std::string name, version;

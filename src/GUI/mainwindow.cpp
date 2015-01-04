@@ -35,16 +35,16 @@ MainWindow::~MainWindow() {
 
 void
 MainWindow::on_ChoosePlatform_currentIndexChanged(const QString &description) {
-    auto it = std::find_if(ListPlatforms.begin(), ListPlatforms.end(),
+    auto it = std::find_if(listPlatforms.begin(), listPlatforms.end(),
                            [&](std::tuple<int, int, std::string> &platform) {
         return (description.toStdString() == std::get<2>(platform));
     });
-    ChosenDevice = std::make_pair(std::get<0>(*it), std::get<1>(*it));
+    chosenDevice = std::make_pair(std::get<0>(*it), std::get<1>(*it));
 }
 
 void MainWindow::setPlatformsList() {
-    ListPlatforms = openCLManager->ListPlatforms();
-    std::for_each(ListPlatforms.begin(), ListPlatforms.end(),
+    listPlatforms = openCLManager->listPlatforms();
+    std::for_each(listPlatforms.begin(), listPlatforms.end(),
                   [this](std::tuple<int, int, std::string> &platform) {
         ui->ChoosePlatform->addItem(
             QString::fromStdString(std::get<2>(platform)));
@@ -55,7 +55,7 @@ void MainWindow::on_Process_clicked() {
     ui->ProcessingProgress->setEnabled(true);
     ui->ProcessingProgress->setText("In progress");
     ui->Process->hide();
-    appManager->Process(
+    appManager->process(
         OperationMap[ui->ChooseOperation->currentText()],
         ui->MorphologicalElementType->currentText().toStdString());
     ui->Process->show();
@@ -72,16 +72,16 @@ void MainWindow::openDirToProcess() {
 }
 
 void MainWindow::on_LoadImages_clicked() {
-    openCLManager->Configure(std::string(KERNELS_DIR) + "Kernels.cl",
-                             ChosenDevice);
+    openCLManager->configure(std::string(KERNELS_DIR) + "Kernels.cl",
+                             chosenDevice);
     if (ui->File->isChecked()) {
         if (filename.size() != 0) {
-            appManager->InitWindows(OBJECT::MOVIE, filename.toStdString());
+            appManager->initWindows(OBJECT::MOVIE, filename.toStdString());
             ui->ImagesLoaded->setText("Images Loaded");
         }
     } else {
         if (directory.size() != 0) {
-            appManager->InitWindows(OBJECT::DIRECTORY,
+            appManager->initWindows(OBJECT::DIRECTORY,
                                     directory.toStdString() + "/");
             ui->ImagesLoaded->setText("Images Loaded");
         }
@@ -93,4 +93,4 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     QMainWindow::closeEvent(event);
 }
 
-void MainWindow::on_ShowWindows_clicked() { appManager->ShowImages(); }
+void MainWindow::on_ShowWindows_clicked() { appManager->showImages(); }

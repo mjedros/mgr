@@ -18,17 +18,17 @@ class OpenCLManager {
     cl::Buffer outBuffer;
     std::vector<cl::Platform> platforms;
 
-    void CreateContext(const unsigned int &platformId);
-    void ReadPrograms(const std::string &kernelFileName);
+    void createContext(const unsigned int &platformId);
+    void readPrograms(const std::string &kernelFileName);
 
   public:
     cl::Context context;
     cl::CommandQueue queue;
     cl::Program program;
-    void Configure(const std::string &kernelFileName,
+    void configure(const std::string &kernelFileName,
                    const std::pair<unsigned int, unsigned int> &ChosenDevice);
-    std::vector<std::tuple<int, int, std::string> > ListPlatforms() const;
-    void ChooseDevice(const unsigned int &platformId,
+    std::vector<std::tuple<int, int, std::string> > listPlatforms() const;
+    void chooseDevice(const unsigned int &platformId,
                       const unsigned int &DeviceId);
     OpenCLManager();
     ~OpenCLManager();

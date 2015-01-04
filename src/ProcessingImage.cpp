@@ -8,7 +8,7 @@ std::map<std::string, StructuralElement> StrElementMap = {
 };
 
 void
-ProcessingImage::PerformMorphologicalOperation(const std::string &Operation) {
+ProcessingImage::performMorphologicalOperation(const std::string &Operation) {
     std::string kernelName = Operation + structuralElementType;
     Kernel kernel(openCLManager->program, kernelName.c_str());
     ImageFormat format(CL_LUMINANCE, CL_UNORM_INT8);
@@ -17,8 +17,8 @@ ProcessingImage::PerformMorphologicalOperation(const std::string &Operation) {
                      image.cols, image.rows, 0, image.data);
     Image2D image_out(openCLManager->context, CL_MEM_WRITE_ONLY, format,
                       image.cols, image.rows);
-    SetStructuralElementArgument(kernel);
-    Process(kernel, image_in, image_out);
+    setStructuralElementArgument(kernel);
+    process(kernel, image_in, image_out);
 }
 
 ProcessingImage::ProcessingImage(
@@ -27,8 +27,8 @@ ProcessingImage::ProcessingImage(
     origin[0] = origin[1] = origin[2] = 0;
 }
 
-Mat ProcessingImage::GetImage() { return image; }
-void ProcessingImage::SetImageToProcess(cv::Mat img) {
+Mat ProcessingImage::getImage() { return image; }
+void ProcessingImage::setImageToProcess(cv::Mat img) {
     image.release();
     image = img;
     region[0] = image.cols;
@@ -42,25 +42,25 @@ void ProcessingImage::SetImageToProcess(cv::Mat img) {
         localRange = { 4, 1 };
 }
 
-void ProcessingImage::Dilate() { PerformMorphologicalOperation("Dilate"); }
+void ProcessingImage::dilate() { performMorphologicalOperation("Dilate"); }
 
-void ProcessingImage::Erode() { PerformMorphologicalOperation("Erode"); }
+void ProcessingImage::erode() { performMorphologicalOperation("Erode"); }
 
-void ProcessingImage::Contour() {
-    Erode();
+void ProcessingImage::contour() {
+    erode();
     cv::Mat temp = image.clone();
-    Dilate();
+    dilate();
     image -= temp;
 }
 
-void ProcessingImage::Skeletonize() {
+void ProcessingImage::skeletonize() {
     cv::Mat skel(image.size(), CV_8U, cv::Scalar(0));
     cv::Mat eroded;
     do {
         cv::Mat img = image.clone();
-        Erode();
+        erode();
         eroded = image.clone();
-        Dilate();
+        dilate();
         img -= image;
 
         cv::bitwise_or(skel, img, skel);
@@ -69,7 +69,7 @@ void ProcessingImage::Skeletonize() {
     image = skel;
 }
 
-void ProcessingImage::SetStructuralElement(const std::string &element,
+void ProcessingImage::setStructuralElement(const std::string &element,
                                            const std::vector<float> &params) {
     if (StrElementMap.find(element.c_str()) == StrElementMap.end()) {
         throw std::string("Not existing structural element");
@@ -79,7 +79,7 @@ void ProcessingImage::SetStructuralElement(const std::string &element,
     structuralElementParams = params;
 }
 
-void ProcessingImage::SetStructuralElementArgument(cl::Kernel &kernel) {
+void ProcessingImage::setStructuralElementArgument(cl::Kernel &kernel) {
     switch (StrElementMap[structuralElementType.c_str()]) {
     case ELLIPSE: {
         cl_float3 ellipseParams =
@@ -101,7 +101,7 @@ void ProcessingImage::SetStructuralElementArgument(cl::Kernel &kernel) {
     }
 }
 
-void ProcessingImage::Binarize(const unsigned int &minimum,
+void ProcessingImage::binarize(const unsigned int &minimum,
                                const unsigned int &maximum) {
     cl::Kernel kernel = cl::Kernel(openCLManager->program, "Binarize");
 
@@ -114,10 +114,10 @@ void ProcessingImage::Binarize(const unsigned int &minimum,
                           image.cols, image.rows);
     kernel.setArg(2, minimum);
     kernel.setArg(3, maximum);
-    Process(kernel, image_in, image_out);
+    process(kernel, image_in, image_out);
 }
 
-void ProcessingImage::Process(cl::Kernel &kernel, const cl::Image2D &image_in,
+void ProcessingImage::process(cl::Kernel &kernel, const cl::Image2D &image_in,
                               cl::Image2D &image_out) {
     kernel.setArg(0, image_in);
     kernel.setArg(1, image_out);
