@@ -1,58 +1,56 @@
 #include "ApplicationManager.h"
 #include <opencv2/opencv.hpp>
+#include "SourceFactory.h"
 using namespace cv;
-using CLProcessingImage::ProcessingImage;
+using namespace Mgr;
 using std::string;
 using std::shared_ptr;
 using std::unique_ptr;
 
-void ApplicationManager::sliderValueChanged(const int &value,
-                                            const QString &title) {
-    if (title.startsWith("Depth"))
-        showWindows(value);
-    else if (title.startsWith("Cols"))
-        showCols(value);
-}
-void ApplicationManager::saveMovie(const Image3d &img3d,
-                                   const std::string &filename) {
-
-    VideoWriter videowriter(filename, CV_FOURCC('D', 'I', 'V', 'X'), 50,
-                            cv::Size(img3d.getRows(), img3d.getCols()), false);
-    if (!videowriter.isOpened()) {
-        std::cout << "Could not open the output video for write " << std::endl;
-        return;
+typedef void (ProcessingImage::*pointerToProcessingMethodType)();
+const std::map<OPERATION, pointerToProcessingMethodType>
+OperationToMethodPointerMap = {
+    { OPERATION::DILATION, &ProcessingImage::dilate },
+    { OPERATION::EROSION, &ProcessingImage::erode },
+    { OPERATION::CONTOUR, &ProcessingImage::contour },
+    { OPERATION::SKELETONIZATION, &ProcessingImage::skeletonize }
+};
+class Processing3dImage {
+  public:
+    virtual void
+    process(std::shared_ptr<Image3d> image,
+            const shared_ptr<ProcessingImage> img,
+            const pointerToProcessingMethodType pointerToMethod) = 0;
+};
+class ProcessCols : public Processing3dImage {
+  public:
+    void process(std::shared_ptr<Image3d> image,
+                 std::shared_ptr<ProcessingImage> img,
+                 pointerToProcessingMethodType operation) {
+        for (auto i = 0; i < image->getCols(); i++) {
+            img->setImageToProcess(image->getImageAtCol(i).clone());
+            (img.get()->*operation)();
+            image->setImageAtCol(i, img->getImage());
+        }
     }
-    for (int j = 0; j < img3d.getDepth(); j++) {
-        videowriter << img3d.getImageAtDepth(j);
+};
+class ProcessDepth : public Processing3dImage {
+  public:
+    void process(std::shared_ptr<Image3d> image,
+                 const std::shared_ptr<ProcessingImage> img,
+                 const pointerToProcessingMethodType operation) {
+        for (auto i = 0; i < image->getDepth(); i++) {
+            img->setImageToProcess(image->getImageAtDepth(i).clone());
+            (img.get()->*operation)();
+            image->setImageAtDepth(i, img->getImage());
+        }
     }
-}
+};
 
-void ApplicationManager::showWindows(const int &depth) {
-    originalWindow->draw(image3d->getImageAtDepth(depth));
-    processedWindow->draw(processedImage3d->getImageAtDepth(depth));
-    processedWindow->update();
-    originalWindow->update();
-}
-
-void ApplicationManager::showCols(const int &col) {
-    colsOriginal->draw(image3d->getImageAtCol(col));
-    colsProcessed->draw(processedImage3d->getImageAtCol(col));
-    colsProcessed->update();
-    colsOriginal->update();
-}
-
-void ApplicationManager::setMaxValues() {
-    originalWindow->setMaxValue(image3d->getDepth() - 1);
-    colsOriginal->setMaxValue(image3d->getCols() - 1);
-}
-
-ApplicationManager::ApplicationManager(
-    shared_ptr<OpenCLManager> openCLManagerPtr)
-    : openCLManager(std::move(openCLManagerPtr)) {}
 namespace {
 #include <dirent.h>
-std::set<std::string> readDir(const std::string &directory) {
-    std::set<std::string> filenames;
+std::set<string> readDir(const string &directory) {
+    std::set<string> filenames;
     DIR *dir;
     struct dirent *ent;
     if ((dir = opendir(directory.c_str())) != NULL) {
@@ -66,8 +64,20 @@ std::set<std::string> readDir(const std::string &directory) {
     }
     return filenames;
 }
+void saveMovie(const Image3d &img3d, const std::string &filename) {
+
+    VideoWriter videowriter(filename, CV_FOURCC('D', 'I', 'V', 'X'), 50,
+                            cv::Size(img3d.getRows(), img3d.getCols()), false);
+    if (!videowriter.isOpened()) {
+        std::cout << "Could not open the output video for write " << std::endl;
+        return;
+    }
+    for (int j = 0; j < img3d.getDepth(); j++) {
+        videowriter << img3d.getImageAtDepth(j);
+    }
 }
-void ApplicationManager::loadDir3dImage(const string &Directory) {
+}
+void AppMan::loadDir3dImage(const string &Directory) {
     auto files = readDir(Directory);
     cv::Mat image2d = cv::imread(Directory + *files.begin());
     cv::cvtColor(image2d, image2d, CV_BGR2GRAY);
@@ -79,7 +89,7 @@ void ApplicationManager::loadDir3dImage(const string &Directory) {
     }
 }
 
-void ApplicationManager::loadFile3dImage(const std::string &filename) {
+void AppMan::loadFile3dImage(const string &filename) {
 
     unique_ptr<IImageSource> imageSource =
         SourceFactory::GetImageSource(VideoFile, filename);
@@ -94,9 +104,17 @@ void ApplicationManager::loadFile3dImage(const std::string &filename) {
         image3d->setImageAtDepth(std::distance(matVector.begin(), it), *it);
     }
 }
-
-void ApplicationManager::initWindows(const OBJECT &object,
-                                     const std::string &name) {
+void AppMan::process(const OPERATION &operation,
+                     const string &structuralElement) {
+    cv::waitKey(1);
+    shared_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
+    img->setStructuralElement(structuralElement, { 3, 2, 2 });
+    std::unique_ptr<Processing3dImage> processing3dImage;
+    processing3dImage = std::unique_ptr<ProcessCols>(new ProcessCols);
+    processing3dImage->process(processedImage3d, img,
+                               OperationToMethodPointerMap.at(operation));
+}
+void AppMan::init(const OBJECT &object, const string &name) {
     switch (object) {
     case OBJECT::DIRECTORY:
         loadDir3dImage(name);
@@ -105,7 +123,7 @@ void ApplicationManager::initWindows(const OBJECT &object,
         loadFile3dImage(name);
         break;
     }
-    processedImage3d = std::unique_ptr<Image3d>(new Image3d(*image3d));
+    processedImage3d = unique_ptr<Image3d>(new Image3d(*image3d));
     LOG(processedImage3d->getDepth());
     for (auto i = 0; i < processedImage3d->getDepth(); i++) {
         unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
@@ -125,30 +143,29 @@ void ApplicationManager::showImages() {
     showCols(image3d->getCols() / 2);
 }
 
-void ApplicationManager::process(const OPERATION &operation,
-                                 const std::string &StructuralElement) {
-    cv::waitKey(1);
-    unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
-    img->setStructuralElement(StructuralElement, { 4, 3, 2 });
-    void (ProcessingImage::*pointerToProcessingMethod)();
-    switch (operation) {
-    case OPERATION::DILATION:
-        pointerToProcessingMethod = &ProcessingImage::dilate;
-        break;
-    case OPERATION::EROSION:
-        pointerToProcessingMethod = &ProcessingImage::erode;
-        break;
-    case OPERATION::CONTOUR:
-        pointerToProcessingMethod = &ProcessingImage::contour;
-        break;
-    case OPERATION::SKELETONIZATION:
-        pointerToProcessingMethod = &ProcessingImage::skeletonize;
-        break;
-    }
+void ApplicationManager::sliderValueChanged(const int &value,
+                                            const QString &title) {
+    if (title.startsWith("Depth"))
+        showWindows(value);
+    else if (title.startsWith("Cols"))
+        showCols(value);
+}
 
-    for (auto i = 0; i < processedImage3d->getDepth(); i++) {
-        img->setImageToProcess(processedImage3d->getImageAtDepth(i).clone());
-        (img.get()->*pointerToProcessingMethod)();
-        processedImage3d->setImageAtDepth(i, img->getImage());
-    }
+void ApplicationManager::showWindows(const int &depth) {
+    originalWindow->draw(image3d->getImageAtDepth(depth));
+    processedWindow->draw(processedImage3d->getImageAtDepth(depth));
+    processedWindow->update();
+    originalWindow->update();
+}
+
+void ApplicationManager::showCols(const int &col) {
+    colsOriginal->draw(image3d->getImageAtCol(col));
+    colsProcessed->draw(processedImage3d->getImageAtCol(col));
+    colsProcessed->update();
+    colsOriginal->update();
+}
+
+void ApplicationManager::setMaxValues() {
+    originalWindow->setMaxValue(image3d->getDepth() - 1);
+    colsOriginal->setMaxValue(image3d->getCols() - 1);
 }

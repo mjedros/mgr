@@ -3,7 +3,7 @@
 #include <opencv2/opencv.hpp>
 #include "OpenCLManager.h"
 
-namespace CLProcessingImage {
+namespace Mgr {
 enum StructuralElement : u_int8_t { ELLIPSE, CROSS, RECTANGLE };
 
 /**

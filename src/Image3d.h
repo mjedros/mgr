@@ -2,7 +2,7 @@
 #define IMAGE3D_H
 #include <opencv2/opencv.hpp>
 #include <opencv/cv.h>
-
+namespace Mgr {
 class Image3d {
   private:
     cv::Mat image;
@@ -23,5 +23,5 @@ class Image3d {
     Image3d(const int &_depth, const cv::Mat image2d);
     Image3d(const Image3d &source);
 };
-
+}
 #endif // IMAGE3D_H

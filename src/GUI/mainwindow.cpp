@@ -4,7 +4,7 @@
 #include "../src/ApplicationManager.h"
 #include <QFileDialog>
 #include "../src/include/Paths.h"
-
+using namespace Mgr;
 std::map<QString, OPERATION> OperationMap = {
     { "Dilation", OPERATION::DILATION },
     { "Erosion", OPERATION::EROSION },
@@ -76,12 +76,12 @@ void MainWindow::on_LoadImages_clicked() {
                              chosenDevice);
     if (ui->File->isChecked()) {
         if (filename.size() != 0) {
-            appManager->initWindows(OBJECT::MOVIE, filename.toStdString());
+            appManager->init(OBJECT::MOVIE, filename.toStdString());
             ui->ImagesLoaded->setText("Images Loaded");
         }
     } else {
         if (directory.size() != 0) {
-            appManager->initWindows(OBJECT::DIRECTORY,
+            appManager->init(OBJECT::DIRECTORY,
                                     directory.toStdString() + "/");
             ui->ImagesLoaded->setText("Images Loaded");
         }

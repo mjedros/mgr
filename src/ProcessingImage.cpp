@@ -1,5 +1,5 @@
 #include "ProcessingImage.h"
-using namespace CLProcessingImage;
+using namespace Mgr;
 using namespace cv;
 using namespace cl;
 
@@ -9,12 +9,12 @@ std::map<std::string, StructuralElement> StrElementMap = {
 
 void
 ProcessingImage::performMorphologicalOperation(const std::string &Operation) {
-    std::string kernelName = Operation + structuralElementType;
+    const std::string kernelName = Operation + structuralElementType;
     Kernel kernel(openCLManager->program, kernelName.c_str());
-    ImageFormat format(CL_LUMINANCE, CL_UNORM_INT8);
-    Image2D image_in(openCLManager->context,
-                     CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
-                     image.cols, image.rows, 0, image.data);
+    const ImageFormat format(CL_LUMINANCE, CL_UNORM_INT8);
+    const Image2D image_in(openCLManager->context,
+                           CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
+                           image.cols, image.rows, 0, image.data);
     Image2D image_out(openCLManager->context, CL_MEM_WRITE_ONLY, format,
                       image.cols, image.rows);
     setStructuralElementArgument(kernel);
@@ -37,9 +37,9 @@ void ProcessingImage::setImageToProcess(cv::Mat img) {
     if (image.cols == image.rows)
         localRange = { 16, 4 };
     else if (image.cols < image.rows)
-        localRange = { 1, 4 };
+        localRange = { 10, 16 };
     else
-        localRange = { 4, 1 };
+        localRange = { 16, 10 };
 }
 
 void ProcessingImage::dilate() { performMorphologicalOperation("Dilate"); }
@@ -82,7 +82,7 @@ void ProcessingImage::setStructuralElement(const std::string &element,
 void ProcessingImage::setStructuralElementArgument(cl::Kernel &kernel) {
     switch (StrElementMap[structuralElementType.c_str()]) {
     case ELLIPSE: {
-        cl_float3 ellipseParams =
+        const cl_float3 ellipseParams =
             (cl_float3) { { structuralElementParams[0],
                             structuralElementParams[1],
                             structuralElementParams[2] } };
@@ -91,8 +91,9 @@ void ProcessingImage::setStructuralElementArgument(cl::Kernel &kernel) {
     }
     case RECTANGLE:
     case CROSS: {
-        cl_int2 rectParams = (cl_int2) { {(int)structuralElementParams[0],
-                                          (int)structuralElementParams[1] } };
+        const cl_int2 rectParams =
+            (cl_int2) { {(int)structuralElementParams[0],
+                         (int)structuralElementParams[1] } };
         kernel.setArg(2, rectParams);
         break;
     }
@@ -105,11 +106,11 @@ void ProcessingImage::binarize(const unsigned int &minimum,
                                const unsigned int &maximum) {
     cl::Kernel kernel = cl::Kernel(openCLManager->program, "Binarize");
 
-    cl::ImageFormat format(CL_INTENSITY, CL_UNSIGNED_INT8);
-    cl::ImageFormat formatOut(CL_INTENSITY, CL_UNSIGNED_INT8);
-    cl::Image2D image_in(openCLManager->context,
-                         CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
-                         image.cols, image.rows, 0, image.data);
+    const cl::ImageFormat format(CL_INTENSITY, CL_UNSIGNED_INT8);
+    const cl::ImageFormat formatOut(CL_INTENSITY, CL_UNSIGNED_INT8);
+    const cl::Image2D image_in(openCLManager->context,
+                               CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
+                               image.cols, image.rows, 0, image.data);
     cl::Image2D image_out(openCLManager->context, CL_MEM_WRITE_ONLY, formatOut,
                           image.cols, image.rows);
     kernel.setArg(2, minimum);

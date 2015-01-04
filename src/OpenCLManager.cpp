@@ -5,6 +5,7 @@
 
 using namespace std;
 using namespace cl;
+using namespace Mgr;
 
 map<cl_device_type, std::string> DeviceNameToStringMap = {
     { CL_DEVICE_TYPE_GPU, "GPU" },

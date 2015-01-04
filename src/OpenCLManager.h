@@ -11,11 +11,10 @@
 #include <CL/cl.hpp>
 #include <memory>
 #include <string>
-
+namespace Mgr {
 class OpenCLManager {
   private:
     cl::Device processingDevice;
-    cl::Buffer outBuffer;
     std::vector<cl::Platform> platforms;
 
     void createContext(const unsigned int &platformId);
@@ -33,5 +32,5 @@ class OpenCLManager {
     OpenCLManager();
     ~OpenCLManager();
 };
-
+}
 #endif /* OpenCLManager_H_ */

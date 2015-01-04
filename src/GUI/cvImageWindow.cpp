@@ -6,6 +6,7 @@
 #include <QStatusBar>
 #include <opencv/cv.h>
 #include "../ApplicationManager.h"
+using namespace Mgr;
 
 cvImageWindow::cvImageWindow(QString title, QObject *_parent)
     : imgDisplayLabel(this), slider(nullptr), parentObject(_parent) {
