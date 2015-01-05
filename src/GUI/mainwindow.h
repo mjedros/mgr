@@ -8,7 +8,7 @@ namespace Ui {
 class MainWindow;
 }
 namespace Mgr {
-class ApplicationManager;
+class ApplicationManagerGUI;
 class OpenCLManager;
 }
 class MainWindow : public QMainWindow {
@@ -36,7 +36,7 @@ class MainWindow : public QMainWindow {
     QString directory;
     void setPlatformsList(void);
     std::shared_ptr<Mgr::OpenCLManager> openCLManager;
-    std::unique_ptr<Mgr::ApplicationManager> appManager;
+    std::unique_ptr<Mgr::ApplicationManagerGUI> applicationManager;
 };
 
 #endif // MAINWINDOW_H

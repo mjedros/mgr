@@ -26,7 +26,8 @@ SOURCES +=\
     ../src/FileVideo.cpp \
     ../src/ApplicationManager.cpp \
     ../src/GUI/cvImageWindow.cpp \
-    ../src/Image3d.cpp
+    ../src/Image3d.cpp \
+    ../src/GUI/ApplicationManagerGUI.cpp
 
 HEADERS  += ../src/GUI/mainwindow.h\
         ../src/OpenCLManager.h \
@@ -36,7 +37,8 @@ HEADERS  += ../src/GUI/mainwindow.h\
     ../src/IImageSource.h \
     ../src/ApplicationManager.h \
     ../src/GUI/cvImageWindow.h \
-    ../src/Image3d.h
+    ../src/Image3d.h \
+    ../src/GUI/ApplicationManagerGUI.h
 
 FORMS    += ../src/GUI/mainwindow.ui
 CONFIG += c++0x

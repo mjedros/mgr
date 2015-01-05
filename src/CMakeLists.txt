@@ -6,6 +6,7 @@ INCLUDE(../CMakeLists.common)
 SET(SOURCES
   GUI/mainwindow.cpp
   GUI/cvImageWindow.cpp
+  GUI/ApplicationManagerGUI.cpp
   Application.cpp
   ApplicationManager.cpp
   OpenCLManager.cpp 
@@ -24,7 +25,7 @@ SET(HEADERS_Qt
 
   GUI/mainwindow.h
   GUI/cvImageWindow.h
-  ApplicationManager.h
+  GUI/ApplicationManagerGUI.h
 )
 
 QT5_WRAP_CPP(HEADERS_MOC ${HEADERS_Qt})

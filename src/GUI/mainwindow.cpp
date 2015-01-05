@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <iostream>
-#include "../src/ApplicationManager.h"
+#include "ApplicationManagerGUI.h"
 #include <QFileDialog>
 #include "../src/include/Paths.h"
 using namespace Mgr;
@@ -14,7 +14,7 @@ std::map<QString, OPERATION> OperationMap = {
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), menu(new QMenu("File")),
       openCLManager(new OpenCLManager()),
-      appManager(new ApplicationManager(openCLManager)) {
+      applicationManager(new ApplicationManagerGUI(openCLManager)) {
     this->setFixedSize(this->size());
     ui->setupUi(this);
     setPlatformsList();
@@ -55,7 +55,7 @@ void MainWindow::on_Process_clicked() {
     ui->ProcessingProgress->setEnabled(true);
     ui->ProcessingProgress->setText("In progress");
     ui->Process->hide();
-    appManager->process(
+    applicationManager->process(
         OperationMap[ui->ChooseOperation->currentText()],
         ui->MorphologicalElementType->currentText().toStdString());
     ui->Process->show();
@@ -76,21 +76,21 @@ void MainWindow::on_LoadImages_clicked() {
                              chosenDevice);
     if (ui->File->isChecked()) {
         if (filename.size() != 0) {
-            appManager->init(OBJECT::MOVIE, filename.toStdString());
+            applicationManager->init(OBJECT::MOVIE, filename.toStdString());
             ui->ImagesLoaded->setText("Images Loaded");
         }
     } else {
         if (directory.size() != 0) {
-            appManager->init(OBJECT::DIRECTORY,
-                                    directory.toStdString() + "/");
+            applicationManager->init(OBJECT::DIRECTORY,
+                                     directory.toStdString() + "/");
             ui->ImagesLoaded->setText("Images Loaded");
         }
     }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    appManager.reset();
+    applicationManager.reset();
     QMainWindow::closeEvent(event);
 }
 
-void MainWindow::on_ShowWindows_clicked() { appManager->showImages(); }
+void MainWindow::on_ShowWindows_clicked() { applicationManager->showImages(); }

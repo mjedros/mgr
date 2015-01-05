@@ -77,7 +77,7 @@ void saveMovie(const Image3d &img3d, const std::string &filename) {
     }
 }
 }
-void AppMan::loadDir3dImage(const string &Directory) {
+void ApplicationManager::loadDir3dImage(const string &Directory) {
     auto files = readDir(Directory);
     cv::Mat image2d = cv::imread(Directory + *files.begin());
     cv::cvtColor(image2d, image2d, CV_BGR2GRAY);
@@ -89,7 +89,7 @@ void AppMan::loadDir3dImage(const string &Directory) {
     }
 }
 
-void AppMan::loadFile3dImage(const string &filename) {
+void ApplicationManager::loadFile3dImage(const string &filename) {
 
     unique_ptr<IImageSource> imageSource =
         SourceFactory::GetImageSource(VideoFile, filename);
@@ -104,8 +104,8 @@ void AppMan::loadFile3dImage(const string &filename) {
         image3d->setImageAtDepth(std::distance(matVector.begin(), it), *it);
     }
 }
-void AppMan::process(const OPERATION &operation,
-                     const string &structuralElement) {
+void ApplicationManager::process(const OPERATION &operation,
+                                 const string &structuralElement) {
     cv::waitKey(1);
     shared_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
     img->setStructuralElement(structuralElement, { 3, 2, 2 });
@@ -114,7 +114,7 @@ void AppMan::process(const OPERATION &operation,
     processing3dImage->process(processedImage3d, img,
                                OperationToMethodPointerMap.at(operation));
 }
-void AppMan::init(const OBJECT &object, const string &name) {
+void ApplicationManager::init(const OBJECT &object, const string &name) {
     switch (object) {
     case OBJECT::DIRECTORY:
         loadDir3dImage(name);
@@ -131,41 +131,4 @@ void AppMan::init(const OBJECT &object, const string &name) {
         img->binarize(70, 255);
         processedImage3d->setImageAtDepth(i, img->getImage());
     }
-}
-
-void ApplicationManager::showImages() {
-    originalWindow.reset(new cvImageWindow("Depth Original", this));
-    processedWindow.reset(new cvImageWindow("Depth Processed", this));
-    colsOriginal.reset(new cvImageWindow("Cols Original", this));
-    colsProcessed.reset(new cvImageWindow("Cols Processed", this));
-    setMaxValues();
-    showWindows(image3d->getDepth() / 2);
-    showCols(image3d->getCols() / 2);
-}
-
-void ApplicationManager::sliderValueChanged(const int &value,
-                                            const QString &title) {
-    if (title.startsWith("Depth"))
-        showWindows(value);
-    else if (title.startsWith("Cols"))
-        showCols(value);
-}
-
-void ApplicationManager::showWindows(const int &depth) {
-    originalWindow->draw(image3d->getImageAtDepth(depth));
-    processedWindow->draw(processedImage3d->getImageAtDepth(depth));
-    processedWindow->update();
-    originalWindow->update();
-}
-
-void ApplicationManager::showCols(const int &col) {
-    colsOriginal->draw(image3d->getImageAtCol(col));
-    colsProcessed->draw(processedImage3d->getImageAtCol(col));
-    colsProcessed->update();
-    colsOriginal->update();
-}
-
-void ApplicationManager::setMaxValues() {
-    originalWindow->setMaxValue(image3d->getDepth() - 1);
-    colsOriginal->setMaxValue(image3d->getCols() - 1);
 }
