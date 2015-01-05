@@ -13,7 +13,7 @@ class ApplicationManager {
   protected:
     std::shared_ptr<OpenCLManager> openCLManager;
     std::string sourceFilename;
-    std::unique_ptr<Image3d> image3d;
+    std::shared_ptr<Image3d> image3d;
     std::shared_ptr<Image3d> processedImage3d;
 
   public:
@@ -24,6 +24,9 @@ class ApplicationManager {
     void process(const OPERATION &operation,
                  const std::string &structuralElement);
     void init(const OBJECT &object, const std::string &name);
+    void initProcessedImage(const unsigned int &minumum = 100,
+                            const unsigned int &maximum = 255);
+    void normalizeOriginalImage();
 };
 }
 #endif // APPLICATIONMANAGER_H

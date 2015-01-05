@@ -1,6 +1,7 @@
 #include "ApplicationManager.h"
 #include <opencv2/opencv.hpp>
 #include "SourceFactory.h"
+#include "Normalization.h"
 using namespace cv;
 using namespace Mgr;
 using std::string;
@@ -123,12 +124,17 @@ void ApplicationManager::init(const OBJECT &object, const string &name) {
         loadFile3dImage(name);
         break;
     }
-    processedImage3d = unique_ptr<Image3d>(new Image3d(*image3d));
-    LOG(processedImage3d->getDepth());
+}
+
+void ApplicationManager::initProcessedImage(const unsigned int &minumum,
+                                            const unsigned int &maximum ) {
+    processedImage3d.reset(new Image3d(*image3d));
     for (auto i = 0; i < processedImage3d->getDepth(); i++) {
         unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
         img->setImageToProcess(processedImage3d->getImageAtDepth(i).clone());
-        img->binarize(70, 255);
+        img->binarize(minumum, maximum);
         processedImage3d->setImageAtDepth(i, img->getImage());
     }
 }
+
+void ApplicationManager::normalizeOriginalImage() { normalize(image3d); }

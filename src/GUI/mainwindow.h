@@ -25,7 +25,9 @@ class MainWindow : public QMainWindow {
     void openFileToProcess();
     void openDirToProcess();
 
-  private:
+    void on_Normalize_clicked();
+
+private:
     virtual void closeEvent(QCloseEvent *event);
     std::pair<int, int> chosenDevice;
     std::vector<std::tuple<int, int, std::string> > listPlatforms;

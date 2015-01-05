@@ -27,6 +27,7 @@ SOURCES +=\
     ../src/ApplicationManager.cpp \
     ../src/GUI/cvImageWindow.cpp \
     ../src/Image3d.cpp \
+    ../src/Normalization.cpp \
     ../src/GUI/ApplicationManagerGUI.cpp
 
 HEADERS  += ../src/GUI/mainwindow.h\
@@ -38,6 +39,7 @@ HEADERS  += ../src/GUI/mainwindow.h\
     ../src/ApplicationManager.h \
     ../src/GUI/cvImageWindow.h \
     ../src/Image3d.h \
+    ../src/Normalization.h \
     ../src/GUI/ApplicationManagerGUI.h
 
 FORMS    += ../src/GUI/mainwindow.ui

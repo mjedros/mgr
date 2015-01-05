@@ -77,12 +77,14 @@ void MainWindow::on_LoadImages_clicked() {
     if (ui->File->isChecked()) {
         if (filename.size() != 0) {
             applicationManager->init(OBJECT::MOVIE, filename.toStdString());
+            applicationManager->initProcessedImage(100,200);
             ui->ImagesLoaded->setText("Images Loaded");
         }
     } else {
         if (directory.size() != 0) {
             applicationManager->init(OBJECT::DIRECTORY,
                                      directory.toStdString() + "/");
+            applicationManager->initProcessedImage(100,200);
             ui->ImagesLoaded->setText("Images Loaded");
         }
     }
@@ -94,3 +96,8 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 void MainWindow::on_ShowWindows_clicked() { applicationManager->showImages(); }
+
+void MainWindow::on_Normalize_clicked() {
+    applicationManager->normalizeOriginalImage();
+    applicationManager->initProcessedImage();
+}

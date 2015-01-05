@@ -12,7 +12,8 @@ SET(SOURCES
   OpenCLManager.cpp 
   ProcessingImage.cpp
   FileVideo.cpp
-  Image3d.cpp
+  Image3d.cpp 
+  Normalization.cpp
 )
 SET (HEADERS
   IImageSource.h
@@ -20,6 +21,7 @@ SET (HEADERS
   OpenCLManager.h
   SourceFactory.h
   Image3d.h
+  Normalization.h
 )
 SET(HEADERS_Qt
 
