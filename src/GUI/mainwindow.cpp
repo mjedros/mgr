@@ -51,6 +51,17 @@ void MainWindow::setPlatformsList() {
     });
 }
 
+void MainWindow::initImages(const Mgr::SourceType &source, const std::string &name) {
+    applicationManager->init(source, name);
+    applicationManager->initProcessedImage(ui->lowLewel->value(),
+                                           ui->highLevel->value());
+    ui->ImagesLoaded->setText("Images Loaded");
+    ui->Process->setEnabled(true);
+    ui->ShowWindows->setEnabled(true);
+    ui->ResetProcessed->setEnabled(true);
+    ui->Normalize->setEnabled(true);
+}
+
 void MainWindow::on_Process_clicked() {
     ui->ProcessingProgress->setEnabled(true);
     ui->ProcessingProgress->setText("In progress");
@@ -76,20 +87,11 @@ void MainWindow::on_LoadImages_clicked() {
     openCLManager->configure(std::string(KERNELS_DIR) + "Kernels.cl",
                              chosenDevice);
     if (ui->File->isChecked()) {
-        if (filename.size() != 0) {
-            applicationManager->init(VideoFile, filename.toStdString());
-            applicationManager->initProcessedImage(ui->lowLewel->value(),
-                                                   ui->highLevel->value());
-            ui->ImagesLoaded->setText("Images Loaded");
-        }
+        if (filename.size() != 0)
+            initImages(VideoFile, filename.toStdString());
     } else {
-        if (directory.size() != 0) {
-            applicationManager->init(DirectorySource,
-                                     directory.toStdString() + "/");
-            applicationManager->initProcessedImage(ui->lowLewel->value(),
-                                                   ui->highLevel->value());
-            ui->ImagesLoaded->setText("Images Loaded");
-        }
+        if (directory.size() != 0)
+            initImages(DirectorySource,directory.toStdString() + "/");
     }
 }
 

@@ -3,7 +3,7 @@
 #include "../../src/OpenCLManager.h"
 #include "../src/include/Paths.h"
 
-using namespace CLProcessingImage;
+using namespace Mgr;
 class ProcessingImagesTest : public QObject {
     Q_OBJECT
     std::shared_ptr<OpenCLManager> openCLManager;

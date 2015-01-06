@@ -67,7 +67,7 @@ void ApplicationManager::process(const OPERATION &operation,
     shared_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
     img->setStructuralElement(structuralElement, { 3, 2, 2 });
     std::unique_ptr<Processing3dImage> processing3dImage;
-    processing3dImage = std::unique_ptr<ProcessCols>(new ProcessCols);
+    processing3dImage = std::unique_ptr<ProcessDepth>(new ProcessDepth);
     processing3dImage->process(processedImage3d, img,
                                OperationToMethodPointerMap.at(operation));
 }
@@ -81,7 +81,7 @@ void ApplicationManager::init(const SourceType &source, const string &name) {
         matVector.push_back(im);
     }
     image3d.reset(new Image3d(matVector.size(), *matVector.begin()));
-    for (auto it = matVector.begin() + 1; it < matVector.end(); it++) {
+    for (auto it = matVector.begin(); it != matVector.end(); it++) {
         image3d->setImageAtDepth(std::distance(matVector.begin(), it), *it);
     }
 }
