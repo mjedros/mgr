@@ -4,6 +4,7 @@
 #include "ApplicationManagerGUI.h"
 #include <QFileDialog>
 #include "../src/include/Paths.h"
+#include "../ImageSource/SourceFactory.h"
 using namespace Mgr;
 std::map<QString, OPERATION> OperationMap = {
     { "Dilation", OPERATION::DILATION },
@@ -51,7 +52,8 @@ void MainWindow::setPlatformsList() {
     });
 }
 
-void MainWindow::initImages(const Mgr::SourceType &source, const std::string &name) {
+void MainWindow::initImages(const Mgr::SourceType &source,
+                            const std::string &name) {
     applicationManager->init(source, name);
     applicationManager->initProcessedImage(ui->lowLewel->value(),
                                            ui->highLevel->value());
@@ -60,6 +62,7 @@ void MainWindow::initImages(const Mgr::SourceType &source, const std::string &na
     ui->ShowWindows->setEnabled(true);
     ui->ResetProcessed->setEnabled(true);
     ui->Normalize->setEnabled(true);
+    ui->SaveImage->setEnabled(true);
 }
 
 void MainWindow::on_Process_clicked() {
@@ -86,13 +89,10 @@ void MainWindow::on_LoadImages_clicked() {
     ui->ImagesLoaded->setText("Images not loaded!");
     openCLManager->configure(std::string(KERNELS_DIR) + "Kernels.cl",
                              chosenDevice);
-    if (ui->File->isChecked()) {
-        if (filename.size() != 0)
-            initImages(VideoFile, filename.toStdString());
-    } else {
-        if (directory.size() != 0)
-            initImages(DirectorySource,directory.toStdString() + "/");
-    }
+    if (ui->File->isChecked() && filename.size() != 0)
+        initImages(VideoFile, filename.toStdString());
+    else if (ui->Directory->isChecked() && directory.size() != 0)
+        initImages(DirectorySource, directory.toStdString() + "/");
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -111,4 +111,10 @@ void MainWindow::on_Normalize_clicked() {
 void MainWindow::on_ResetProcessed_clicked() {
     applicationManager->initProcessedImage(ui->lowLewel->value(),
                                            ui->highLevel->value());
+}
+
+void MainWindow::on_SaveImage_clicked() {
+    applicationManager->saveOriginalImage(
+        QFileDialog::getSaveFileName(this, tr("Save Image"),
+                                     QDir::currentPath()).toStdString());
 }

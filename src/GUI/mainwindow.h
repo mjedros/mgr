@@ -27,6 +27,7 @@ class MainWindow : public QMainWindow {
     void openDirToProcess();
     void on_Normalize_clicked();
     void on_ResetProcessed_clicked();
+    void on_SaveImage_clicked();
 
   private:
     std::pair<int, int> chosenDevice;

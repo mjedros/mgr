@@ -48,16 +48,17 @@ class ProcessDepth : public Processing3dImage {
     }
 };
 
-void saveMovie(const Image3d &img3d, const std::string &filename) {
+void saveMovie(std::shared_ptr<Image3d> image, const std::string &filename) {
 
-    VideoWriter videowriter(filename, CV_FOURCC('D', 'I', 'V', 'X'), 50,
-                            cv::Size(img3d.getRows(), img3d.getCols()), false);
+    VideoWriter videowriter(filename, CV_FOURCC('D', 'I', 'V', 'X'), 300,
+                            cv::Size(image->getRows(), image->getCols()),
+                            false);
     if (!videowriter.isOpened()) {
         std::cout << "Could not open the output video for write " << std::endl;
         return;
     }
-    for (int j = 0; j < img3d.getDepth(); j++) {
-        videowriter << img3d.getImageAtDepth(j);
+    for (int j = 0; j < image->getDepth(); j++) {
+        videowriter << image->getImageAtDepth(j);
     }
 }
 
@@ -98,3 +99,11 @@ void ApplicationManager::initProcessedImage(const unsigned int &minumum,
 }
 
 void ApplicationManager::normalizeOriginalImage() { normalize(image3d); }
+
+void ApplicationManager::saveOriginalImage(const std::string &filename) {
+    saveMovie(image3d, filename);
+}
+
+void ApplicationManager::saveProcessedImage(const std::string &filename) {
+    saveMovie(processedImage3d, filename);
+}

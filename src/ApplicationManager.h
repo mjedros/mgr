@@ -4,10 +4,10 @@
 #include "OpenCLManager.h"
 #include "Image3d.h"
 #include "GUI/cvImageWindow.h"
-#include "ImageSource/SourceFactory.h"
 #include <QObject>
 #include <QEvent>
 namespace Mgr {
+enum SourceType : u_int8_t;
 enum class OPERATION : uint8_t { DILATION, EROSION, CONTOUR, SKELETONIZATION };
 class ApplicationManager {
   protected:
@@ -25,6 +25,8 @@ class ApplicationManager {
     void initProcessedImage(const unsigned int &minumum = 100,
                             const unsigned int &maximum = 255);
     void normalizeOriginalImage();
+    void saveOriginalImage(const std::string &filename);
+    void saveProcessedImage(const std::string &filename);
 };
 }
 #endif // APPLICATIONMANAGER_H

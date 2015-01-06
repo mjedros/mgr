@@ -13,12 +13,12 @@ enum SourceType : u_int8_t { VideoFile, DirectorySource };
 class SourceFactory {
   public:
     static std::unique_ptr<IImageSource>
-    GetImageSource(SourceType sourceType, const std::string &fileName = "") {
+    GetImageSource(SourceType sourceType, const std::string &name = "") {
         switch (sourceType) {
         case VideoFile:
-            return std::unique_ptr<IImageSource>(new Mgr::FileVideo(fileName));
+            return std::unique_ptr<IImageSource>(new Mgr::FileVideo(name));
         case DirectorySource:
-            return std::unique_ptr<IImageSource>(new Mgr::Directory(fileName));
+            return std::unique_ptr<IImageSource>(new Mgr::Directory(name));
         default:
             throw std::string("Image source type unknown");
         }

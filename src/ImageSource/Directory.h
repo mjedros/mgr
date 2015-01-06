@@ -4,11 +4,18 @@
 #include <memory>
 #include <set>
 namespace Mgr {
+/**
+ * @brief Class representing directory with images as image source
+ *
+ */
 class Directory : public IImageSource {
     /**
-     * @brief Video filename
+     * @brief Const iterator
      */
     std::set<std::string>::const_iterator it;
+    /**
+     * @brief Directory
+     */
     std::string directory;
     /**
      * @brief Video capture ptr
@@ -18,7 +25,7 @@ class Directory : public IImageSource {
   public:
     /**
      * @brief Constructor
-     * @param Filename
+     * @param directory
      */
     Directory(const std::string &directory);
     virtual void Start();
