@@ -11,15 +11,17 @@ SET(SOURCES
   ApplicationManager.cpp
   OpenCLManager.cpp 
   ProcessingImage.cpp
-  FileVideo.cpp
+  ImageSource/FileVideo.cpp
+  ImageSource/Directory.cpp
   Image3d.cpp 
   Normalization.cpp
 )
 SET (HEADERS
-  IImageSource.h
-  FileVideo.h
+  ImageSource/SourceFactory.h  
+  ImageSource/IImageSource.h
+  ImageSource/FileVideo.h
+  ImageSource/Directory.h
   OpenCLManager.h
-  SourceFactory.h
   Image3d.h
   Normalization.h
 )

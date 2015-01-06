@@ -4,6 +4,7 @@ namespace cv {
 class Mat;
 class VideoCapture;
 }
+namespace Mgr {
 /**
  * @brief Image source interface.
  *
@@ -25,3 +26,4 @@ class IImageSource {
      */
     virtual cv::Mat Get() = 0;
 };
+}

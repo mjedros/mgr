@@ -2,27 +2,27 @@
 
 #include <string>
 #include <memory>
-/**
- * @brief Class representing video file as image source
- *
- */
-class FileVideo : public IImageSource {
+#include <set>
+namespace Mgr {
+class Directory : public IImageSource {
     /**
      * @brief Video filename
      */
-    std::string fileName;
+    std::set<std::string>::const_iterator it;
+    std::string directory;
     /**
      * @brief Video capture ptr
      */
-    std::unique_ptr<cv::VideoCapture> videoCapture;
+    std::set<std::string> files;
 
   public:
     /**
      * @brief Constructor
      * @param Filename
      */
-    FileVideo(const std::string &fileName);
+    Directory(const std::string &directory);
     virtual void Start();
     virtual void Stop();
     cv::Mat Get();
 };
+}

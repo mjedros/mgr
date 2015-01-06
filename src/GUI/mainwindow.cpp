@@ -72,19 +72,22 @@ void MainWindow::openDirToProcess() {
 }
 
 void MainWindow::on_LoadImages_clicked() {
+    ui->ImagesLoaded->setText("Images not loaded!");
     openCLManager->configure(std::string(KERNELS_DIR) + "Kernels.cl",
                              chosenDevice);
     if (ui->File->isChecked()) {
         if (filename.size() != 0) {
-            applicationManager->init(OBJECT::MOVIE, filename.toStdString());
-            applicationManager->initProcessedImage(100,200);
+            applicationManager->init(VideoFile, filename.toStdString());
+            applicationManager->initProcessedImage(ui->lowLewel->value(),
+                                                   ui->highLevel->value());
             ui->ImagesLoaded->setText("Images Loaded");
         }
     } else {
         if (directory.size() != 0) {
-            applicationManager->init(OBJECT::DIRECTORY,
+            applicationManager->init(DirectorySource,
                                      directory.toStdString() + "/");
-            applicationManager->initProcessedImage(100,200);
+            applicationManager->initProcessedImage(ui->lowLewel->value(),
+                                                   ui->highLevel->value());
             ui->ImagesLoaded->setText("Images Loaded");
         }
     }
@@ -99,5 +102,11 @@ void MainWindow::on_ShowWindows_clicked() { applicationManager->showImages(); }
 
 void MainWindow::on_Normalize_clicked() {
     applicationManager->normalizeOriginalImage();
-    applicationManager->initProcessedImage();
+    applicationManager->initProcessedImage(ui->lowLewel->value(),
+                                           ui->highLevel->value());
+}
+
+void MainWindow::on_ResetProcessed_clicked() {
+    applicationManager->initProcessedImage(ui->lowLewel->value(),
+                                           ui->highLevel->value());
 }

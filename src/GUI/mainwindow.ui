@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>513</width>
+    <width>692</width>
     <height>376</height>
    </rect>
   </property>
@@ -27,8 +27,8 @@
    <widget class="QPushButton" name="Process">
     <property name="geometry">
      <rect>
-      <x>380</x>
-      <y>110</y>
+      <x>370</x>
+      <y>190</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -144,7 +144,7 @@
      <string>Images not Loaded</string>
     </property>
    </widget>
-   <widget class="QSpinBox" name="spinBox">
+   <widget class="QSpinBox" name="lowLewel">
     <property name="geometry">
      <rect>
       <x>420</x>
@@ -152,6 +152,12 @@
       <width>51</width>
       <height>26</height>
      </rect>
+    </property>
+    <property name="maximum">
+     <number>255</number>
+    </property>
+    <property name="value">
+     <number>80</number>
     </property>
    </widget>
    <widget class="QPushButton" name="Normalize">
@@ -167,13 +173,42 @@
      <string>Normalize</string>
     </property>
    </widget>
+   <widget class="QSpinBox" name="highLevel">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>50</y>
+      <width>51</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>255</number>
+    </property>
+    <property name="value">
+     <number>255</number>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ResetProcessed">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>30</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Reset processed</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>513</width>
+     <width>692</width>
      <height>22</height>
     </rect>
    </property>

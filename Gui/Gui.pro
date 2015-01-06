@@ -23,7 +23,8 @@ SOURCES +=\
         ../src/OpenCLManager.cpp \
     ../src/Application.cpp \
     ../src/ProcessingImage.cpp \
-    ../src/FileVideo.cpp \
+    ../src/ImageSource/FileVideo.cpp \
+    ../src/ImageSource/Directory.cpp \
     ../src/ApplicationManager.cpp \
     ../src/GUI/cvImageWindow.cpp \
     ../src/Image3d.cpp \
@@ -33,9 +34,10 @@ SOURCES +=\
 HEADERS  += ../src/GUI/mainwindow.h\
         ../src/OpenCLManager.h \
     ../src/ProcessingImage.h \
-    ../src/FileVideo.h \
-    ../src/SourceFactory.h \
-    ../src/IImageSource.h \
+    ../src/ImageSource/FileVideo.h \
+    ../src/ImageSource/Directory.h \
+    ../src/ImageSource/SourceFactory.h \
+    ../src/ImageSource/IImageSource.h \
     ../src/ApplicationManager.h \
     ../src/GUI/cvImageWindow.h \
     ../src/Image3d.h \

@@ -1,6 +1,6 @@
 #include "FileVideo.h"
 #include <opencv2/opencv.hpp>
-
+using namespace Mgr;
 FileVideo::FileVideo(const std::string &fileName) : fileName(fileName) {}
 
 void FileVideo::Start() {

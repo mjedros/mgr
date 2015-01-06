@@ -21,7 +21,7 @@ void changeContrast(cv::Mat image, const double &alfa) {
 void changeBrightness(cv::Mat image, const int &level) {
     for (int col = 0; col < image.cols; col++) {
         for (int row = 0; row < image.rows; row++) {
-            if ((image.at<uchar>(row, col) - level >= 0)) {
+            if ((image.at<uchar>(row, col) - level > 0)) {
                 image.at<uchar>(row, col) -= level;
             }
         }
@@ -29,10 +29,11 @@ void changeBrightness(cv::Mat image, const int &level) {
 }
 int setImageLight(std::shared_ptr<Image3d> image3d, const unsigned int &depth,
                   const int &newLevel) {
-    cv::Mat image = image3d->getImageAtDepth(depth).clone();
+    cv::Mat image = image3d->getImageAtDepth(depth);
     while (!checkBrighness(image, newLevel)) {
         changeContrast(image, 0.95);
-        changeBrightness(image, 2);
+        if (!checkBrighness(image, newLevel))
+            changeBrightness(image, 1);
     }
     image3d->setImageAtDepth(depth, image);
     return newLevel;
@@ -40,7 +41,7 @@ int setImageLight(std::shared_ptr<Image3d> image3d, const unsigned int &depth,
 
 void normalize(std::shared_ptr<Image3d> image3d) {
     for (auto i = 0; i <= image3d->getDepth() - NORMALIZATION_WIDTH; i++) {
-        std::vector<unsigned int> levels(NORMALIZATION_WIDTH);
+        std::vector<unsigned int> levels(NORMALIZATION_WIDTH, 0);
         for (int curId = 0; curId < NORMALIZATION_WIDTH; curId++) {
             cv::Mat image = image3d->getImageAtDepth(i + curId).clone();
             for (int col = 0; col < image.cols; col++) {

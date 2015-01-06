@@ -1,6 +1,6 @@
 #include "ApplicationManager.h"
 #include <opencv2/opencv.hpp>
-#include "SourceFactory.h"
+#include "ImageSource/SourceFactory.h"
 #include "Normalization.h"
 using namespace cv;
 using namespace Mgr;
@@ -48,23 +48,6 @@ class ProcessDepth : public Processing3dImage {
     }
 };
 
-namespace {
-#include <dirent.h>
-std::set<string> readDir(const string &directory) {
-    std::set<string> filenames;
-    DIR *dir;
-    struct dirent *ent;
-    if ((dir = opendir(directory.c_str())) != NULL) {
-        while ((ent = readdir(dir)) != NULL) {
-            if (strlen(ent->d_name) > 2)
-                filenames.emplace(ent->d_name);
-        }
-        closedir(dir);
-    } else {
-        perror("could not open directory");
-    }
-    return filenames;
-}
 void saveMovie(const Image3d &img3d, const std::string &filename) {
 
     VideoWriter videowriter(filename, CV_FOURCC('D', 'I', 'V', 'X'), 50,
@@ -77,23 +60,20 @@ void saveMovie(const Image3d &img3d, const std::string &filename) {
         videowriter << img3d.getImageAtDepth(j);
     }
 }
-}
-void ApplicationManager::loadDir3dImage(const string &Directory) {
-    auto files = readDir(Directory);
-    cv::Mat image2d = cv::imread(Directory + *files.begin());
-    cv::cvtColor(image2d, image2d, CV_BGR2GRAY);
-    image3d = std::unique_ptr<Image3d>(new Image3d(files.size(), image2d));
-    for (auto it = files.begin(); it != files.end(); ++it) {
-        image2d = cv::imread(Directory + *it);
-        cv::cvtColor(image2d, image2d, CV_BGR2GRAY);
-        image3d->setImageAtDepth(std::distance(files.begin(), it), image2d);
-    }
-}
 
-void ApplicationManager::loadFile3dImage(const string &filename) {
-
+void ApplicationManager::process(const OPERATION &operation,
+                                 const string &structuralElement) {
+    cv::waitKey(1);
+    shared_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
+    img->setStructuralElement(structuralElement, { 3, 2, 2 });
+    std::unique_ptr<Processing3dImage> processing3dImage;
+    processing3dImage = std::unique_ptr<ProcessCols>(new ProcessCols);
+    processing3dImage->process(processedImage3d, img,
+                               OperationToMethodPointerMap.at(operation));
+}
+void ApplicationManager::init(const SourceType &source, const string &name) {
     unique_ptr<IImageSource> imageSource =
-        SourceFactory::GetImageSource(VideoFile, filename);
+        SourceFactory::GetImageSource(source, name);
     imageSource->Start();
     std::vector<cv::Mat> matVector;
     for (Mat im = imageSource->Get(); !im.empty(); im = imageSource->Get()) {
@@ -105,29 +85,9 @@ void ApplicationManager::loadFile3dImage(const string &filename) {
         image3d->setImageAtDepth(std::distance(matVector.begin(), it), *it);
     }
 }
-void ApplicationManager::process(const OPERATION &operation,
-                                 const string &structuralElement) {
-    cv::waitKey(1);
-    shared_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
-    img->setStructuralElement(structuralElement, { 3, 2, 2 });
-    std::unique_ptr<Processing3dImage> processing3dImage;
-    processing3dImage = std::unique_ptr<ProcessCols>(new ProcessCols);
-    processing3dImage->process(processedImage3d, img,
-                               OperationToMethodPointerMap.at(operation));
-}
-void ApplicationManager::init(const OBJECT &object, const string &name) {
-    switch (object) {
-    case OBJECT::DIRECTORY:
-        loadDir3dImage(name);
-        break;
-    case OBJECT::MOVIE:
-        loadFile3dImage(name);
-        break;
-    }
-}
 
 void ApplicationManager::initProcessedImage(const unsigned int &minumum,
-                                            const unsigned int &maximum ) {
+                                            const unsigned int &maximum) {
     processedImage3d.reset(new Image3d(*image3d));
     for (auto i = 0; i < processedImage3d->getDepth(); i++) {
         unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
