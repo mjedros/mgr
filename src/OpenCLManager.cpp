@@ -16,8 +16,7 @@ map<cl_device_type, std::string> DeviceNameToStringMap = {
 OpenCLManager::OpenCLManager() {
     try {
         Platform::get(&platforms);
-    }
-    catch (Error &e) {
+    } catch (Error &e) {
         LOG(e.what());
         LOG(e.err());
         throw std::string(e.what());
@@ -34,11 +33,9 @@ void OpenCLManager::configure(
         createContext(ChosenDevice.first);
         readPrograms(kernelFileName);
         queue = CommandQueue(context, processingDevice);
-    }
-    catch (std::string &e) {
+    } catch (std::string &e) {
         throw std::string("Configure error: " + e);
-    }
-    catch (...) {
+    } catch (...) {
         throw std::string("Configure error!");
     }
 }
@@ -56,8 +53,7 @@ void OpenCLManager::readPrograms(const std::string &kernelFileName) {
     program = Program(context, source);
     try {
         program.build({ processingDevice }, "");
-    }
-    catch (Error &e) {
+    } catch (Error &e) {
         throw std::string(
             "Build error:" +
             program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(processingDevice) +

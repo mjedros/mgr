@@ -2,7 +2,8 @@
 #define PROCESSINGIMAGE_H
 #include <opencv2/opencv.hpp>
 #include "OpenCLManager.h"
-
+int getAvarage();
+void clear();
 namespace Mgr {
 enum StructuralElement : u_int8_t { ELLIPSE, CROSS, RECTANGLE };
 

@@ -10,12 +10,12 @@ using std::unique_ptr;
 
 typedef void (ProcessingImage::*pointerToProcessingMethodType)();
 const std::map<OPERATION, pointerToProcessingMethodType>
-OperationToMethodPointerMap = {
-    { OPERATION::DILATION, &ProcessingImage::dilate },
-    { OPERATION::EROSION, &ProcessingImage::erode },
-    { OPERATION::CONTOUR, &ProcessingImage::contour },
-    { OPERATION::SKELETONIZATION, &ProcessingImage::skeletonize }
-};
+    OperationToMethodPointerMap = {
+        { OPERATION::DILATION, &ProcessingImage::dilate },
+        { OPERATION::EROSION, &ProcessingImage::erode },
+        { OPERATION::CONTOUR, &ProcessingImage::contour },
+        { OPERATION::SKELETONIZATION, &ProcessingImage::skeletonize }
+    };
 class Processing3dImage {
   public:
     virtual void
@@ -29,7 +29,7 @@ class ProcessCols : public Processing3dImage {
                  std::shared_ptr<ProcessingImage> img,
                  pointerToProcessingMethodType operation) {
         for (auto i = 0; i < image->getCols(); i++) {
-            img->setImageToProcess(image->getImageAtCol(i).clone());
+            img->setImageToProcess(image->getImageAtCol(i));
             (img.get()->*operation)();
             image->setImageAtCol(i, img->getImage());
         }
@@ -40,11 +40,13 @@ class ProcessDepth : public Processing3dImage {
     void process(std::shared_ptr<Image3d> image,
                  const std::shared_ptr<ProcessingImage> img,
                  const pointerToProcessingMethodType operation) {
+        clear();
         for (auto i = 0; i < image->getDepth(); i++) {
             img->setImageToProcess(image->getImageAtDepth(i).clone());
             (img.get()->*operation)();
             image->setImageAtDepth(i, img->getImage());
         }
+        std::cout<<getAvarage()<<std::endl;
     }
 };
 
@@ -68,9 +70,10 @@ void ApplicationManager::process(const OPERATION &operation,
     shared_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
     img->setStructuralElement(structuralElement, { 3, 2, 2 });
     std::unique_ptr<Processing3dImage> processing3dImage;
-    processing3dImage = std::unique_ptr<ProcessDepth>(new ProcessDepth);
+    processing3dImage = std::unique_ptr<ProcessCols>(new ProcessCols);
     processing3dImage->process(processedImage3d, img,
                                OperationToMethodPointerMap.at(operation));
+
 }
 void ApplicationManager::init(const SourceType &source, const string &name) {
     unique_ptr<IImageSource> imageSource =
@@ -96,6 +99,7 @@ void ApplicationManager::initProcessedImage(const unsigned int &minumum,
         img->binarize(minumum, maximum);
         processedImage3d->setImageAtDepth(i, img->getImage());
     }
+    std::cout<<getAvarage()<<std::endl;
 }
 
 void ApplicationManager::normalizeOriginalImage() { normalize(image3d); }

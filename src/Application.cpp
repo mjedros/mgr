@@ -14,11 +14,9 @@ int main(int argc, char *argv[]) {
         MainWindow w;
         w.show();
         return a.exec();
-    }
-    catch (std::string &e) {
+    } catch (std::string &e) {
         LOG(" error, number= " + e);
-    }
-    catch (cl::Error &e) {
+    } catch (cl::Error &e) {
         LOG(" error, number= " + (int)e.err());
     }
     std::terminate();

@@ -1,4 +1,5 @@
 #include "ProcessingImage.h"
+#include <chrono>
 using namespace Mgr;
 using namespace cv;
 using namespace cl;
@@ -6,7 +7,8 @@ using namespace cl;
 std::map<std::string, StructuralElement> StrElementMap = {
     { "Ellipse", ELLIPSE }, { "Cross", CROSS }, { "Rectangle", RECTANGLE }
 };
-
+unsigned int counter = 0;
+unsigned int timeSum = 0;
 void
 ProcessingImage::performMorphologicalOperation(const std::string &Operation) {
     const std::string kernelName = Operation + structuralElementType;
@@ -83,17 +85,17 @@ void ProcessingImage::setStructuralElementArgument(cl::Kernel &kernel) {
     switch (StrElementMap[structuralElementType.c_str()]) {
     case ELLIPSE: {
         const cl_float3 ellipseParams =
-            (cl_float3) { { structuralElementParams[0],
-                            structuralElementParams[1],
-                            structuralElementParams[2] } };
+            (cl_float3){ { structuralElementParams[0],
+                           structuralElementParams[1],
+                           structuralElementParams[2] } };
         kernel.setArg(2, ellipseParams);
         break;
     }
     case RECTANGLE:
     case CROSS: {
         const cl_int2 rectParams =
-            (cl_int2) { {(int)structuralElementParams[0],
-                         (int)structuralElementParams[1] } };
+            (cl_int2){ {(int)structuralElementParams[0],
+                        (int)structuralElementParams[1] } };
         kernel.setArg(2, rectParams);
         break;
     }
@@ -122,9 +124,26 @@ void ProcessingImage::process(cl::Kernel &kernel, const cl::Image2D &image_in,
                               cl::Image2D &image_out) {
     kernel.setArg(0, image_in);
     kernel.setArg(1, image_out);
-    openCLManager->queue.enqueueNDRangeKernel(
-        kernel, cl::NullRange, cl::NDRange(image.cols, image.rows), localRange,
-        NULL, NULL);
+    counter++;
+    std::chrono::time_point<std::chrono::system_clock> start, end;
+    start = std::chrono::system_clock::now();
+        openCLManager->queue.enqueueNDRangeKernel(
+                kernel, cl::NDRange(0,0), cl::NDRange(image.cols, image.rows),
+                cl::NullRange,
+                NULL, NULL);
     openCLManager->queue.enqueueReadImage(image_out, CL_TRUE, origin, region, 0,
                                           0, image.data);
+    end = std::chrono::system_clock::now();
+
+    timeSum+=std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+}
+
+
+int getAvarage()
+{
+    return timeSum/counter;
+}
+void clear()
+{
+    timeSum=counter=0;
 }

@@ -57,7 +57,7 @@ void normalize(std::shared_ptr<Image3d> image3d) {
         }
         const int avarage = std::accumulate(levels.begin(), levels.end(), 0) /
                             NORMALIZATION_WIDTH;
-        for (int curId = 1; curId < NORMALIZATION_WIDTH; curId++) {
+        for (unsigned int curId = 1; curId < NORMALIZATION_WIDTH; curId++) {
             if (levels[curId] - avarage > 5) {
                 levels[curId] =
                     setImageLight(image3d, i + curId, levels[curId - 1]);
