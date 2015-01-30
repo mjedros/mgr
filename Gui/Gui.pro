@@ -49,7 +49,7 @@ CONFIG += c++0x
 QMAKE_CXXFLAGS += -std=c++0x
 
 unix {
-    QMAKE_CXXFLAGS += -Werror
+   # QMAKE_CXXFLAGS += -Werror
 }
 win32:QMAKE_CXXFLAGS += -fpermissive
 

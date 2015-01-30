@@ -4,7 +4,7 @@
 #include <QFileDialog>
 #include <QApplication>
 #include <QStatusBar>
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 #include "../ApplicationManager.h"
 using namespace Mgr;
 

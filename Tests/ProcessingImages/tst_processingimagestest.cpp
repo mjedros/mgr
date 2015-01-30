@@ -1,4 +1,4 @@
-#include <QtTest>
+#include <QtTest/QtTest>
 #include "../../src/ProcessingImage.h"
 #include "../../src/OpenCLManager.h"
 #include "../src/include/Paths.h"
@@ -10,7 +10,7 @@ class ProcessingImagesTest : public QObject {
     void CheckImagesEqual(cv::Mat one, cv::Mat two);
     std::unique_ptr<ProcessingImage> img;
     cv::Mat skeletonizeOpenCV(cv::Mat img);
-    cv::Mat image;
+    cv::Mat imageOriginal;
 
   public:
     ProcessingImagesTest();
@@ -24,16 +24,16 @@ class ProcessingImagesTest : public QObject {
     void DilateRectangleTest();
     void ErodeRectangleTest();
     void skeletonizeTest();
+    void binarizefragmentOfmatTest();
 };
-
 void ProcessingImagesTest::CheckImagesEqual(cv::Mat one, cv::Mat two) {
     cv::Mat result;
     cv::compare(one, two, result, cv::CMP_EQ);
     int nz = cv::countNonZero(result);
-    QVERIFY(nz == one.cols * one.rows);
+    QVERIFY(nz = one.cols * one.rows);
 }
 cv::Mat ProcessingImagesTest::skeletonizeOpenCV(cv::Mat img) {
-    cv::Mat skel(img.size(), CV_8UC1, cv::Scalar(0));
+    cv::Mat skel(img.size(), CV_8U, cv::Scalar(0));
     cv::Mat temp;
     cv::Mat eroded;
 
@@ -55,15 +55,24 @@ cv::Mat ProcessingImagesTest::skeletonizeOpenCV(cv::Mat img) {
 
 ProcessingImagesTest::ProcessingImagesTest()
     : openCLManager(new OpenCLManager) {
-    openCLManager->configure(std::string(KERNELS_DIR) + "Kernels.cl", std::make_pair(0, 0));
+    auto listPlatforms = openCLManager->listPlatforms();
+    std::for_each(listPlatforms.begin(), listPlatforms.end(),
+                  [this](std::tuple<int, int, std::string> &platform) {
+        std::cout << (std::get<2>(platform)) << std::endl;
+    });
+    LOG("configuring")
+    openCLManager->configure(std::string(KERNELS_DIR) + "Kernels.cl",
+                             std::make_pair(0, 0));
+    LOG("configured correctly!")
     img = std::unique_ptr<ProcessingImage>(new ProcessingImage(openCLManager));
-    image = cv::Mat(512, 512, CV_8U);
-    for (int i = 0; i < image.cols; i++) {
-        for (int j = 0; j < image.rows; j++) {
-            image.at<uchar>(j, i) = i;
+    imageOriginal = cv::Mat(512, 203, CV_8UC1);
+    for (int i = 0; i < imageOriginal.cols; i++) {
+        for (int j = 0; j < imageOriginal.rows; j++) {
+            imageOriginal.at<uchar>(j, i) = i;
         }
     }
 }
+
 
 void ProcessingImagesTest::EmptyImageTest() {
     cv::Mat img1 = img->getImage();
@@ -73,7 +82,7 @@ void ProcessingImagesTest::EmptyImageTest() {
 
 void ProcessingImagesTest::SimpleImageTest() {
     cv::Mat eye = cv::Mat::eye({ 10, 10 }, 2);
-    img->setImageToProcess(eye.clone());
+    img->setImageToProcess(eye);
 
     QCOMPARE(*eye.data, *(img->getImage()).data);
     eye = cv::Mat::zeros({ 5, 5 }, 1);
@@ -81,21 +90,24 @@ void ProcessingImagesTest::SimpleImageTest() {
 }
 
 void ProcessingImagesTest::binarizeTest() {
-    img->setImageToProcess(image.clone());
-    img->binarize(127);
+    cv::Mat image = imageOriginal.clone();
     cv::Mat thresholded;
     cv::threshold(image, thresholded, 127, 255, cv::THRESH_BINARY);
+    img->setImageToProcess(image);
+    img->binarize(127);
     CheckImagesEqual(thresholded, img->getImage());
 }
 void ProcessingImagesTest::binarizeTestTwoThresholds() {
-    img->setImageToProcess(image.clone());
-    img->binarize(127, 255);
+    cv::Mat image = imageOriginal.clone();
     cv::Mat thresholded;
     cv::threshold(image, thresholded, 127, 255, cv::THRESH_BINARY);
+    img->setImageToProcess(image);
+    img->binarize(127, 255);
     CheckImagesEqual(thresholded, img->getImage());
 }
 void ProcessingImagesTest::DilateCrossTest() {
-    img->setImageToProcess(image.clone());
+    cv::Mat image = imageOriginal.clone();
+    img->setImageToProcess(image);
     img->binarize(127);
     cv::Mat dilated;
     cv::Mat element =
@@ -107,7 +119,8 @@ void ProcessingImagesTest::DilateCrossTest() {
 }
 
 void ProcessingImagesTest::ErodeCrossTest() {
-    img->setImageToProcess(image.clone());
+    cv::Mat image = imageOriginal.clone();
+    img->setImageToProcess(image);
     img->binarize(127);
     cv::Mat eroded;
     cv::Mat element =
@@ -119,7 +132,8 @@ void ProcessingImagesTest::ErodeCrossTest() {
 }
 
 void ProcessingImagesTest::DilateRectangleTest() {
-    img->setImageToProcess(image.clone());
+    cv::Mat image = imageOriginal.clone();
+    img->setImageToProcess(image);
     img->binarize(127);
     cv::Mat dilated;
     cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
@@ -130,7 +144,8 @@ void ProcessingImagesTest::DilateRectangleTest() {
 }
 
 void ProcessingImagesTest::ErodeRectangleTest() {
-    img->setImageToProcess(image.clone());
+    cv::Mat image = imageOriginal.clone();
+    img->setImageToProcess(image);
     img->binarize(127);
     cv::Mat dilated;
     cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
@@ -141,12 +156,24 @@ void ProcessingImagesTest::ErodeRectangleTest() {
 }
 
 void ProcessingImagesTest::skeletonizeTest() {
-    img->setImageToProcess(image.clone());
+    cv::Mat image = imageOriginal.clone();
+    img->setImageToProcess(image);
     img->binarize(127);
-    cv::Mat skeletonized = skeletonizeOpenCV((img->getImage()).clone());
+    cv::Mat skeletonized = skeletonizeOpenCV((img->getImage().clone()));
     img->setStructuralElement("Cross", { 1, 1 });
     img->skeletonize();
     CheckImagesEqual(skeletonized, img->getImage());
+}
+
+void ProcessingImagesTest::binarizefragmentOfmatTest() {
+    cv::Mat image = imageOriginal.clone();
+    imageOriginal.assignTo(image);
+    cv::Mat imageFragment = image.colRange(0, image.cols / 2);
+    cv::Mat thresholded;
+    cv::threshold(imageFragment, thresholded, 127, 255, cv::THRESH_BINARY);
+    img->setImageToProcess(imageFragment.clone());
+    img->binarize(127);
+    CheckImagesEqual(thresholded, img->getImage());
 }
 
 QTEST_APPLESS_MAIN(ProcessingImagesTest)

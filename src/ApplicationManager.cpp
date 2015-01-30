@@ -10,12 +10,12 @@ using std::unique_ptr;
 
 typedef void (ProcessingImage::*pointerToProcessingMethodType)();
 const std::map<OPERATION, pointerToProcessingMethodType>
-    OperationToMethodPointerMap = {
-        { OPERATION::DILATION, &ProcessingImage::dilate },
-        { OPERATION::EROSION, &ProcessingImage::erode },
-        { OPERATION::CONTOUR, &ProcessingImage::contour },
-        { OPERATION::SKELETONIZATION, &ProcessingImage::skeletonize }
-    };
+OperationToMethodPointerMap = {
+    { OPERATION::DILATION, &ProcessingImage::dilate },
+    { OPERATION::EROSION, &ProcessingImage::erode },
+    { OPERATION::CONTOUR, &ProcessingImage::contour },
+    { OPERATION::SKELETONIZATION, &ProcessingImage::skeletonize }
+};
 class Processing3dImage {
   public:
     virtual void
@@ -46,7 +46,7 @@ class ProcessDepth : public Processing3dImage {
             (img.get()->*operation)();
             image->setImageAtDepth(i, img->getImage());
         }
-        std::cout<<getAvarage()<<std::endl;
+        std::cout << getAvarage() << std::endl;
     }
 };
 
@@ -73,7 +73,6 @@ void ApplicationManager::process(const OPERATION &operation,
     processing3dImage = std::unique_ptr<ProcessCols>(new ProcessCols);
     processing3dImage->process(processedImage3d, img,
                                OperationToMethodPointerMap.at(operation));
-
 }
 void ApplicationManager::init(const SourceType &source, const string &name) {
     unique_ptr<IImageSource> imageSource =
@@ -92,14 +91,15 @@ void ApplicationManager::init(const SourceType &source, const string &name) {
 
 void ApplicationManager::initProcessedImage(const unsigned int &minumum,
                                             const unsigned int &maximum) {
-    processedImage3d.reset(new Image3d(*image3d));
+    processedImage3d.reset(
+        new Image3d(image3d->getDepth(), image3d->getImageAtDepth(0)));
+    unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
     for (auto i = 0; i < processedImage3d->getDepth(); i++) {
-        unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
-        img->setImageToProcess(processedImage3d->getImageAtDepth(i).clone());
+        img->setImageToProcess(image3d->getImageAtDepth(i).clone());
         img->binarize(minumum, maximum);
         processedImage3d->setImageAtDepth(i, img->getImage());
     }
-    std::cout<<getAvarage()<<std::endl;
+    std::cout << getAvarage() << std::endl;
 }
 
 void ApplicationManager::normalizeOriginalImage() { normalize(image3d); }

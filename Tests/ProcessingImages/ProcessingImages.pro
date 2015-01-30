@@ -8,7 +8,7 @@ QT       += testlib
 
 QT       -= gui
 
-TARGET = tst_processingimagestest
+TARGET   =  tst_processingimagestest.cpp
 CONFIG   += console
 CONFIG   += c++0x
 QMAKE_CXXFLAGS += -std=c++0x
@@ -35,3 +35,5 @@ win32 {
 
     INCLUDEPATH += $(OPENCV_DIR)/build/include
 }
+
+HEADERS +=

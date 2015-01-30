@@ -16,7 +16,7 @@ class ProcessingImage {
     cl::size_t<3> origin;
     cl::size_t<3> region;
     cl::NDRange localRange;
-    void process(cl::Kernel &kernel, const cl::Image2D &image_in,
+    void process(cl::Kernel &kernel, cl::Image2D &image_in,
                  cl::Image2D &image_out);
     std::shared_ptr<OpenCLManager> openCLManager;
     std::string structuralElementType;
@@ -68,8 +68,8 @@ class ProcessingImage {
      * @brief Set image data
      * @param img - image sent to process
      */
-    void setImageToProcess(cv::Mat img);
-    ProcessingImage(std::shared_ptr<OpenCLManager> openCLManagerPtr);
+    void setImageToProcess(const cv::Mat &img);
+    ProcessingImage(const std::shared_ptr<OpenCLManager> &openCLManagerPtr);
 };
 }
 #endif // PROCESSINGIMAGE_H

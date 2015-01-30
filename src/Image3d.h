@@ -1,7 +1,6 @@
 #ifndef IMAGE3D_H
 #define IMAGE3D_H
 #include <opencv2/opencv.hpp>
-#include <opencv/cv.h>
 namespace Mgr {
 class Image3d {
   private:

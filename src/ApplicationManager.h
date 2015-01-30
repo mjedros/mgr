@@ -17,8 +17,8 @@ class ApplicationManager {
     std::shared_ptr<Image3d> processedImage3d;
 
   public:
-    ApplicationManager(std::shared_ptr<OpenCLManager> openCLManagerPtr)
-        : openCLManager(std::move(openCLManagerPtr)) {}
+    ApplicationManager(const std::shared_ptr<OpenCLManager> &openCLManagerPtr)
+        : openCLManager(openCLManagerPtr) {}
     void process(const OPERATION &operation,
                  const std::string &structuralElement);
     void init(const SourceType &source, const std::string &name);

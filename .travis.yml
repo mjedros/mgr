@@ -3,21 +3,22 @@ compiler: g++
 script:
  - mkdir build
  - cd build
- - cmake .. && make
+ - cmake .. && make -j
+ - Tests/Tests
 branches:
   only:
     - master
 
 
-before_install:
+before_install: 
+ - sudo add-apt-repository ppa:yjwong/opencv2 -y
  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
  - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
  - sudo apt-get update -qq
- - sudo apt-get install -qq  nvidia-opencl-dev libopencv-dev libhighgui-dev
- - sudo apt-get install -qq wx2.8-headers libwxgtk2.8-0 libwxgtk2.8-dev
+ - sudo apt-get install -qq  fglrx=2:8.960-0ubuntu1 libopencv-dev libhighgui-dev
  - sudo apt-get update -qq -y
- - sudo apt-get install -qq fglrx opencl-headers
- - sudo apt-get install -qq qt5-qmake qtbase5-dev qtdeclarative5-dev libqt5webkit5-dev libsqlite3-dev
+ - sudo apt-get install -qq opencl-headers
+ - sudo apt-get install -qq qt5-qmake qtbase5-dev qtdeclarative5-dev libqt5test5
  - sudo apt-get update -qq -y
  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi

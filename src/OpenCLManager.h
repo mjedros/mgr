@@ -17,7 +17,7 @@ class OpenCLManager {
     cl::Device processingDevice;
     std::vector<cl::Platform> platforms;
 
-    void createContext(const unsigned int &platformId);
+    void createContext();
     void readPrograms(const std::string &kernelFileName);
 
   public:

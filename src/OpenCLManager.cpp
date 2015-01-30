@@ -16,7 +16,8 @@ map<cl_device_type, std::string> DeviceNameToStringMap = {
 OpenCLManager::OpenCLManager() {
     try {
         Platform::get(&platforms);
-    } catch (Error &e) {
+    }
+    catch (Error &e) {
         LOG(e.what());
         LOG(e.err());
         throw std::string(e.what());
@@ -30,12 +31,17 @@ void OpenCLManager::configure(
     const std::pair<unsigned int, unsigned int> &ChosenDevice) {
     try {
         chooseDevice(ChosenDevice.first, ChosenDevice.second);
-        createContext(ChosenDevice.first);
+        LOG("Device chosen")
+        createContext();
+        LOG("Context Created")
         readPrograms(kernelFileName);
+        LOG("Programs Loaded")
         queue = CommandQueue(context, processingDevice);
-    } catch (std::string &e) {
+    }
+    catch (std::string &e) {
         throw std::string("Configure error: " + e);
-    } catch (...) {
+    }
+    catch (...) {
         throw std::string("Configure error!");
     }
 }
@@ -53,22 +59,19 @@ void OpenCLManager::readPrograms(const std::string &kernelFileName) {
     program = Program(context, source);
     try {
         program.build({ processingDevice }, "");
-    } catch (Error &e) {
-        throw std::string(
+    }
+    catch (Error &e) {
+        std::string ErrorString(
             "Build error:" +
             program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(processingDevice) +
             e.what());
+        LOG(ErrorString);
+        throw std::string(ErrorString);
     }
 }
 
-void OpenCLManager::createContext(const unsigned int &platformId) {
-
-    cl_context_properties context_properties[3] = {
-        CL_CONTEXT_PLATFORM, (cl_context_properties)(platforms[platformId])(), 0
-    };
-    cl_device_type deviceType;
-    processingDevice.getInfo((cl_device_info)CL_DEVICE_TYPE, &deviceType);
-    context = Context(deviceType, context_properties);
+void OpenCLManager::createContext() {
+    context = Context({processingDevice});
 }
 
 void OpenCLManager::chooseDevice(const unsigned int &platformId,

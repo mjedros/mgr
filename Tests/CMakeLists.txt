@@ -19,7 +19,6 @@ TARGET_LINK_LIBRARIES( Tests ${OPENCL_LIB})
 TARGET_LINK_LIBRARIES( Tests Qt5::Test )
 include_directories(${Qt5Core_INCLUDE_DIRS})
 if(NOT MSVC)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall  -Wextra -std=c++11" )
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall  -Wextra -std=c++11 -fPIC" )
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
 endif(NOT MSVC)
-
