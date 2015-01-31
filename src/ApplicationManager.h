@@ -20,7 +20,8 @@ class ApplicationManager {
     ApplicationManager(const std::shared_ptr<OpenCLManager> &openCLManagerPtr)
         : openCLManager(openCLManagerPtr) {}
     void process(const OPERATION &operation,
-                 const std::string &structuralElement);
+                 const std::string &structuralElement,
+                 const std::vector<float> &params);
     void init(const SourceType &source, const std::string &name);
     void initProcessedImage(const unsigned int &minumum = 100,
                             const unsigned int &maximum = 255);

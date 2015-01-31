@@ -14,6 +14,7 @@ class ProcessingImagesTest : public QObject {
 
   public:
     ProcessingImagesTest();
+    cv::Mat setToProcessAndBinarizeOriginalImage();
   private Q_SLOTS:
     void EmptyImageTest();
     void SimpleImageTest();
@@ -26,6 +27,7 @@ class ProcessingImagesTest : public QObject {
     void skeletonizeTest();
     void binarizefragmentOfmatTest();
 };
+
 void ProcessingImagesTest::CheckImagesEqual(cv::Mat one, cv::Mat two) {
     cv::Mat result;
     cv::compare(one, two, result, cv::CMP_EQ);
@@ -53,6 +55,12 @@ cv::Mat ProcessingImagesTest::skeletonizeOpenCV(cv::Mat img) {
     return skel;
 }
 
+cv::Mat ProcessingImagesTest::setToProcessAndBinarizeOriginalImage() {
+    cv::Mat image = imageOriginal.clone();
+    img->setImageToProcess(image);
+    img->binarize(127);
+    return image;
+}
 ProcessingImagesTest::ProcessingImagesTest()
     : openCLManager(new OpenCLManager) {
     auto listPlatforms = openCLManager->listPlatforms();
@@ -72,7 +80,6 @@ ProcessingImagesTest::ProcessingImagesTest()
         }
     }
 }
-
 
 void ProcessingImagesTest::EmptyImageTest() {
     cv::Mat img1 = img->getImage();
@@ -106,9 +113,7 @@ void ProcessingImagesTest::binarizeTestTwoThresholds() {
     CheckImagesEqual(thresholded, img->getImage());
 }
 void ProcessingImagesTest::DilateCrossTest() {
-    cv::Mat image = imageOriginal.clone();
-    img->setImageToProcess(image);
-    img->binarize(127);
+    setToProcessAndBinarizeOriginalImage();
     cv::Mat dilated;
     cv::Mat element =
         cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
@@ -119,9 +124,7 @@ void ProcessingImagesTest::DilateCrossTest() {
 }
 
 void ProcessingImagesTest::ErodeCrossTest() {
-    cv::Mat image = imageOriginal.clone();
-    img->setImageToProcess(image);
-    img->binarize(127);
+    setToProcessAndBinarizeOriginalImage();
     cv::Mat eroded;
     cv::Mat element =
         cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(5, 5));
@@ -132,9 +135,7 @@ void ProcessingImagesTest::ErodeCrossTest() {
 }
 
 void ProcessingImagesTest::DilateRectangleTest() {
-    cv::Mat image = imageOriginal.clone();
-    img->setImageToProcess(image);
-    img->binarize(127);
+    setToProcessAndBinarizeOriginalImage();
     cv::Mat dilated;
     cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
     cv::dilate(img->getImage(), dilated, element);
@@ -144,9 +145,7 @@ void ProcessingImagesTest::DilateRectangleTest() {
 }
 
 void ProcessingImagesTest::ErodeRectangleTest() {
-    cv::Mat image = imageOriginal.clone();
-    img->setImageToProcess(image);
-    img->binarize(127);
+    setToProcessAndBinarizeOriginalImage();
     cv::Mat dilated;
     cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
     cv::erode(img->getImage(), dilated, element);
@@ -156,9 +155,7 @@ void ProcessingImagesTest::ErodeRectangleTest() {
 }
 
 void ProcessingImagesTest::skeletonizeTest() {
-    cv::Mat image = imageOriginal.clone();
-    img->setImageToProcess(image);
-    img->binarize(127);
+    setToProcessAndBinarizeOriginalImage();
     cv::Mat skeletonized = skeletonizeOpenCV((img->getImage().clone()));
     img->setStructuralElement("Cross", { 1, 1 });
     img->skeletonize();

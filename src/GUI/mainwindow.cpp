@@ -71,7 +71,10 @@ void MainWindow::on_Process_clicked() {
     ui->Process->hide();
     applicationManager->process(
         OperationMap[ui->ChooseOperation->currentText()],
-        ui->MorphologicalElementType->currentText().toStdString());
+        ui->MorphologicalElementType->currentText().toStdString(),
+        { static_cast<float>(ui->StructElementParam1->value()),
+          static_cast<float>(ui->StructElementParam2->value()),
+          static_cast<float>(ui->StructElementParam3->value()) });
     ui->Process->show();
     ui->ProcessingProgress->setText("Done");
 }

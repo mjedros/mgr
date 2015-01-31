@@ -65,10 +65,11 @@ void saveMovie(std::shared_ptr<Image3d> image, const std::string &filename) {
 }
 
 void ApplicationManager::process(const OPERATION &operation,
-                                 const string &structuralElement) {
+                                 const string &structuralElement,
+                                 const std::vector<float> &params) {
     cv::waitKey(1);
     shared_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
-    img->setStructuralElement(structuralElement, { 3, 2, 2 });
+    img->setStructuralElement(structuralElement, params);
     std::unique_ptr<Processing3dImage> processing3dImage;
     processing3dImage = std::unique_ptr<ProcessCols>(new ProcessCols);
     processing3dImage->process(processedImage3d, img,

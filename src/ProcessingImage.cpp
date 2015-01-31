@@ -117,11 +117,11 @@ void ProcessingImage::binarize(const unsigned int &minimum,
         process(kernel, image_in, image_out);
     }
     catch (Error &e) {
-      LOG(e.what());
-      LOG(e.err());
+        LOG(e.what());
+        LOG(e.err());
     }
     catch (...) {
-      LOG("Unknown Error");
+        LOG("Unknown Error");
     }
 }
 

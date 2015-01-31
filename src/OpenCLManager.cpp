@@ -71,7 +71,7 @@ void OpenCLManager::readPrograms(const std::string &kernelFileName) {
 }
 
 void OpenCLManager::createContext() {
-    context = Context({processingDevice});
+    context = Context({ processingDevice });
 }
 
 void OpenCLManager::chooseDevice(const unsigned int &platformId,

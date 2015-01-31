@@ -230,52 +230,52 @@
      <string>Save image</string>
     </property>
    </widget>
-   <widget class="QSpinBox" name="lowLewel_2">
-    <property name="geometry">
-     <rect>
-      <x>510</x>
-      <y>180</y>
-      <width>51</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>255</number>
-    </property>
-    <property name="value">
-     <number>80</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="lowLewel_3">
+   <widget class="QDoubleSpinBox" name="StructElementParam1">
     <property name="geometry">
      <rect>
       <x>380</x>
       <y>180</y>
-      <width>51</width>
-      <height>26</height>
+      <width>66</width>
+      <height>24</height>
      </rect>
     </property>
     <property name="maximum">
-     <number>255</number>
+     <double>5.000000000000000</double>
     </property>
     <property name="value">
-     <number>80</number>
+     <double>1.000000000000000</double>
     </property>
    </widget>
-   <widget class="QSpinBox" name="lowLewel_4">
+   <widget class="QDoubleSpinBox" name="StructElementParam2">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>450</x>
       <y>180</y>
-      <width>51</width>
-      <height>26</height>
+      <width>66</width>
+      <height>24</height>
      </rect>
     </property>
     <property name="maximum">
-     <number>255</number>
+     <double>5.000000000000000</double>
     </property>
     <property name="value">
-     <number>80</number>
+     <double>1.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="StructElementParam3">
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>180</y>
+      <width>66</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <double>5.000000000000000</double>
+    </property>
+    <property name="value">
+     <double>1.000000000000000</double>
     </property>
    </widget>
   </widget>
@@ -285,7 +285,7 @@
      <x>0</x>
      <y>0</y>
      <width>625</width>
-     <height>23</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>
