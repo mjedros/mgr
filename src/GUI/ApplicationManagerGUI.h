@@ -1,6 +1,7 @@
 #ifndef APPLICATIONMANAGERGUI_H
 #define APPLICATIONMANAGERGUI_H
 #include "../src/ApplicationManager.h"
+#include "cvImageWindow.h"
 namespace Mgr {
 class ApplicationManagerGUI : public QObject, public ApplicationManager {
     Q_OBJECT

@@ -30,5 +30,5 @@ class cvImageWindow : public QDialog {
     std::unique_ptr<QSlider> slider;
     QObject *parentObject;
 signals:
-    void sliderValueChanged(const int &value, QString title);
+    void sliderValueChanged(const int &value, const QString &title);
 };

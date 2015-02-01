@@ -1,4 +1,5 @@
 #include "ApplicationManagerGUI.h"
+#include "../src/Image3d.h"
 using namespace Mgr;
 
 void ApplicationManagerGUI::showImages() {

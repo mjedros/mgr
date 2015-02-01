@@ -6,12 +6,43 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>625</width>
-    <height>270</height>
+    <width>752</width>
+    <height>350</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>752</width>
+    <height>350</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>752</width>
+    <height>350</height>
+   </size>
+  </property>
+  <property name="font">
+   <font>
+    <family>Liberation Sans</family>
+    <pointsize>10</pointsize>
+    <weight>50</weight>
+    <bold>false</bold>
+    <stylestrategy>PreferDefault</stylestrategy>
+    <kerning>false</kerning>
+   </font>
+  </property>
+  <property name="cursor">
+   <cursorShape>ArrowCursor</cursorShape>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::ClickFocus</enum>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
+  </property>
+  <property name="animated">
+   <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QComboBox" name="ChoosePlatform">
@@ -23,6 +54,9 @@
       <height>31</height>
      </rect>
     </property>
+    <property name="cursor">
+     <cursorShape>ArrowCursor</cursorShape>
+    </property>
    </widget>
    <widget class="QPushButton" name="Process">
     <property name="enabled">
@@ -30,8 +64,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>110</y>
+      <x>110</x>
+      <y>260</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -49,6 +83,9 @@
       <height>31</height>
      </rect>
     </property>
+    <property name="cursor">
+     <cursorShape>ArrowCursor</cursorShape>
+    </property>
    </widget>
    <widget class="QRadioButton" name="File">
     <property name="geometry">
@@ -58,6 +95,14 @@
       <width>86</width>
       <height>19</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Liberation Sans</family>
+      <pointsize>10</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
     </property>
     <property name="text">
      <string>Movie file</string>
@@ -88,6 +133,9 @@
       <height>31</height>
      </rect>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::ClickFocus</enum>
+    </property>
     <property name="text">
      <string>Load images</string>
     </property>
@@ -98,8 +146,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>500</x>
-      <y>110</y>
+      <x>560</x>
+      <y>90</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -114,8 +162,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>150</y>
+      <x>250</x>
+      <y>270</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -132,6 +180,9 @@
       <width>321</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>ArrowCursor</cursorShape>
     </property>
    </widget>
    <widget class="QLabel" name="ImagesLoaded">
@@ -204,8 +255,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>30</y>
+      <x>560</x>
+      <y>40</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -230,64 +281,80 @@
      <string>Save image</string>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="StructElementParam1">
+   <widget class="QComboBox" name="ProcessingWay">
     <property name="geometry">
      <rect>
-      <x>380</x>
-      <y>180</y>
-      <width>66</width>
-      <height>24</height>
+      <x>20</x>
+      <y>220</y>
+      <width>321</width>
+      <height>31</height>
      </rect>
     </property>
-    <property name="maximum">
-     <double>5.000000000000000</double>
-    </property>
-    <property name="value">
-     <double>1.000000000000000</double>
+    <property name="cursor">
+     <cursorShape>ArrowCursor</cursorShape>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="StructElementParam2">
+   <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>450</x>
+      <x>440</x>
       <y>180</y>
-      <width>66</width>
-      <height>24</height>
+      <width>301</width>
+      <height>111</height>
      </rect>
     </property>
-    <property name="maximum">
-     <double>5.000000000000000</double>
+    <property name="title">
+     <string>Structural elements parameters</string>
     </property>
-    <property name="value">
-     <double>1.000000000000000</double>
-    </property>
+    <widget class="QDoubleSpinBox" name="StructElementParam3">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>50</y>
+       <width>66</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <double>5.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="StructElementParam2">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>50</y>
+       <width>66</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <double>5.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="StructElementParam1">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>66</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <double>5.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
    </widget>
-   <widget class="QDoubleSpinBox" name="StructElementParam3">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>180</y>
-      <width>66</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <double>5.000000000000000</double>
-    </property>
-    <property name="value">
-     <double>1.000000000000000</double>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>625</width>
-     <height>20</height>
-    </rect>
-   </property>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">

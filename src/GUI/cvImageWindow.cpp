@@ -16,8 +16,9 @@ cvImageWindow::cvImageWindow(QString title, QObject *_parent)
         slider.reset(new QSlider(this));
         connect(slider.get(), SIGNAL(valueChanged(int)), this,
                 SLOT(sliderValueChanged(int)));
-        connect(this, SIGNAL(sliderValueChanged(const int &, QString)),
-                parentObject, SLOT(sliderValueChanged(const int &, QString)));
+        connect(this, SIGNAL(sliderValueChanged(const int &, const QString)),
+                parentObject,
+                SLOT(sliderValueChanged(const int &, const QString &)));
     }
 }
 

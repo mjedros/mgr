@@ -16,39 +16,27 @@ OperationToMethodPointerMap = {
     { OPERATION::CONTOUR, &ProcessingImage::contour },
     { OPERATION::SKELETONIZATION, &ProcessingImage::skeletonize }
 };
-class Processing3dImage {
-  public:
-    virtual void
-    process(std::shared_ptr<Image3d> image,
-            const shared_ptr<ProcessingImage> img,
-            const pointerToProcessingMethodType pointerToMethod) = 0;
-};
-class ProcessCols : public Processing3dImage {
-  public:
-    void process(std::shared_ptr<Image3d> image,
-                 std::shared_ptr<ProcessingImage> img,
-                 pointerToProcessingMethodType operation) {
-        for (auto i = 0; i < image->getCols(); i++) {
-            img->setImageToProcess(image->getImageAtCol(i));
-            (img.get()->*operation)();
-            image->setImageAtCol(i, img->getImage());
-        }
+void ProcessDepth::process(std::shared_ptr<Image3d> image,
+                           const std::shared_ptr<ProcessingImage> img,
+                           const OPERATION &operation) {
+    clear();
+    for (auto i = 0; i < image->getDepth(); i++) {
+        img->setImageToProcess(image->getImageAtDepth(i).clone());
+        (img.get()->*(OperationToMethodPointerMap.at(operation)))();
+        image->setImageAtDepth(i, img->getImage());
     }
-};
-class ProcessDepth : public Processing3dImage {
-  public:
-    void process(std::shared_ptr<Image3d> image,
-                 const std::shared_ptr<ProcessingImage> img,
-                 const pointerToProcessingMethodType operation) {
-        clear();
-        for (auto i = 0; i < image->getDepth(); i++) {
-            img->setImageToProcess(image->getImageAtDepth(i).clone());
-            (img.get()->*operation)();
-            image->setImageAtDepth(i, img->getImage());
-        }
-        std::cout << getAvarage() << std::endl;
+    std::cout << getAvarage() << std::endl;
+}
+
+void ProcessCols::process(std::shared_ptr<Image3d> image,
+                          std::shared_ptr<ProcessingImage> img,
+                          const OPERATION &operation) {
+    for (auto i = 0; i < image->getCols(); i++) {
+        img->setImageToProcess(image->getImageAtCol(i));
+        (img.get()->*(OperationToMethodPointerMap.at(operation)))();
+        image->setImageAtCol(i, img->getImage());
     }
-};
+}
 
 void saveMovie(std::shared_ptr<Image3d> image, const std::string &filename) {
 
@@ -64,17 +52,6 @@ void saveMovie(std::shared_ptr<Image3d> image, const std::string &filename) {
     }
 }
 
-void ApplicationManager::process(const OPERATION &operation,
-                                 const string &structuralElement,
-                                 const std::vector<float> &params) {
-    cv::waitKey(1);
-    shared_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
-    img->setStructuralElement(structuralElement, params);
-    std::unique_ptr<Processing3dImage> processing3dImage;
-    processing3dImage = std::unique_ptr<ProcessCols>(new ProcessCols);
-    processing3dImage->process(processedImage3d, img,
-                               OperationToMethodPointerMap.at(operation));
-}
 void ApplicationManager::init(const SourceType &source, const string &name) {
     unique_ptr<IImageSource> imageSource =
         SourceFactory::GetImageSource(source, name);

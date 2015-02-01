@@ -12,6 +12,7 @@ std::map<QString, OPERATION> OperationMap = {
     { "Contour", OPERATION::CONTOUR },
     { "Skeletonize", OPERATION::SKELETONIZATION }
 };
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), menu(new QMenu("File")),
       openCLManager(new OpenCLManager()),
@@ -26,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->ChooseOperation->addItems(
         { "Dilation", "Erosion", "Contour", "Skeletonize" });
     ui->MorphologicalElementType->addItems({ "Ellipse", "Cross", "Rectangle" });
+    ui->ProcessingWay->addItems({ "Process columns", "Process depth" });
     setMenuBar(&menu_bar);
 }
 
@@ -68,13 +70,21 @@ void MainWindow::initImages(const Mgr::SourceType &source,
 void MainWindow::on_Process_clicked() {
     ui->ProcessingProgress->setEnabled(true);
     ui->ProcessingProgress->setText("In progress");
-    ui->Process->hide();
-    applicationManager->process(
-        OperationMap[ui->ChooseOperation->currentText()],
-        ui->MorphologicalElementType->currentText().toStdString(),
-        { static_cast<float>(ui->StructElementParam1->value()),
-          static_cast<float>(ui->StructElementParam2->value()),
-          static_cast<float>(ui->StructElementParam3->value()) });
+    const OPERATION &operation =
+        OperationMap[ui->ChooseOperation->currentText()];
+    const std::string MorphElementType =
+        ui->MorphologicalElementType->currentText().toStdString();
+    const std::vector<float> StructElemParams = {
+        static_cast<float>(ui->StructElementParam1->value()),
+        static_cast<float>(ui->StructElementParam2->value()),
+        static_cast<float>(ui->StructElementParam3->value())
+    };
+    if (ui->ProcessingWay->currentText() == "Process columns")
+        applicationManager->process<ProcessCols>(operation, MorphElementType,
+                                                 StructElemParams);
+    else
+        applicationManager->process<ProcessDepth>(operation, MorphElementType,
+                                                  StructElemParams);
     ui->Process->show();
     ui->ProcessingProgress->setText("Done");
 }
