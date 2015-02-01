@@ -37,6 +37,14 @@ FIND_PACKAGE(Qt5Core)
 find_package(Qt5Widgets)
 find_package(Qt5Gui)
 
+if(NOT VTK_BINARY_DIR)
+  find_package(VTK REQUIRED)
+else()
+  set(VTK_DIR ${VTK_BINARY_DIR})
+  find_package(VTK REQUIRED)
+endif()
+
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)

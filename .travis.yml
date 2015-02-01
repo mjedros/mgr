@@ -19,6 +19,12 @@ before_install:
  - sudo apt-get update -qq -y
  - sudo apt-get install -qq opencl-headers
  - sudo apt-get install -qq qt5-qmake qtbase5-dev qtdeclarative5-dev libqt5test5
+ - sudo apt-get install libxt-dev
+ # VTK
+ - travis_retry wget http://www.opengeosys.org/images/dev/vtk-6.1.0.tar.gz
+ - tar -xzf vtk-6.1.0.tar.gz
+ - sudo cp -fR VTK-Install/* /usr
+ - rm -rf vtk-6.1.0.tar.gz VTK-Install
  - sudo apt-get update -qq -y
  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
