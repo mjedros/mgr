@@ -3,13 +3,12 @@ PROJECT(Mgr)
 INCLUDE(../CMakeLists.common)
 SET(TESTS
    ProcessingImages/tst_processingimagestest.cpp
-   ../src/OpenCLManager.cpp
-   ../src/ProcessingImage.cpp
 )
 
 find_package(Qt5Test)
 set(CMAKE_AUTOMOC ON)
 ADD_EXECUTABLE(Tests ${TESTS})
+TARGET_LINK_LIBRARIES( Tests COMMON_LIB )
 TARGET_LINK_LIBRARIES( Tests ${OPENCV_CALIB3D_LIB})
 TARGET_LINK_LIBRARIES( Tests ${OPENCV_CORE_LIB})
 TARGET_LINK_LIBRARIES( Tests ${OPENCV_IMGPROC_LIB})
