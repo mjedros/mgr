@@ -1,9 +1,9 @@
 #include "ProcessingImage.h"
 #include <chrono>
-using namespace Mgr;
+
 using namespace cv;
 using namespace cl;
-
+namespace Mgr {
 std::map<std::string, StructuralElement> StrElementMap = {
     { "Ellipse", ELLIPSE }, { "Cross", CROSS }, { "Rectangle", RECTANGLE }
 };
@@ -79,17 +79,17 @@ void ProcessingImage::setStructuralElementArgument(cl::Kernel &kernel) {
     switch (StrElementMap[structuralElementType.c_str()]) {
     case ELLIPSE: {
         const cl_float3 ellipseParams =
-            (cl_float3) { { structuralElementParams[0],
-                            structuralElementParams[1],
-                            structuralElementParams[2] } };
+            (cl_float3){ { structuralElementParams[0],
+                           structuralElementParams[1],
+                           structuralElementParams[2] } };
         kernel.setArg(2, ellipseParams);
         break;
     }
     case RECTANGLE:
     case CROSS: {
         const cl_int2 rectParams =
-            (cl_int2) { {(int)structuralElementParams[0],
-                         (int)structuralElementParams[1] } };
+            (cl_int2){ {(int)structuralElementParams[0],
+                        (int)structuralElementParams[1] } };
         kernel.setArg(2, rectParams);
         break;
     }
@@ -115,12 +115,10 @@ void ProcessingImage::binarize(const unsigned int &minimum,
         kernel.setArg(2, minimum);
         kernel.setArg(3, maximum);
         process(kernel, image_in, image_out);
-    }
-    catch (Error &e) {
+    } catch (Error &e) {
         LOG(e.what());
         LOG(e.err());
-    }
-    catch (...) {
+    } catch (...) {
         LOG("Unknown Error");
     }
 }
@@ -144,3 +142,4 @@ void ProcessingImage::process(cl::Kernel &kernel, cl::Image2D &image_in,
 
 int getAvarage() { return timeSum / counter; }
 void clear() { timeSum = counter = 0; }
+}

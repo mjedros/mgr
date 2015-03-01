@@ -5,7 +5,8 @@
 
 using namespace std;
 using namespace cl;
-using namespace Mgr;
+
+namespace Mgr {
 
 map<cl_device_type, std::string> DeviceNameToStringMap = {
     { CL_DEVICE_TYPE_GPU, "GPU" },
@@ -16,8 +17,7 @@ map<cl_device_type, std::string> DeviceNameToStringMap = {
 OpenCLManager::OpenCLManager() {
     try {
         Platform::get(&platforms);
-    }
-    catch (Error &e) {
+    } catch (Error &e) {
         LOG(e.what());
         LOG(e.err());
         throw std::string(e.what());
@@ -37,11 +37,9 @@ void OpenCLManager::configure(
         readPrograms(kernelFileName);
         LOG("Programs Loaded")
         queue = CommandQueue(context, processingDevice);
-    }
-    catch (std::string &e) {
+    } catch (std::string &e) {
         throw std::string("Configure error: " + e);
-    }
-    catch (...) {
+    } catch (...) {
         throw std::string("Configure error!");
     }
 }
@@ -59,8 +57,7 @@ void OpenCLManager::readPrograms(const std::string &kernelFileName) {
     program = Program(context, source);
     try {
         program.build({ processingDevice }, "");
-    }
-    catch (Error &e) {
+    } catch (Error &e) {
         std::string ErrorString(
             "Build error:" +
             program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(processingDevice) +
@@ -70,9 +67,7 @@ void OpenCLManager::readPrograms(const std::string &kernelFileName) {
     }
 }
 
-void OpenCLManager::createContext() {
-    context = Context({ processingDevice });
-}
+void OpenCLManager::createContext() { context = Context({ processingDevice }); }
 
 void OpenCLManager::chooseDevice(const unsigned int &platformId,
                                  const unsigned int &DeviceId) {
@@ -98,4 +93,5 @@ OpenCLManager::listPlatforms() const {
         }
     }
     return devicesInfo;
+}
 }

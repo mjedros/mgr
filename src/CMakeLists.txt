@@ -12,21 +12,13 @@ SET(SOURCES
   GUI/ApplicationManagerGUI.cpp
   Application.cpp
   ApplicationManager.cpp
-
   ImageSource/FileVideo.cpp
   ImageSource/Directory.cpp
   Image3d.cpp 
+  Processing3dImage.cpp
   Normalization.cpp
 )
-SET (HEADERS
-  ImageSource/SourceFactory.h  
-  ImageSource/IImageSource.h
-  ImageSource/FileVideo.h
-  ImageSource/Directory.h
-  OpenCLManager.h
-  Image3d.h
-  Normalization.h
-)
+
 SET(HEADERS_Qt
 
   GUI/mainwindow.h

@@ -1,6 +1,6 @@
 #include "Directory.h"
 #include <opencv2/opencv.hpp>
-using namespace Mgr;
+namespace Mgr {
 namespace {
 #include <dirent.h>
 std::set<std::string> readDir(const std::string &directory) {
@@ -35,4 +35,5 @@ cv::Mat Directory::Get() {
         it++;
     }
     return ans;
+}
 }

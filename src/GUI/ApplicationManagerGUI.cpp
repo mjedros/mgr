@@ -1,7 +1,6 @@
 #include "ApplicationManagerGUI.h"
 #include "../src/Image3d.h"
-using namespace Mgr;
-
+namespace Mgr {
 void ApplicationManagerGUI::showImages() {
     originalWindow.reset(new cvImageWindow("Depth Original", this));
     processedWindow.reset(new cvImageWindow("Depth Processed", this));
@@ -37,4 +36,5 @@ void ApplicationManagerGUI::showCols(const int &col) {
 void ApplicationManagerGUI::setMaxValues() {
     originalWindow->setMaxValue(image3d->getDepth() - 1);
     colsOriginal->setMaxValue(image3d->getCols() - 1);
+}
 }

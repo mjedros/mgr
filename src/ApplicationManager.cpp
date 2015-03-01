@@ -3,41 +3,8 @@
 #include "ImageSource/SourceFactory.h"
 #include "Normalization.h"
 using namespace cv;
-using namespace Mgr;
-using std::string;
-using std::shared_ptr;
-using std::unique_ptr;
 
-typedef void (ProcessingImage::*pointerToProcessingMethodType)();
-const std::map<OPERATION, pointerToProcessingMethodType>
-OperationToMethodPointerMap = {
-    { OPERATION::DILATION, &ProcessingImage::dilate },
-    { OPERATION::EROSION, &ProcessingImage::erode },
-    { OPERATION::CONTOUR, &ProcessingImage::contour },
-    { OPERATION::SKELETONIZATION, &ProcessingImage::skeletonize }
-};
-void ProcessDepth::process(std::shared_ptr<Image3d> image,
-                           const std::shared_ptr<ProcessingImage> img,
-                           const OPERATION &operation) {
-    clear();
-    for (auto i = 0; i < image->getDepth(); i++) {
-        img->setImageToProcess(image->getImageAtDepth(i).clone());
-        (img.get()->*(OperationToMethodPointerMap.at(operation)))();
-        image->setImageAtDepth(i, img->getImage());
-    }
-    std::cout << getAvarage() << std::endl;
-}
-
-void ProcessCols::process(std::shared_ptr<Image3d> image,
-                          std::shared_ptr<ProcessingImage> img,
-                          const OPERATION &operation) {
-    for (auto i = 0; i < image->getCols(); i++) {
-        img->setImageToProcess(image->getImageAtCol(i));
-        (img.get()->*(OperationToMethodPointerMap.at(operation)))();
-        image->setImageAtCol(i, img->getImage());
-    }
-}
-
+namespace Mgr {
 void saveMovie(std::shared_ptr<Image3d> image, const std::string &filename) {
 
     VideoWriter videowriter(filename, CV_FOURCC('D', 'I', 'V', 'X'), 300,
@@ -53,7 +20,7 @@ void saveMovie(std::shared_ptr<Image3d> image, const std::string &filename) {
 }
 
 void ApplicationManager::init(const SourceType &source, const string &name) {
-    unique_ptr<IImageSource> imageSource =
+    std::unique_ptr<IImageSource> imageSource =
         SourceFactory::GetImageSource(source, name);
     imageSource->Start();
     std::vector<cv::Mat> matVector;
@@ -71,7 +38,7 @@ void ApplicationManager::initProcessedImage(const unsigned int &minumum,
                                             const unsigned int &maximum) {
     processedImage3d.reset(
         new Image3d(image3d->getDepth(), image3d->getImageAtDepth(0)));
-    unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
+    std::unique_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
     for (auto i = 0; i < processedImage3d->getDepth(); i++) {
         img->setImageToProcess(image3d->getImageAtDepth(i).clone());
         img->binarize(minumum, maximum);
@@ -88,4 +55,5 @@ void ApplicationManager::saveOriginalImage(const std::string &filename) {
 
 void ApplicationManager::saveProcessedImage(const std::string &filename) {
     saveMovie(processedImage3d, filename);
+}
 }

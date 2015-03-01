@@ -1,5 +1,5 @@
 #include "Normalization.h"
-using namespace Mgr;
+namespace Mgr {
 static const int NORMALIZATION_WIDTH = 8;
 bool checkBrighness(cv::Mat image, const int &level) {
     int sum = 0;
@@ -64,4 +64,5 @@ void normalize(std::shared_ptr<Image3d> image3d) {
             }
         }
     }
+}
 }

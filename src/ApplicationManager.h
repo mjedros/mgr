@@ -2,31 +2,13 @@
 #define APPLICATIONMANAGER_H
 #include "ProcessingImage.h"
 #include "OpenCLManager.h"
+#include "Processing3dImage.h"
 #include <QObject>
 #include <QEvent>
 namespace Mgr {
 class Image3d;
 enum SourceType : u_int8_t;
-enum class OPERATION : uint8_t { DILATION, EROSION, CONTOUR, SKELETONIZATION };
 
-class Processing3dImage {
-  public:
-    virtual void process(std::shared_ptr<Image3d> image,
-                         const std::shared_ptr<ProcessingImage> img,
-                         const OPERATION &operation) = 0;
-};
-class ProcessCols : public Processing3dImage {
-  public:
-    void process(std::shared_ptr<Image3d> image,
-                 std::shared_ptr<ProcessingImage> img,
-                 const OPERATION &operation);
-};
-class ProcessDepth : public Processing3dImage {
-  public:
-    void process(std::shared_ptr<Image3d> image,
-                 const std::shared_ptr<ProcessingImage> img,
-                 const OPERATION &operation);
-};
 class ApplicationManager {
   protected:
     std::shared_ptr<OpenCLManager> openCLManager;

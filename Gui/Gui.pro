@@ -29,7 +29,8 @@ SOURCES +=\
     ../src/GUI/cvImageWindow.cpp \
     ../src/Image3d.cpp \
     ../src/Normalization.cpp \
-    ../src/GUI/ApplicationManagerGUI.cpp
+    ../src/GUI/ApplicationManagerGUI.cpp \
+    ../src/Processing3dImage.cpp
 
 HEADERS  += ../src/GUI/mainwindow.h\
         ../src/OpenCLManager.h \
@@ -42,7 +43,8 @@ HEADERS  += ../src/GUI/mainwindow.h\
     ../src/GUI/cvImageWindow.h \
     ../src/Image3d.h \
     ../src/Normalization.h \
-    ../src/GUI/ApplicationManagerGUI.h
+    ../src/GUI/ApplicationManagerGUI.h \
+    ../src/Processing3dImage.h
 
 FORMS    += ../src/GUI/mainwindow.ui
 CONFIG += c++0x
@@ -56,6 +58,7 @@ win32:QMAKE_CXXFLAGS += -fpermissive
 unix {
     LIBS += -L/usr/lib/ -lOpenCL -lopencv_highgui -lopencv_core -lopencv_imgproc
     INCLUDEPATH += /usr/include
+    INCLUDEPATH += /usr/include/vtk-6.1
     DEPENDPATH += /usr/include
 }
 win32 {

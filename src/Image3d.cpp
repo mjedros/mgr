@@ -1,6 +1,5 @@
 #include "Image3d.h"
-using namespace Mgr;
-
+namespace Mgr {
 void Image3d::setImageAtDepth(const int &_depth, const cv::Mat image2d) {
     image2d.copyTo(image.colRange(cols * _depth, cols * (_depth + 1)));
 }
@@ -48,4 +47,5 @@ Image3d::Image3d(const int &_depth, const cv::Mat image2d) : depth(_depth) {
 Image3d::Image3d(const Image3d &source)
     : depth(source.depth), rows(source.rows), cols(source.cols) {
     image = source.image.clone();
+}
 }

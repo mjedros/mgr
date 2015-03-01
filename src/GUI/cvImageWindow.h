@@ -9,7 +9,7 @@
 #include <QSlider>
 
 #include <opencv/highgui.h>
-
+namespace Mgr {
 class cvImageWindow : public QDialog {
     Q_OBJECT
 
@@ -32,3 +32,4 @@ class cvImageWindow : public QDialog {
 signals:
     void sliderValueChanged(const int &value, const QString &title);
 };
+}

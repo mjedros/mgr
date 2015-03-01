@@ -6,7 +6,7 @@
 #include <QStatusBar>
 #include <opencv2/opencv.hpp>
 #include "../ApplicationManager.h"
-using namespace Mgr;
+namespace Mgr {
 
 cvImageWindow::cvImageWindow(QString title, QObject *_parent)
     : imgDisplayLabel(this), slider(nullptr), parentObject(_parent) {
@@ -48,4 +48,5 @@ void cvImageWindow::setMaxValue(const int &value) { slider->setMaximum(value); }
 
 void cvImageWindow::sliderValueChanged(const int &value) {
     emit(sliderValueChanged(value, this->windowTitle()));
+}
 }
