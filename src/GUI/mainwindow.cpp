@@ -3,7 +3,7 @@
 #include <iostream>
 #include "ApplicationManagerGUI.h"
 #include <QFileDialog>
-#include "../src/include/Paths.h"
+#include "../build/src/include/Paths.h"
 #include "../ImageSource/SourceFactory.h"
 using namespace Mgr;
 std::map<QString, OPERATION> OperationMap = {

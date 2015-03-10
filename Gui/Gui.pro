@@ -8,7 +8,7 @@ TEMPLATE = app
 
 QT      += core gui
 
-contains(QT_VERSION, ^5\\.[0-8]\\..*) {
+contains(QT_VERSION, ^4\\.[0-8]\\..*) {
         message("* Using Qt $${QT_VERSION}.")
         QT += widgets
 }
@@ -30,7 +30,8 @@ SOURCES +=\
     ../src/Image3d.cpp \
     ../src/Normalization.cpp \
     ../src/GUI/ApplicationManagerGUI.cpp \
-    ../src/Processing3dImage.cpp
+    ../src/Processing3dImage.cpp \
+    ../src/GUI/vtkview.cpp
 
 HEADERS  += ../src/GUI/mainwindow.h\
         ../src/OpenCLManager.h \
@@ -44,14 +45,16 @@ HEADERS  += ../src/GUI/mainwindow.h\
     ../src/Image3d.h \
     ../src/Normalization.h \
     ../src/GUI/ApplicationManagerGUI.h \
-    ../src/Processing3dImage.h
+    ../src/Processing3dImage.h \
+    ../src/GUI/vtkview.h
 
-FORMS    += ../src/GUI/mainwindow.ui
+FORMS    += ../src/GUI/mainwindow.ui \
+    ../src/GUI/vtkview.ui
 CONFIG += c++0x
 QMAKE_CXXFLAGS += -std=c++0x
 
 unix {
-   # QMAKE_CXXFLAGS += -Werror
+    QMAKE_CXXFLAGS += -Werror
 }
 win32:QMAKE_CXXFLAGS += -fpermissive
 

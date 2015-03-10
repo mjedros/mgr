@@ -33,10 +33,7 @@ find_library(OPENCV_VIDEO_LIB
 		NAMES opencv_video248d opencv_video
 		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib"
 		)	
-FIND_PACKAGE(Qt5Core)
-find_package(Qt5Widgets)
-find_package(Qt5Gui)
-
+FIND_PACKAGE(Qt4)
 if(NOT VTK_BINARY_DIR)
   find_package(VTK REQUIRED)
 else()
@@ -48,9 +45,7 @@ endif()
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-include_directories(${Qt5Widgets_INCLUDE_DIRS})
-include_directories(${Qt5Gui_INCLUDE_DIRS})
-include_directories(${Qt5Core_INCLUDE_DIRS})
-include_directories(${Qt5Test_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${OPENCV_INC})
 INCLUDE_DIRECTORIES(${OPENCL_INC})
+include(${VTK_USE_FILE})
+
