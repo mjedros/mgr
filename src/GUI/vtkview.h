@@ -1,22 +1,25 @@
 #ifndef VTKVIEW_H
 #define VTKVIEW_H
-
+#include <vtkRenderWindow.h>
+#include <QVTKInteractor.h>
 #include <QWidget>
 
 namespace Ui {
 class VTKView;
 }
-
-class VTKView : public QWidget
-{
+class VTKData;
+class VTKView : public QWidget {
     Q_OBJECT
 
-public:
+  public:
     explicit VTKView(QWidget *parent = 0);
     ~VTKView();
 
-private:
+  private:
     Ui::VTKView *ui;
+    vtkRenderWindow* renWin;
+    VTKData *vtkData;
+    QVTKInteractor* iren;
 };
 
 #endif // VTKVIEW_H

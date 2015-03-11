@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>752</width>
-    <height>350</height>
+    <height>370</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>752</width>
-    <height>350</height>
+    <height>370</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>752</width>
-    <height>350</height>
+    <height>370</height>
    </size>
   </property>
   <property name="font">
@@ -354,6 +354,19 @@
       <double>1.000000000000000</double>
      </property>
     </widget>
+   </widget>
+   <widget class="QPushButton" name="vtkViewButton">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>280</y>
+      <width>181</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Visualize 3d</string>
+    </property>
    </widget>
   </widget>
   <widget class="QToolBar" name="mainToolBar">

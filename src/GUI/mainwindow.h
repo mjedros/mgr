@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QMenuBar>
 #include "../src/OpenCLManager.h"
+#include "vtkview.h"
 namespace Ui {
 class MainWindow;
 }
@@ -28,6 +29,7 @@ class MainWindow : public QMainWindow {
     void on_Normalize_clicked();
     void on_ResetProcessed_clicked();
     void on_SaveImage_clicked();
+    void on_vtkViewButton_clicked();
 
   private:
     std::pair<int, int> chosenDevice;
@@ -37,6 +39,7 @@ class MainWindow : public QMainWindow {
     QMenuBar menu_bar;
     QString filename;
     QString directory;
+    VTKView *vtkView;
     std::shared_ptr<Mgr::OpenCLManager> openCLManager;
     std::unique_ptr<Mgr::ApplicationManagerGUI> applicationManager;
     virtual void closeEvent(QCloseEvent *event);

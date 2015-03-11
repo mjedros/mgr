@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include "../build/src/include/Paths.h"
 #include "../ImageSource/SourceFactory.h"
+
 using namespace Mgr;
 std::map<QString, OPERATION> OperationMap = {
     { "Dilation", OPERATION::DILATION },
@@ -130,4 +131,9 @@ void MainWindow::on_SaveImage_clicked() {
     applicationManager->saveOriginalImage(
         QFileDialog::getSaveFileName(this, tr("Save Image"),
                                      QDir::currentPath()).toStdString());
+}
+
+void MainWindow::on_vtkViewButton_clicked() {
+    vtkView = new VTKView();
+    vtkView->show();
 }

@@ -11,6 +11,7 @@ SET(SOURCES
   GUI/cvImageWindow.cpp
   GUI/ApplicationManagerGUI.cpp
   GUI/vtkview.cpp
+  GUI/VTKData.cpp
   Application.cpp
   ApplicationManager.cpp
   ImageSource/FileVideo.cpp

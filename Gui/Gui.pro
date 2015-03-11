@@ -31,7 +31,8 @@ SOURCES +=\
     ../src/Normalization.cpp \
     ../src/GUI/ApplicationManagerGUI.cpp \
     ../src/Processing3dImage.cpp \
-    ../src/GUI/vtkview.cpp
+    ../src/GUI/vtkview.cpp \
+    ../src/GUI/VTKData.cpp
 
 HEADERS  += ../src/GUI/mainwindow.h\
         ../src/OpenCLManager.h \
@@ -46,7 +47,8 @@ HEADERS  += ../src/GUI/mainwindow.h\
     ../src/Normalization.h \
     ../src/GUI/ApplicationManagerGUI.h \
     ../src/Processing3dImage.h \
-    ../src/GUI/vtkview.h
+    ../src/GUI/vtkview.h \
+    ../src/GUI/VTKData.h
 
 FORMS    += ../src/GUI/mainwindow.ui \
     ../src/GUI/vtkview.ui
