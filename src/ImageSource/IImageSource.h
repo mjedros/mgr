@@ -12,18 +12,18 @@ namespace Mgr {
  *
  */
 class IImageSource {
-  public:
-    /**
-     * @brief Start image aquisition.
-     */
-    virtual void Start() = 0;
-    /**
-     * @brief Stop image aquisition.
-     */
-    virtual void Stop() = 0;
-    /**
-     * @brief Get next image in queue.
-     */
-    virtual cv::Mat Get() = 0;
+public:
+  /**
+   * @brief Start image aquisition.
+   */
+  virtual void Start() = 0;
+  /**
+   * @brief Stop image aquisition.
+   */
+  virtual void Stop() = 0;
+  /**
+   * @brief Get next image in queue.
+   */
+  virtual cv::Mat Get() = 0;
 };
 }

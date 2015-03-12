@@ -9,23 +9,23 @@ namespace Mgr {
  *
  */
 class FileVideo : public IImageSource {
-    /**
-     * @brief Video filename
-     */
-    std::string fileName;
-    /**
-     * @brief Video capture ptr
-     */
-    std::unique_ptr<cv::VideoCapture> videoCapture;
+  /**
+   * @brief Video filename
+   */
+  std::string fileName;
+  /**
+   * @brief Video capture ptr
+   */
+  std::unique_ptr<cv::VideoCapture> videoCapture;
 
-  public:
-    /**
-     * @brief Constructor
-     * @param Filename
-     */
-    FileVideo(const std::string &fileName);
-    virtual void Start();
-    virtual void Stop();
-    cv::Mat Get();
+public:
+  /**
+   * @brief Constructor
+   * @param Filename
+   */
+  FileVideo(const std::string &fileName);
+  virtual void Start();
+  virtual void Stop();
+  cv::Mat Get();
 };
 }

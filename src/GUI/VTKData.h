@@ -28,12 +28,18 @@
 #include <vtkRenderLargeImage.h>
 #include <QMessageBox>
 #include <vtkGenericDataObjectWriter.h>
+#include "../src/Image3d.h"
+#include <memory>
 class VTKData {
-    vtkRenderer *ren;
+  vtkSmartPointer<vtkRenderer> ren;
+  std::shared_ptr<Mgr::Image3d> image3d;
 
-  public:
-    VTKData();
-    vtkRenderer * getVTKRenderer() const { return ren; }
+public:
+  VTKData();
+  void setImage3d(const std::shared_ptr<Mgr::Image3d> &image) {
+    image3d = image;
+  }
+  vtkSmartPointer<vtkRenderer> getVTKRenderer() const { return ren; }
 };
 
 #endif // VTKDATA_H

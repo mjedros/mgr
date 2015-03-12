@@ -8,8 +8,8 @@ void FileVideo::Start() { videoCapture.reset(new cv::VideoCapture(fileName)); }
 void FileVideo::Stop() {}
 
 cv::Mat FileVideo::Get() {
-    cv::Mat ans;
-    (*videoCapture) >> ans;
-    return ans;
+  cv::Mat ans;
+  (*videoCapture) >> ans;
+  return ans;
 }
 }

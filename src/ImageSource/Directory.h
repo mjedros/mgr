@@ -9,27 +9,27 @@ namespace Mgr {
  *
  */
 class Directory : public IImageSource {
-    /**
-     * @brief Const iterator
-     */
-    std::set<std::string>::const_iterator it;
-    /**
-     * @brief Directory
-     */
-    std::string directory;
-    /**
-     * @brief Video capture ptr
-     */
-    std::set<std::string> files;
+  /**
+   * @brief Const iterator
+   */
+  std::set<std::string>::const_iterator it;
+  /**
+   * @brief Directory
+   */
+  std::string directory;
+  /**
+   * @brief Video capture ptr
+   */
+  std::set<std::string> files;
 
-  public:
-    /**
-     * @brief Constructor
-     * @param directory
-     */
-    Directory(const std::string &directory);
-    virtual void Start();
-    virtual void Stop();
-    cv::Mat Get();
+public:
+  /**
+   * @brief Constructor
+   * @param directory
+   */
+  Directory(const std::string &directory);
+  virtual void Start();
+  virtual void Stop();
+  cv::Mat Get();
 };
 }

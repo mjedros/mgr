@@ -1,5 +1,3 @@
 #include "VTKData.h"
 
-VTKData::VTKData() {
-    ren = vtkRenderer::New();
-}
+VTKData::VTKData() { ren = vtkRenderer::New(); }
