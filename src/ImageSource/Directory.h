@@ -8,6 +8,9 @@ namespace Mgr {
  * @brief Class representing directory with images as image source
  *
  */
+
+enum fileType : u_int8_t { DICOM, OTHER };
+
 class Directory : public IImageSource {
   /**
    * @brief Const iterator
@@ -21,6 +24,9 @@ class Directory : public IImageSource {
    * @brief Video capture ptr
    */
   std::set<std::string> files;
+  fileType type;
+
+  cv::Mat getDicomImage(const std::string &filename);
 
 public:
   /**
