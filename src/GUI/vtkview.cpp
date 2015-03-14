@@ -44,11 +44,14 @@ VTKView::VTKView(std::unique_ptr<QWidget> parent)
   vtkData = std::unique_ptr<VTKData>(new VTKData());
   ui->vtkwidget->GetRenderWindow()->AddRenderer(vtkData->getVTKRenderer());
   renWin = ui->vtkwidget->GetRenderWindow();
+  renWin->StereoCapableWindowOn();
   iren = ui->vtkwidget->GetInteractor();
 }
 
 void VTKView::setImage3d(const std::shared_ptr<Mgr::Image3d> &image) {
   vtkData->setImage3d(image);
+  vtkData->initVTKImage();
+  renWin->Render();
 }
 
 VTKView::~VTKView() {}

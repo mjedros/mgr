@@ -29,11 +29,9 @@ void Directory::Start() {
 void Directory::Stop() {}
 
 cv::Mat Directory::Get() {
-  cv::Mat ans;
-  if (it != files.end()) {
-    ans = (cv::imread(directory + *it));
-    it++;
-  }
-  return ans;
+  if (it != files.end())
+    return cv::imread(directory + *it++);
+  else
+    return cv::Mat();
 }
 }

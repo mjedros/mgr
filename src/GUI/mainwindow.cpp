@@ -132,9 +132,7 @@ void MainWindow::on_SaveImage_clicked() {
 }
 
 void MainWindow::on_vtkViewButton_clicked() {
-  if (vtkView == nullptr) {
-    vtkView = std::unique_ptr<VTKView>(new VTKView());
-    vtkView->setImage3d(applicationManager->getProcessedImage3d());
-  }
+  vtkView.reset(new VTKView());
+  vtkView->setImage3d(applicationManager->getProcessedImage3d());
   vtkView->show();
 }
