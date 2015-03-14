@@ -2,6 +2,7 @@
 #include <opencv2/opencv.hpp>
 #include <vtkDICOMImageReader.h>
 #include <vtkSmartPointer.h>
+#include <vtkImageData.h>
 namespace Mgr {
 namespace {
 #include <dirent.h>
@@ -22,11 +23,14 @@ std::set<std::string> readDir(const std::string &directory) {
 }
 }
 cv::Mat Directory::getDicomImage(const std::string &filename) {
-  cv::Mat matImage;
   vtkSmartPointer<vtkDICOMImageReader> reader = vtkDICOMImageReader::New();
   reader->SetFileName(filename.c_str());
   reader->Update();
-  return matImage;
+  vtkSmartPointer<vtkImageData> vtkImage = vtkImageData::New();
+  vtkImage = reader->GetOutput();
+  int dims[3];
+  vtkImage->GetDimensions(dims);
+  return cv::Mat(dims[0], dims[1], CV_8UC4, vtkImage->GetScalarPointer());
 }
 
 Directory::Directory(const std::string &directory) : directory(directory) {}
@@ -34,7 +38,7 @@ Directory::Directory(const std::string &directory) : directory(directory) {}
 void Directory::Start() {
   files = readDir(directory);
   it = files.begin();
-  if (it->find(".dcm"))
+  if (it->find(".dcm") != std::string::npos)
     type = DICOM;
   else
     type = OTHER;
@@ -46,8 +50,9 @@ cv::Mat Directory::Get() {
   if (it != files.end()) {
     if (type == OTHER)
       return cv::imread(directory + *it++);
-    else
+    else {
       return getDicomImage(directory + *it++);
+    }
   } else
     return cv::Mat();
 }

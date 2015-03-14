@@ -26,7 +26,8 @@ void ApplicationManager::init(const SourceType &source, const string &name) {
   std::vector<cv::Mat> matVector;
 
   for (Mat im = imageSource->Get(); !im.empty(); im = imageSource->Get()) {
-    cv::cvtColor(im, im, CV_BGR2GRAY);
+    if (im.type() != CV_8UC1)
+      cv::cvtColor(im, im, CV_BGR2GRAY);
     matVector.push_back(im);
   }
 
