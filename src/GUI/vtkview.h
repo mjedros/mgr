@@ -3,7 +3,7 @@
 #include <vtkRenderWindow.h>
 #include <QVTKInteractor.h>
 #include <vtkSmartPointer.h>
-#include <QWidget>
+#include "QVTKWidget.h"
 #include <memory>
 namespace Mgr {
 class Image3d;
@@ -12,11 +12,11 @@ namespace Ui {
 class VTKView;
 }
 class VTKData;
-class VTKView : public QWidget {
+class VTKView : public QVTKWidget {
   Q_OBJECT
 
 public:
-  explicit VTKView(std::unique_ptr<QWidget> parent = nullptr);
+  explicit VTKView(std::unique_ptr<QVTKWidget> parent = nullptr);
   void setImage3d(const std::shared_ptr<Mgr::Image3d> &image);
   void initImage();
   void renderNewImage(std::tuple<double, double, double> colors);

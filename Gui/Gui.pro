@@ -50,8 +50,7 @@ HEADERS  += ../src/GUI/mainwindow.h\
     ../src/GUI/vtkview.h \
     ../src/GUI/VTKData.h
 
-FORMS    += ../src/GUI/mainwindow.ui \
-    ../src/GUI/vtkview.ui
+FORMS    += ../src/GUI/mainwindow.ui
 CONFIG += c++0x
 QMAKE_CXXFLAGS += -std=c++0x
 
