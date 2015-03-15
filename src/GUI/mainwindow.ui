@@ -368,6 +368,19 @@
      <string>Visualize 3d</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="addNextVTKImage">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>280</y>
+      <width>181</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Add next 3d Image</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">

@@ -10,7 +10,8 @@ VTKData::VTKData() : renderer(vtkRenderer::New()) {
   renderer->SetBackground(.1, .1, .1);
 }
 
-void VTKData::initVTKImage() {
+vtkSmartPointer<vtkActor>
+VTKData::createActorOutOf3dImage(std::tuple<double, double, double> colors) {
   vtkSmartPointer<vtkPolyData> polyData = vtkPolyData::New();
   vtkSmartPointer<vtkPoints> points = vtkPoints::New();
   vtkSmartPointer<vtkPolyDataMapper> mapper = vtkPolyDataMapper::New();
@@ -33,6 +34,20 @@ void VTKData::initVTKImage() {
   polyData->SetVerts(vertices);
   mapper->SetInputData(polyData);
   actor->SetMapper(mapper);
-  actor->GetProperty()->SetColor(0.9, 0.9, 0.9);
+  actor->GetProperty()->SetColor(std::get<0>(colors), std::get<1>(colors),
+                                 std::get<2>(colors));
+
+  return actor;
+}
+
+void VTKData::initVTKImage() {
+  vtkSmartPointer<vtkActor> actor =
+      createActorOutOf3dImage(std::make_tuple(0.9, 0.9, 0.9));
   renderer->AddActor(actor);
+}
+
+void VTKData::addNextImage(std::tuple<double, double, double> colors) {
+  vtkSmartPointer<vtkActor> actor = createActorOutOf3dImage(colors);
+  renderer->AddActor(actor);
+  renderer->Render();
 }

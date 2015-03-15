@@ -70,6 +70,7 @@ void MainWindow::initImages(const Mgr::SourceType &source,
 void MainWindow::on_Process_clicked() {
   ui->ProcessingProgress->setEnabled(true);
   ui->ProcessingProgress->setText("In progress");
+  cv::waitKey(1);
   const OPERATION &operation = OperationMap[ui->ChooseOperation->currentText()];
   const std::string MorphElementType =
       ui->MorphologicalElementType->currentText().toStdString();
@@ -134,5 +135,11 @@ void MainWindow::on_SaveImage_clicked() {
 void MainWindow::on_vtkViewButton_clicked() {
   vtkView.reset(new VTKView());
   vtkView->setImage3d(applicationManager->getProcessedImage3d());
+  vtkView->initImage();
   vtkView->show();
+}
+
+void MainWindow::on_addNextVTKImage_clicked() {
+  vtkView->setImage3d(applicationManager->getProcessedImage3d());
+  vtkView->renderNewImage(std::make_tuple(1, 0.2, 0.2));
 }

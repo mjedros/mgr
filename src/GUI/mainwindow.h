@@ -30,6 +30,7 @@ private slots:
   void on_ResetProcessed_clicked();
   void on_SaveImage_clicked();
   void on_vtkViewButton_clicked();
+  void on_addNextVTKImage_clicked();
 
 private:
   std::pair<int, int> chosenDevice;

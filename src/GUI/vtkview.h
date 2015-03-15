@@ -18,6 +18,8 @@ class VTKView : public QWidget {
 public:
   explicit VTKView(std::unique_ptr<QWidget> parent = nullptr);
   void setImage3d(const std::shared_ptr<Mgr::Image3d> &image);
+  void initImage();
+  void renderNewImage(std::tuple<double, double, double> colors);
   ~VTKView();
 
 private:

@@ -15,7 +15,10 @@ public:
     image3d = image;
   }
   void initVTKImage();
+  void addNextImage(std::tuple<double, double, double> colors);
   vtkSmartPointer<vtkRenderer> getVTKRenderer() const { return renderer; }
+  vtkSmartPointer<vtkActor>
+  createActorOutOf3dImage(std::tuple<double, double, double> colors);
 };
 
 #endif // VTKDATA_H

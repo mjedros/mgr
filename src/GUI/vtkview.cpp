@@ -50,7 +50,15 @@ VTKView::VTKView(std::unique_ptr<QWidget> parent)
 
 void VTKView::setImage3d(const std::shared_ptr<Mgr::Image3d> &image) {
   vtkData->setImage3d(image);
+}
+
+void VTKView::initImage() {
   vtkData->initVTKImage();
+  renWin->Render();
+}
+
+void VTKView::renderNewImage(std::tuple<double, double, double> colors) {
+  vtkData->addNextImage(colors);
   renWin->Render();
 }
 
