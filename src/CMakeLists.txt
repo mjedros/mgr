@@ -5,6 +5,7 @@ INCLUDE(../CMakeLists.common)
 SET(COMMON_SOURCES
   OpenCLManager.cpp 
   ProcessingImage.cpp
+  csvFileUtils.cpp
 )
 SET(SOURCES
   GUI/mainwindow.cpp

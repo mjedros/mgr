@@ -9,25 +9,25 @@ const std::map<OPERATION, pointerToProcessingMethodType>
       { OPERATION::CONTOUR, &ProcessingImage::contour },
       { OPERATION::SKELETONIZATION, &ProcessingImage::skeletonize }
     };
-void ProcessDepth::process(const std::shared_ptr<Image3d> &image,
+void ProcessDepth::process(const std::shared_ptr<Image3d> &image3d,
                            const std::shared_ptr<ProcessingImage> &img,
                            const OPERATION &operation) {
   clear();
-  for (auto i = 0; i < image->getDepth(); i++) {
-    img->setImageToProcess(image->getImageAtDepth(i).clone());
+  for (auto i = 0; i < image3d->getDepth(); i++) {
+    img->setImageToProcess(image3d->getImageAtDepth(i).clone());
     (img.get()->*(OperationToMethodPointerMap.at(operation)))();
-    image->setImageAtDepth(i, img->getImage());
+    image3d->setImageAtDepth(i, img->getImage());
   }
   std::cout << getAvarage() << std::endl;
 }
 
-void ProcessCols::process(const std::shared_ptr<Image3d> &image,
+void ProcessCols::process(const std::shared_ptr<Image3d> &image3d,
                           const std::shared_ptr<ProcessingImage> &img,
                           const OPERATION &operation) {
-  for (auto i = 0; i < image->getCols(); i++) {
-    img->setImageToProcess(image->getImageAtCol(i));
+  for (auto i = 0; i < image3d->getCols(); i++) {
+    img->setImageToProcess(image3d->getImageAtCol(i));
     (img.get()->*(OperationToMethodPointerMap.at(operation)))();
-    image->setImageAtCol(i, img->getImage());
+    image3d->setImageAtCol(i, img->getImage());
   }
 }
 }
