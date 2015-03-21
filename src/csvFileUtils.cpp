@@ -27,4 +27,17 @@ const vector<vector<string>> getOperationsVector(const string &filename) {
 
   return operationsVector;
 }
+
+void saveCsvFile(const vector<vector<string>> &operationsVector,
+                 const std::string &filename) {
+  ofstream csvFile(filename);
+  for (auto &operation : operationsVector) {
+    for (auto token = operation.begin(); token != operation.end(); token++) {
+      csvFile << *token;
+      if (token != operation.end() - 1)
+        csvFile << ",";
+    }
+    csvFile << endl;
+  }
+}
 }
