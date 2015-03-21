@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QMenuBar>
 #include "../src/OpenCLManager.h"
+#include "../csvFileUtils.h"
 namespace Ui {
 class MainWindow;
 }
@@ -19,6 +20,7 @@ class MainWindow : public QMainWindow {
 public:
   explicit MainWindow(QWidget *parent = 0);
   ~MainWindow();
+  void initBinaryImage();
 private slots:
   void on_ChoosePlatform_currentIndexChanged(const QString &description);
   void on_Process_clicked();
@@ -31,6 +33,8 @@ private slots:
   void on_SaveImage_clicked();
   void on_vtkViewButton_clicked();
   void on_addNextVTKImage_clicked();
+  void on_saveCsvFile_clicked();
+  void on_addToCsvFile_clicked();
 
 private:
   std::pair<int, int> chosenDevice;
@@ -40,6 +44,7 @@ private:
   QMenuBar menu_bar;
   QString filename;
   QString directory;
+  Mgr::CsvFile csvFile;
   std::unique_ptr<VTKView> vtkView;
   std::shared_ptr<Mgr::OpenCLManager> openCLManager;
   std::unique_ptr<Mgr::ApplicationManagerGUI> applicationManager;

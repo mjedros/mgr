@@ -3,9 +3,14 @@
 #include <vector>
 #include <string>
 namespace Mgr {
-const std::vector<std::vector<std::string>>
-getOperationsVector(const std::string &filename);
-void saveCsvFile(const std::vector<std::vector<std::string>> &operationsVector,
-                 const std::string &filename);
+class CsvFile {
+  std::vector<std::vector<std::string>> operationsVector;
+
+public:
+  void addOperations(const std::vector<std::string> &operations);
+  void saveFile(const std::string &filename);
+  void loadFile(const std::string &filename);
+  void clear() { operationsVector.clear(); }
+};
 }
 #endif // CSVFILEUTILS_H

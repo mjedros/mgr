@@ -14,12 +14,17 @@ std::map<QString, OPERATION> OperationMap = {
   { "Contour", OPERATION::CONTOUR },
   { "Skeletonize", OPERATION::SKELETONIZATION }
 };
-
+namespace {
+inline std::string getDoubleText(const QString &text) {
+  std::string doubleText = text.toStdString();
+  doubleText.replace(doubleText.find(','), 1, ".");
+  return doubleText;
+}
+}
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent), ui(new Ui::MainWindow), menu(new QMenu("File")),
     openCLManager(new OpenCLManager()),
     applicationManager(new ApplicationManagerGUI(openCLManager)) {
-  this->setFixedSize(this->size());
   ui->setupUi(this);
   setPlatformsList();
   menu->addAction("Open file to process", this, SLOT(openFileToProcess()));
@@ -57,8 +62,7 @@ void MainWindow::setPlatformsList() {
 void MainWindow::initImages(const Mgr::SourceType &source,
                             const std::string &name) {
   applicationManager->init(source, name);
-  applicationManager->initProcessedImage(ui->lowLewel->value(),
-                                         ui->highLevel->value());
+  initBinaryImage();
   ui->ImagesLoaded->setText("Images Loaded");
   ui->Process->setEnabled(true);
   ui->ShowWindows->setEnabled(true);
@@ -71,6 +75,7 @@ void MainWindow::on_Process_clicked() {
   ui->ProcessingProgress->setEnabled(true);
   ui->ProcessingProgress->setText("In progress");
   cv::waitKey(1);
+
   const OPERATION &operation = OperationMap[ui->ChooseOperation->currentText()];
   const std::string MorphElementType =
       ui->MorphologicalElementType->currentText().toStdString();
@@ -117,14 +122,17 @@ void MainWindow::on_ShowWindows_clicked() { applicationManager->showImages(); }
 
 void MainWindow::on_Normalize_clicked() {
   applicationManager->normalizeOriginalImage();
-  applicationManager->initProcessedImage(ui->lowLewel->value(),
-                                         ui->highLevel->value());
+  initBinaryImage();
 }
 
-void MainWindow::on_ResetProcessed_clicked() {
+void MainWindow::initBinaryImage() {
   applicationManager->initProcessedImage(ui->lowLewel->value(),
                                          ui->highLevel->value());
+  csvFile.addOperations({ "Binarize", ui->lowLewel->text().toStdString(),
+                          ui->highLevel->text().toStdString() });
 }
+
+void MainWindow::on_ResetProcessed_clicked() { initBinaryImage(); }
 
 void MainWindow::on_SaveImage_clicked() {
   applicationManager->saveOriginalImage(
@@ -142,4 +150,18 @@ void MainWindow::on_vtkViewButton_clicked() {
 void MainWindow::on_addNextVTKImage_clicked() {
   vtkView->setImage3d(applicationManager->getProcessedImage3d());
   vtkView->renderNewImage(std::make_tuple(1, 0.2, 0.2));
+}
+
+void MainWindow::on_saveCsvFile_clicked() {
+  csvFile.saveFile(
+      QFileDialog::getSaveFileName(this, tr("Save Image"), QDir::currentPath())
+          .toStdString());
+}
+
+void MainWindow::on_addToCsvFile_clicked() {
+  csvFile.addOperations({ ui->ChooseOperation->currentText().toStdString(),
+                          getDoubleText(ui->StructElementParam1->text()),
+                          getDoubleText(ui->StructElementParam2->text()),
+                          getDoubleText(ui->StructElementParam3->text()),
+                          ui->ProcessingWay->currentText().toStdString() });
 }
