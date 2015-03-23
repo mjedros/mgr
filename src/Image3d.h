@@ -21,7 +21,7 @@ public:
   const cv::Mat getImageAtCol(const int &col) const;
   Image3d(const int &_depth, const cv::Mat image2d);
   Image3d(const Image3d &source);
-  ~Image3d() { std::cout << "Image3d destructor" << std::endl; }
+  ~Image3d() { image.release(); }
 };
 }
 #endif // IMAGE3D_H

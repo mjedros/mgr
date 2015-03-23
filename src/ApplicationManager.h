@@ -15,6 +15,7 @@ protected:
   std::string sourceFilename;
   std::shared_ptr<Image3d> image3d;
   std::shared_ptr<Image3d> processedImage3d;
+  std::unique_ptr<Image3d> image3dPrevious;
 
 public:
   ApplicationManager(const std::shared_ptr<OpenCLManager> &openCLManagerPtr)
@@ -23,6 +24,8 @@ public:
   void process(const OPERATION &operation, const std::string &structuralElement,
                const std::vector<float> &params) {
     cv::waitKey(1);
+    image3dPrevious.reset(new Image3d(*processedImage3d)); // save image
+
     std::shared_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
     img->setStructuralElement(structuralElement, params);
     std::unique_ptr<Processing3dImage> processing3dImage;

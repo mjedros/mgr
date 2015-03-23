@@ -32,6 +32,7 @@ ProcessingImage::ProcessingImage(
 
 Mat ProcessingImage::getImage() { return image; }
 void ProcessingImage::setImageToProcess(const cv::Mat &img) {
+  image.release();
   image = img;
   region[0] = img.cols;
   region[1] = img.rows;
