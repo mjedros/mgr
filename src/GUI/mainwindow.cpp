@@ -128,8 +128,6 @@ void MainWindow::on_Normalize_clicked() {
 void MainWindow::initBinaryImage() {
   applicationManager->initProcessedImage(ui->lowLewel->value(),
                                          ui->highLevel->value());
-  csvFile.addOperations({ "Binarize", ui->lowLewel->text().toStdString(),
-                          ui->highLevel->text().toStdString() });
 }
 
 void MainWindow::on_ResetProcessed_clicked() { initBinaryImage(); }
@@ -153,15 +151,24 @@ void MainWindow::on_addNextVTKImage_clicked() {
 }
 
 void MainWindow::on_saveCsvFile_clicked() {
-  csvFile.saveFile(
+  applicationManager->saveCSVFile(
       QFileDialog::getSaveFileName(this, tr("Save Image"), QDir::currentPath())
           .toStdString());
 }
 
 void MainWindow::on_addToCsvFile_clicked() {
-  csvFile.addOperations({ ui->ChooseOperation->currentText().toStdString(),
-                          getDoubleText(ui->StructElementParam1->text()),
-                          getDoubleText(ui->StructElementParam2->text()),
-                          getDoubleText(ui->StructElementParam3->text()),
-                          ui->ProcessingWay->currentText().toStdString() });
+  applicationManager->addToCSVFile(
+      { ui->ChooseOperation->currentText().toStdString(),
+        ui->MorphologicalElementType->currentText().toStdString(),
+        getDoubleText(ui->StructElementParam1->text()),
+        getDoubleText(ui->StructElementParam2->text()),
+        getDoubleText(ui->StructElementParam3->text()),
+        ui->ProcessingWay->currentText().toStdString() });
+}
+
+void MainWindow::on_loadCsvFile_clicked() {
+  applicationManager->loadCSVFile(
+      QFileDialog::getOpenFileName(this, tr("Open CSV File"),
+                                   QDir::currentPath(),
+                                   tr("Csv Files(*.csv)")).toStdString());
 }

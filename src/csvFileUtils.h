@@ -11,6 +11,9 @@ public:
   void saveFile(const std::string &filename);
   void loadFile(const std::string &filename);
   void clear() { operationsVector.clear(); }
+  const std::vector<std::vector<std::string>> &getOperationsVector() const {
+    return operationsVector;
+  }
 };
 }
 #endif // CSVFILEUTILS_H

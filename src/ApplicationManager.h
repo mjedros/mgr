@@ -3,6 +3,7 @@
 #include "ProcessingImage.h"
 #include "OpenCLManager.h"
 #include "Processing3dImage.h"
+#include "csvFileUtils.h"
 #include <QObject>
 #include <QEvent>
 namespace Mgr {
@@ -16,6 +17,7 @@ protected:
   std::shared_ptr<Image3d> image3d;
   std::shared_ptr<Image3d> processedImage3d;
   std::unique_ptr<Image3d> image3dPrevious;
+  CsvFile csvFile;
 
 public:
   ApplicationManager(const std::shared_ptr<OpenCLManager> &openCLManagerPtr)
@@ -36,10 +38,25 @@ public:
   void init(const SourceType &source, const std::string &name);
   void initProcessedImage(const unsigned int &minumum = 100,
                           const unsigned int &maximum = 255);
+
   void normalizeOriginalImage();
   void saveOriginalImage(const std::string &filename);
   void saveProcessedImage(const std::string &filename);
-  const std::shared_ptr<Image3d> &getProcessedImage3d() const {
+  inline void saveCSVFile(const std::string &filename) {
+    csvFile.saveFile(filename);
+  }
+  inline void loadCSVFile(const std::string &filename) {
+    csvFile.loadFile(filename);
+  }
+  inline void revertLastOperation() { *processedImage3d = *image3dPrevious; }
+  inline void addToCSVFile(const std::vector<std::string> &operationsVector) {
+    csvFile.addOperations(operationsVector);
+  }
+  inline const std::vector<std::vector<std::string>> &
+  getOperationsVector() const {
+    return csvFile.getOperationsVector();
+  }
+  inline const std::shared_ptr<Image3d> &getProcessedImage3d() const {
     return processedImage3d;
   }
 };

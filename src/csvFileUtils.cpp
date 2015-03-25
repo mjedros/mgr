@@ -6,7 +6,7 @@
 
 using namespace std;
 namespace Mgr {
-namespace {
+namespace Utils {
 const vector<string> split(const string &text, char sep) {
   vector<string> tokens;
   size_t start = 0, end = 0;
@@ -41,16 +41,16 @@ void saveCsvFile(const vector<vector<string>> &operationsVector,
     csvFile << endl;
   }
 }
-}
+} // namespace Utils
 void CsvFile::addOperations(const vector<string> &operations) {
   operationsVector.push_back(operations);
 }
 
 void CsvFile::saveFile(const string &filename) {
-  saveCsvFile(operationsVector, filename);
+  Utils::saveCsvFile(operationsVector, filename);
 }
 
 void CsvFile::loadFile(const string &filename) {
-  operationsVector = getOperationsVector(filename);
+  operationsVector = Utils::getOperationsVector(filename);
 }
 }

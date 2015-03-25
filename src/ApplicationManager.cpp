@@ -2,6 +2,7 @@
 #include <opencv2/opencv.hpp>
 #include "ImageSource/SourceFactory.h"
 #include "Normalization.h"
+
 using namespace cv;
 
 namespace Mgr {
@@ -49,8 +50,9 @@ void ApplicationManager::initProcessedImage(const unsigned int &minumum,
     processedImage3d->setImageAtDepth(i, img->getImage());
   }
   std::cout << getAvarage() << std::endl;
+  csvFile.addOperations(
+      { "Binarize", std::to_string(minumum), std::to_string(maximum) });
 }
-
 void ApplicationManager::normalizeOriginalImage() { normalize(image3d); }
 
 void ApplicationManager::saveOriginalImage(const std::string &filename) {
