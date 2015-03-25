@@ -8,7 +8,7 @@
 #include "vtkview.h"
 #include "../src/Image3d.h"
 using namespace Mgr;
-std::map<QString, OPERATION> OperationMap = {
+std::map<std::string, OPERATION> OperationMap = {
   { "Dilation", OPERATION::DILATION },
   { "Erosion", OPERATION::EROSION },
   { "Contour", OPERATION::CONTOUR },
@@ -71,12 +71,24 @@ void MainWindow::initImages(const Mgr::SourceType &source,
   ui->SaveImage->setEnabled(true);
 }
 
+void MainWindow::Process(const std::string &operationString,
+                         const std::string &MorphElementType,
+                         const std::vector<float> StructElemParams,
+                         const std::string &operationWay) {
+  const OPERATION &operation = OperationMap[operationString];
+  if (operationWay == "Process columns")
+    applicationManager->process<ProcessCols>(operation, MorphElementType,
+                                             StructElemParams);
+  else
+    applicationManager->process<ProcessDepth>(operation, MorphElementType,
+                                              StructElemParams);
+}
+
 void MainWindow::on_Process_clicked() {
   ui->ProcessingProgress->setEnabled(true);
   ui->ProcessingProgress->setText("In progress");
   cv::waitKey(1);
 
-  const OPERATION &operation = OperationMap[ui->ChooseOperation->currentText()];
   const std::string MorphElementType =
       ui->MorphologicalElementType->currentText().toStdString();
   const std::vector<float> StructElemParams = {
@@ -84,12 +96,9 @@ void MainWindow::on_Process_clicked() {
     static_cast<float>(ui->StructElementParam2->value()),
     static_cast<float>(ui->StructElementParam3->value())
   };
-  if (ui->ProcessingWay->currentText() == "Process columns")
-    applicationManager->process<ProcessCols>(operation, MorphElementType,
-                                             StructElemParams);
-  else
-    applicationManager->process<ProcessDepth>(operation, MorphElementType,
-                                              StructElemParams);
+
+  Process(ui->ChooseOperation->currentText().toStdString(), MorphElementType,
+          StructElemParams, ui->ProcessingWay->currentText().toStdString());
   ui->Process->show();
   ui->ProcessingProgress->setText("Done");
 }
@@ -171,4 +180,19 @@ void MainWindow::on_loadCsvFile_clicked() {
       QFileDialog::getOpenFileName(this, tr("Open CSV File"),
                                    QDir::currentPath(),
                                    tr("Csv Files(*.csv)")).toStdString());
+}
+
+void MainWindow::on_processCsvSequence_clicked() {
+  auto operationsVector = applicationManager->getOperationsVector();
+  for (auto &tokens : operationsVector) {
+    if (tokens[0] == "Binarize") {
+      applicationManager->initProcessedImage(std::stoi(tokens[1]),
+                                             std::stoi(tokens[2]));
+    } else {
+      Process(
+          tokens[0], tokens[1],
+          { std::stof(tokens[2]), std::stof(tokens[3]), std::stof(tokens[4]) },
+          tokens[5]);
+    }
+  }
 }

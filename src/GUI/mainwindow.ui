@@ -430,6 +430,19 @@
      <string>Load csv file</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="processCsvSequence">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>430</y>
+      <width>141</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Process sequence</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
