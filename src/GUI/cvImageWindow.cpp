@@ -55,8 +55,7 @@ void cvImageWindow::mousePressEvent(QMouseEvent *e) {
   std::cout << "pressed " << e->globalX() << ", " << e->globalY() << std::endl;
 }
 
-void cvImageWindow::mouseMoveEvent(QMouseEvent *) {
-}
+void cvImageWindow::mouseMoveEvent(QMouseEvent *) {}
 
 void cvImageWindow::mouseReleaseEvent(QMouseEvent *releaseEvent) {
   std::cout << "released " << releaseEvent->globalX() << ", "

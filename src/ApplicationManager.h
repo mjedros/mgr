@@ -16,7 +16,7 @@ protected:
   std::string sourceFilename;
   std::shared_ptr<Image3d> image3d;
   std::shared_ptr<Image3d> processedImage3d;
-  std::unique_ptr<Image3d> image3dPrevious;
+  Image3d image3dPrevious;
   CsvFile csvFile;
 
 public:
@@ -26,7 +26,7 @@ public:
   void process(const OPERATION &operation, const std::string &structuralElement,
                const std::vector<float> &params) {
     cv::waitKey(1);
-    image3dPrevious.reset(new Image3d(*processedImage3d)); // save image
+    image3dPrevious = *processedImage3d; // save image
 
     std::shared_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
     img->setStructuralElement(structuralElement, params);
@@ -42,21 +42,18 @@ public:
   void normalizeOriginalImage();
   void saveOriginalImage(const std::string &filename);
   void saveProcessedImage(const std::string &filename);
-  inline void saveCSVFile(const std::string &filename) {
-    csvFile.saveFile(filename);
+  void saveCSVFile(const std::string &filename) { csvFile.saveFile(filename); }
+  void loadCSVFile(const std::string &filename) { csvFile.loadFile(filename); }
+  void revertLastOperation() {
+    processedImage3d.reset(new Image3d(image3dPrevious));
   }
-  inline void loadCSVFile(const std::string &filename) {
-    csvFile.loadFile(filename);
-  }
-  inline void revertLastOperation() { *processedImage3d = *image3dPrevious; }
-  inline void addToCSVFile(const std::vector<std::string> &operationsVector) {
+  void addToCSVFile(const std::vector<std::string> &operationsVector) {
     csvFile.addOperations(operationsVector);
   }
-  inline const std::vector<std::vector<std::string>> &
-  getOperationsVector() const {
+  const std::vector<std::vector<std::string>> &getOperationsVector() const {
     return csvFile.getOperationsVector();
   }
-  inline const std::shared_ptr<Image3d> &getProcessedImage3d() const {
+  const std::shared_ptr<Image3d> &getProcessedImage3d() const {
     return processedImage3d;
   }
 };
