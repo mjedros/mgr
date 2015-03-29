@@ -1,5 +1,4 @@
 #include "cvImageWindow.h"
-#include <QLabel>
 #include <QPainter>
 #include <QFileDialog>
 #include <QApplication>
@@ -22,8 +21,8 @@ cvImageWindow::cvImageWindow(QString title, QObject *_parent)
   }
 }
 
-cvImageWindow::cvImageWindow(QDialog *parent)
-  : QDialog(parent), imgDisplayLabel(this) {
+cvImageWindow::cvImageWindow(QGraphicsView *parent)
+  : QGraphicsView(parent), imgDisplayLabel(this) {
   closed = false;
   this->show();
 }
@@ -41,7 +40,7 @@ void cvImageWindow::draw(cv::Mat img) {
   imgDisplayLabel.adjustSize();
   if (windowTitle().contains("Origin"))
     slider->setFixedHeight(imgDisplayLabel.size().height());
-  this->adjustSize();
+  this->setFixedSize(imgDisplayLabel.size());
 }
 
 void cvImageWindow::setMaxValue(const int &value) { slider->setMaximum(value); }

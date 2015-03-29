@@ -66,6 +66,7 @@ void MainWindow::initImages(const Mgr::SourceType &source,
   ui->ImagesLoaded->setText("Images Loaded");
   ui->Process->setEnabled(true);
   ui->ShowWindows->setEnabled(true);
+  ui->CloseWindows->setEnabled(true);
   ui->ResetProcessed->setEnabled(true);
   ui->Normalize->setEnabled(true);
   ui->SaveImage->setEnabled(true);
@@ -195,4 +196,8 @@ void MainWindow::on_processCsvSequence_clicked() {
           tokens[5]);
     }
   }
+}
+
+void MainWindow::on_CloseWindows_clicked() {
+  applicationManager->closeWindows();
 }

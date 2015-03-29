@@ -26,6 +26,13 @@ void ApplicationManagerGUI::showWindows(const int &depth) {
   originalWindow->update();
 }
 
+void ApplicationManagerGUI::closeWindows() {
+  colsProcessed->close();
+  colsOriginal->close();
+  processedWindow->close();
+  originalWindow->close();
+}
+
 void ApplicationManagerGUI::showCols(const int &col) {
   colsOriginal->draw(image3d->getImageAtCol(col));
   colsProcessed->draw(processedImage3d->getImageAtCol(col));

@@ -19,6 +19,7 @@ public:
   ApplicationManagerGUI(std::shared_ptr<OpenCLManager> openCLManager)
     : ApplicationManager(openCLManager) {}
   void showImages();
+  void closeWindows();
 
 public slots:
   void sliderValueChanged(const int &value, const QString &title);

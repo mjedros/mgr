@@ -39,8 +39,8 @@ private slots:
   void on_saveCsvFile_clicked();
   void on_addToCsvFile_clicked();
   void on_loadCsvFile_clicked();
-
   void on_processCsvSequence_clicked();
+  void on_CloseWindows_clicked();
 
 private:
   std::pair<int, int> chosenDevice;

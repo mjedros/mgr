@@ -1,5 +1,5 @@
 #pragma once
-#include <QDialog>
+#include <QGraphicsView>
 #include <QMouseEvent>
 #include <QImage>
 #include <QKeyEvent>
@@ -10,13 +10,13 @@
 
 #include <opencv/highgui.h>
 namespace Mgr {
-class cvImageWindow : public QDialog {
+class cvImageWindow : public QGraphicsView {
   Q_OBJECT
 
 public:
   bool closed;
   cvImageWindow(QString title = "", QObject *_parent = 0);
-  explicit cvImageWindow(QDialog *parent = 0);
+  explicit cvImageWindow(QGraphicsView *parent = 0);
   void wheelEvent(QWheelEvent *event);
   void draw(cv::Mat image);
   void setMaxValue(const int &value);
