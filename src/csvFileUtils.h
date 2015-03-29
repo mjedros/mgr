@@ -14,6 +14,7 @@ public:
   const std::vector<std::vector<std::string>> &getOperationsVector() const {
     return operationsVector;
   }
+  void deleteOperation(const int &number);
 };
 }
 #endif // CSVFILEUTILS_H

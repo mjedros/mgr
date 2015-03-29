@@ -53,4 +53,8 @@ void CsvFile::saveFile(const string &filename) {
 void CsvFile::loadFile(const string &filename) {
   operationsVector = Utils::getOperationsVector(filename);
 }
+
+void CsvFile::deleteOperation(const int &number) {
+  operationsVector.erase(operationsVector.begin() + number);
+}
 }

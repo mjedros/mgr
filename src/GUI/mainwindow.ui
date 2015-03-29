@@ -64,7 +64,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>50</x>
       <y>260</y>
       <width>121</width>
       <height>31</height>
@@ -397,7 +397,7 @@
    <widget class="QPushButton" name="saveCsvFile">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>390</x>
       <y>350</y>
       <width>99</width>
       <height>27</height>
@@ -412,7 +412,7 @@
      <rect>
       <x>30</x>
       <y>330</y>
-      <width>256</width>
+      <width>351</width>
       <height>192</height>
      </rect>
     </property>
@@ -420,7 +420,7 @@
    <widget class="QPushButton" name="loadCsvFile">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>390</x>
       <y>390</y>
       <width>99</width>
       <height>27</height>
@@ -433,7 +433,7 @@
    <widget class="QPushButton" name="processCsvSequence">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>390</x>
       <y>430</y>
       <width>141</width>
       <height>27</height>
@@ -457,6 +457,35 @@
     </property>
     <property name="text">
      <string>Close windows</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="Revert">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>260</y>
+      <width>191</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Revert last operation</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="deleteFromCsvFile">
+    <property name="geometry">
+     <rect>
+      <x>198</x>
+      <y>300</y>
+      <width>121</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Delete selected</string>
     </property>
    </widget>
   </widget>

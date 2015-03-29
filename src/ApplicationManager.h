@@ -50,6 +50,8 @@ public:
   void addToCSVFile(const std::vector<std::string> &operationsVector) {
     csvFile.addOperations(operationsVector);
   }
+  void deleteOperation(const int &number) { csvFile.deleteOperation(number); }
+
   const std::vector<std::vector<std::string>> &getOperationsVector() const {
     return csvFile.getOperationsVector();
   }

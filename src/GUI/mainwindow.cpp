@@ -3,6 +3,7 @@
 #include <iostream>
 #include "ApplicationManagerGUI.h"
 #include <QFileDialog>
+#include <QStringListModel>
 #include "../build/src/include/Paths.h"
 #include "../ImageSource/SourceFactory.h"
 #include "vtkview.h"
@@ -22,7 +23,8 @@ inline std::string getDoubleText(const QString &text) {
 }
 }
 MainWindow::MainWindow(QWidget *parent)
-  : QMainWindow(parent), ui(new Ui::MainWindow), menu(new QMenu("File")),
+  : QMainWindow(parent), ui(new Ui::MainWindow),
+    csvOperationsModel(new QStringListModel(this)), menu(new QMenu("File")),
     openCLManager(new OpenCLManager()),
     applicationManager(new ApplicationManagerGUI(openCLManager)) {
   ui->setupUi(this);
@@ -70,6 +72,21 @@ void MainWindow::initImages(const Mgr::SourceType &source,
   ui->ResetProcessed->setEnabled(true);
   ui->Normalize->setEnabled(true);
   ui->SaveImage->setEnabled(true);
+  ui->Revert->setEnabled(true);
+}
+
+void MainWindow::updateCSVOperations() {
+  QStringList List;
+  auto operationsVector = applicationManager->getOperationsVector();
+  QString parameters;
+  for (auto &tokens : operationsVector) {
+    parameters.clear();
+    for (auto &params : tokens)
+      parameters += QString::fromStdString(params) + " ";
+    List << parameters;
+  }
+  csvOperationsModel->setStringList(List);
+  ui->csvOperations->setModel(csvOperationsModel);
 }
 
 void MainWindow::Process(const std::string &operationString,
@@ -138,6 +155,7 @@ void MainWindow::on_Normalize_clicked() {
 void MainWindow::initBinaryImage() {
   applicationManager->initProcessedImage(ui->lowLewel->value(),
                                          ui->highLevel->value());
+  updateCSVOperations();
 }
 
 void MainWindow::on_ResetProcessed_clicked() { initBinaryImage(); }
@@ -174,6 +192,7 @@ void MainWindow::on_addToCsvFile_clicked() {
         getDoubleText(ui->StructElementParam2->text()),
         getDoubleText(ui->StructElementParam3->text()),
         ui->ProcessingWay->currentText().toStdString() });
+  updateCSVOperations();
 }
 
 void MainWindow::on_loadCsvFile_clicked() {
@@ -200,4 +219,13 @@ void MainWindow::on_processCsvSequence_clicked() {
 
 void MainWindow::on_CloseWindows_clicked() {
   applicationManager->closeWindows();
+}
+
+void MainWindow::on_Revert_clicked() {
+  applicationManager->revertLastOperation();
+}
+
+void MainWindow::on_deleteFromCsvFile_clicked() {
+  applicationManager->deleteOperation(ui->csvOperations->currentIndex().row());
+  updateCSVOperations();
 }
