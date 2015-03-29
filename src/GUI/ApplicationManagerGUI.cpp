@@ -19,6 +19,10 @@ void ApplicationManagerGUI::sliderValueChanged(const int &value,
     showCols(value);
 }
 
+void ApplicationManagerGUI::setMousePoint(QPointF) {
+  std::cout << "dupa" << std::endl;
+}
+
 void ApplicationManagerGUI::showWindows(const int &depth) {
   originalWindow->draw(image3d->getImageAtDepth(depth));
   processedWindow->draw(processedImage3d->getImageAtDepth(depth));

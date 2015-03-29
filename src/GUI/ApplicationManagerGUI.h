@@ -23,6 +23,7 @@ public:
 
 public slots:
   void sliderValueChanged(const int &value, const QString &title);
+  void setMousePoint(QPointF point);
 };
 }
 #endif // APPLICATIONMANAGERGUI_H

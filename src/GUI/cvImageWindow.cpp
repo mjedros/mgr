@@ -11,8 +11,10 @@ cvImageWindow::cvImageWindow(QString title, QObject *_parent)
   : imgDisplayLabel(this), slider(nullptr), parentObject(_parent) {
   closed = false;
   setWindowTitle(title);
+  this->setMouseTracking(true);
   if (title.contains("Origin")) {
     slider.reset(new QSlider(this));
+    slider->setValue(0);
     connect(slider.get(), SIGNAL(valueChanged(int)), this,
             SLOT(sliderValueChanged(int)));
     connect(this, SIGNAL(sliderValueChanged(const int &, const QString)),
@@ -21,8 +23,8 @@ cvImageWindow::cvImageWindow(QString title, QObject *_parent)
   }
 }
 
-cvImageWindow::cvImageWindow(QGraphicsView *parent)
-  : QGraphicsView(parent), imgDisplayLabel(this) {
+cvImageWindow::cvImageWindow(QDialog *parent)
+  : QDialog(parent), imgDisplayLabel(this) {
   closed = false;
   this->show();
 }
@@ -47,5 +49,17 @@ void cvImageWindow::setMaxValue(const int &value) { slider->setMaximum(value); }
 
 void cvImageWindow::sliderValueChanged(const int &value) {
   emit(sliderValueChanged(value, this->windowTitle()));
+}
+
+void cvImageWindow::mousePressEvent(QMouseEvent *e) {
+  std::cout << "pressed " << e->globalX() << ", " << e->globalY() << std::endl;
+}
+
+void cvImageWindow::mouseMoveEvent(QMouseEvent *) {
+}
+
+void cvImageWindow::mouseReleaseEvent(QMouseEvent *releaseEvent) {
+  std::cout << "released " << releaseEvent->globalX() << ", "
+            << releaseEvent->globalY() << std::endl;
 }
 }
