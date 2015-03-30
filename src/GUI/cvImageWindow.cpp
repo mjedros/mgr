@@ -10,7 +10,7 @@ std::mutex g_mutex;
 namespace Mgr {
 
 cvImageWindow::cvImageWindow(QString title, QObject *_parent)
-  : slider(nullptr), parentObject(_parent) {
+  : item(nullptr), rectangle(0), slider(nullptr), parentObject(_parent) {
   closed = false;
   setWindowTitle(title);
   this->setMouseTracking(true);
@@ -37,18 +37,17 @@ void cvImageWindow::wheelEvent(QWheelEvent *event) {
 }
 
 void cvImageWindow::draw(cv::Mat img) {
+  if (image != nullptr)
+    scene.removeItem(item.get());
 
   image.reset(new QImage(img.data, img.cols, img.rows, img.step,
                          QImage::Format_Indexed8));
   item.reset(new QGraphicsPixmapItem(QPixmap::fromImage(*image)));
-  scene.clear();
   scene.addItem(item.get());
   show();
   if (windowTitle().contains("Origin"))
     slider->setFixedHeight(image->size().height());
   setFixedSize(image->size() + QSize(10, 10));
-  rectangle = scene.addRect(0, 0, image->size().width(), image->size().height(),
-                            QPen(Qt::white));
 }
 
 void cvImageWindow::setMaxValue(const int &value) { slider->setMaximum(value); }
@@ -66,7 +65,10 @@ void cvImageWindow::mouseMoveEvent(QMouseEvent *event) {
   if (!mousePressed)
     return;
   QPoint endPos = event->pos() - rectPosition;
-  scene.removeItem(rectangle);
+  if (rectangle) {
+    scene.removeItem(rectangle);
+    delete rectangle;
+  }
   rectangle = scene.addRect(rectPosition.rx(), rectPosition.ry(), endPos.rx(),
                             endPos.ry(), QPen(Qt::white));
 }
@@ -74,8 +76,12 @@ void cvImageWindow::mouseMoveEvent(QMouseEvent *event) {
 void cvImageWindow::mouseReleaseEvent(QMouseEvent *releaseEvent) {
   mousePressed = false;
   rectEnd = releaseEvent->pos() - rectPosition;
-  scene.removeItem(rectangle);
+  if (rectangle) {
+    scene.removeItem(rectangle);
+    delete rectangle;
+  }
   rectangle = scene.addRect(rectPosition.rx(), rectPosition.ry(), rectEnd.rx(),
                             rectEnd.ry(), QPen(Qt::white));
+  rectangle->setZValue(999);
 }
 }
