@@ -23,9 +23,10 @@ cvImageWindow::cvImageWindow(QString title, QObject *_parent)
   }
 }
 
-cvImageWindow::cvImageWindow(QDialog *parent)
-  : QDialog(parent), imgDisplayLabel(this) {
+cvImageWindow::cvImageWindow(QGraphicsView *parent)
+  : QGraphicsView(parent), imgDisplayLabel(this), scene(this) {
   closed = false;
+  setScene(&scene);
   this->show();
 }
 
@@ -35,14 +36,16 @@ void cvImageWindow::wheelEvent(QWheelEvent *event) {
 }
 
 void cvImageWindow::draw(cv::Mat img) {
-  this->show();
+
   image.reset(new QImage(img.data, img.cols, img.rows, img.step,
                          QImage::Format_Indexed8));
-  imgDisplayLabel.setPixmap(QPixmap::fromImage(*image));
-  imgDisplayLabel.adjustSize();
+  item.reset(new QGraphicsPixmapItem(QPixmap::fromImage(*image)));
+  scene.addItem(item.get());
+  this->setScene(&scene);
+  this->show();
   if (windowTitle().contains("Origin"))
-    slider->setFixedHeight(imgDisplayLabel.size().height());
-  this->setFixedSize(imgDisplayLabel.size());
+    slider->setFixedHeight(image->size().height());
+  this->setFixedSize(image->size() + QSize(10, 10));
 }
 
 void cvImageWindow::setMaxValue(const int &value) { slider->setMaximum(value); }

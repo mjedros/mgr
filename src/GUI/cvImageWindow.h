@@ -2,6 +2,7 @@
 #include <QGraphicsView>
 #include <QDialog>
 #include <QGraphicsScene>
+#include <QGraphicsView>
 #include <QMouseEvent>
 #include <QImage>
 #include <QKeyEvent>
@@ -9,16 +10,16 @@
 #include <QLabel>
 #include <memory>
 #include <QSlider>
-
+#include <QGraphicsPixmapItem>
 #include <opencv/highgui.h>
 namespace Mgr {
-class cvImageWindow : public QDialog {
+class cvImageWindow : public QGraphicsView {
   Q_OBJECT
 
 public:
   bool closed;
   cvImageWindow(QString title = "", QObject *_parent = 0);
-  explicit cvImageWindow(QDialog *parent = 0);
+  explicit cvImageWindow(QGraphicsView *parent = 0);
   void wheelEvent(QWheelEvent *event);
   void mousePressEvent(QMouseEvent *e);
   void mouseMoveEvent(QMouseEvent *e);
@@ -32,6 +33,8 @@ private slots:
 private:
   std::unique_ptr<QImage> image;
   QLabel imgDisplayLabel;
+  QGraphicsScene scene;
+  std::unique_ptr<QGraphicsPixmapItem> item;
 
   std::unique_ptr<QSlider> slider;
   QObject *parentObject;
