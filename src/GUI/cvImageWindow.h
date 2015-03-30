@@ -22,7 +22,7 @@ public:
   explicit cvImageWindow(QGraphicsView *parent = 0);
   void wheelEvent(QWheelEvent *event);
   void mousePressEvent(QMouseEvent *e);
-  void mouseMoveEvent(QMouseEvent *e);
+  void mouseMoveEvent(QMouseEvent *event);
   void mouseReleaseEvent(QMouseEvent *releaseEvent);
   void draw(cv::Mat image);
   void setMaxValue(const int &value);
@@ -31,10 +31,13 @@ private slots:
   void sliderValueChanged(const int &value);
 
 private:
+  bool mousePressed;
   std::unique_ptr<QImage> image;
-  QLabel imgDisplayLabel;
   QGraphicsScene scene;
   std::unique_ptr<QGraphicsPixmapItem> item;
+  QGraphicsRectItem *rectangle;
+  QPoint rectPosition;
+  QPoint rectEnd;
 
   std::unique_ptr<QSlider> slider;
   QObject *parentObject;
