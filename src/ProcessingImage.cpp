@@ -4,6 +4,7 @@
 using namespace cv;
 using namespace cl;
 namespace Mgr {
+
 std::map<std::string, StructuralElement> StrElementMap = {
   { "Ellipse", ELLIPSE }, { "Cross", CROSS }, { "Rectangle", RECTANGLE }
 };
@@ -12,21 +13,24 @@ unsigned int timeSum = 0;
 
 void
 ProcessingImage::performMorphologicalOperation(const std::string &Operation) {
+  getROIOOutOfMat();
   const std::string kernelName = Operation + structuralElementType;
   Kernel kernel(openCLManager->program, kernelName.c_str());
   const ImageFormat format(CL_R, CL_UNORM_INT8);
-  Image2D image_in(openCLManager->context,
-                   CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format, image.cols,
-                   image.rows, 0, image.data);
+  Image2D image_in(
+      openCLManager->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
+      imageToProcess->cols, imageToProcess->rows, 0, imageToProcess->data);
   Image2D image_out(openCLManager->context, CL_MEM_WRITE_ONLY, format,
-                    image.cols, image.rows);
+                    imageToProcess->cols, imageToProcess->rows);
   setStructuralElementArgument(kernel);
   process(kernel, image_in, image_out);
+  updateFullImage();
 }
 
 ProcessingImage::ProcessingImage(
-    const std::shared_ptr<OpenCLManager> &openCLManagerPtr)
-  : image(cv::Mat()), openCLManager(std::move(openCLManagerPtr)) {
+    const std::shared_ptr<OpenCLManager> &openCLManagerPtr, bool processRoi)
+  : processROI(processRoi), image(cv::Mat()), imageToProcess(nullptr),
+    openCLManager(std::move(openCLManagerPtr)) {
   origin[0] = origin[1] = origin[2] = 0;
 }
 
@@ -100,20 +104,22 @@ void ProcessingImage::setStructuralElementArgument(cl::Kernel &kernel) {
 void ProcessingImage::binarize(const unsigned int &minimum,
                                const unsigned int &maximum) {
   cl::Kernel kernel = cl::Kernel(openCLManager->program, "Binarize");
-
   const cl::ImageFormat format(CL_A, CL_UNSIGNED_INT8);
   const cl::ImageFormat formatOut(CL_R, CL_UNORM_INT8);
 
   try {
+    getROIOOutOfMat();
     cl::Image2D image_in(openCLManager->context, CL_MEM_READ_ONLY, format,
-                         image.cols, image.rows, 0);
+                         imageToProcess->cols, imageToProcess->rows, 0);
     cl::Image2D image_out(openCLManager->context, CL_MEM_WRITE_ONLY, formatOut,
-                          image.cols, image.rows, 0);
+                          imageToProcess->cols, imageToProcess->rows, 0);
     openCLManager->queue.enqueueWriteImage(image_in, CL_TRUE, origin, region, 0,
-                                           0, image.data);
+                                           0, imageToProcess->data);
+
     kernel.setArg(2, minimum);
     kernel.setArg(3, maximum);
     process(kernel, image_in, image_out);
+    updateFullImage();
   } catch (Error &e) {
     LOG(e.what());
     LOG(e.err());
@@ -129,14 +135,38 @@ void ProcessingImage::process(cl::Kernel &kernel, cl::Image2D &image_in,
   counter++;
   std::chrono::time_point<std::chrono::system_clock> start, end;
   start = std::chrono::system_clock::now();
-  openCLManager->queue.enqueueNDRangeKernel(kernel, cl::NDRange(0, 0),
-                                            cl::NDRange(image.cols, image.rows),
-                                            cl::NullRange, NULL, NULL);
+  openCLManager->queue.enqueueNDRangeKernel(
+      kernel, cl::NDRange(0, 0),
+      cl::NDRange(imageToProcess->cols, imageToProcess->rows), cl::NullRange,
+      NULL, NULL);
   openCLManager->queue.enqueueReadImage(image_out, CL_TRUE, origin, region, 0,
-                                        0, image.data);
+                                        0, imageToProcess->data);
   end = std::chrono::system_clock::now();
   timeSum += std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
                  .count();
+}
+void ProcessingImage::getROIOOutOfMat() {
+  imageToProcess.release();
+  if (!processROI)
+    imageToProcess = std::unique_ptr<Mat>(&image);
+  else {
+    roiImage = Mat(image(Range(roi.first.first, roi.first.second),
+                         Range(roi.second.first, roi.second.second))).clone();
+    imageToProcess = std::unique_ptr<Mat>(&roiImage);
+  }
+  region[0] = imageToProcess->cols;
+  region[1] = imageToProcess->rows;
+}
+
+void ProcessingImage::updateFullImage() {
+  if (!processROI) {
+    image = *imageToProcess;
+    return;
+  }
+  image = Mat(image.cols, image.rows, imageToProcess->type(), 0.0);
+  imageToProcess->copyTo(
+      image(Rect(roi.first.first, roi.second.first, imageToProcess->cols,
+                 imageToProcess->rows)));
 }
 
 int getAvarage() { return timeSum / counter; }

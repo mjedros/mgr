@@ -7,16 +7,23 @@ namespace Mgr {
 int getAvarage();
 void clear();
 enum StructuralElement : u_int8_t { ELLIPSE, CROSS, RECTANGLE };
+typedef std::pair<std::pair<u_int16_t, u_int16_t>,
+                  std::pair<u_int16_t, u_int16_t>> ROI;
 
 /**
  * @brief Class representing image that is being processed with OpenCL
  */
 class ProcessingImage {
 private:
+  bool processROI;
   cv::Mat image;
+  cv::Mat roiImage;
+  std::unique_ptr<cv::Mat> imageToProcess;
   cl::size_t<3> origin;
   cl::size_t<3> region;
   cl::NDRange localRange;
+  ROI roi;
+
   void process(cl::Kernel &kernel, cl::Image2D &image_in,
                cl::Image2D &image_out);
   std::shared_ptr<OpenCLManager> openCLManager;
@@ -28,6 +35,9 @@ private:
    * @param Operation - name of operation in kernel file
    */
   void performMorphologicalOperation(const std::string &Operation);
+
+  void getROIOOutOfMat();
+  void updateFullImage();
 
 public:
   /**
@@ -70,7 +80,10 @@ public:
    * @param img - image sent to process
    */
   void setImageToProcess(const cv::Mat &img);
-  ProcessingImage(const std::shared_ptr<OpenCLManager> &openCLManagerPtr);
+  void setROI(const ROI NewRoi) { roi = NewRoi; }
+  ProcessingImage(const std::shared_ptr<OpenCLManager> &openCLManagerPtr,
+                  bool processRoi = false);
+  ~ProcessingImage() { imageToProcess.release(); }
 };
 }
 #endif // PROCESSINGIMAGE_H
