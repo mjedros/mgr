@@ -29,7 +29,7 @@ const vector<vector<string>> getOperationsVector(const string &filename) {
   return operationsVector;
 }
 
-void saveCsvFile(const vector<vector<string>> &operationsVector,
+void saveCsvFile(const OperationsVector &operationsVector,
                  const string &filename) {
   ofstream csvFile(filename);
   for (auto &operation : operationsVector) {

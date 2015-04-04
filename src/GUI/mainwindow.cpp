@@ -92,8 +92,9 @@ void MainWindow::updateCSVOperations() {
 void MainWindow::Process(const std::string &operationString,
                          const std::string &MorphElementType,
                          const std::vector<float> StructElemParams,
-                         const std::string &operationWay) {
+                         const std::string &operationWay, bool processROI) {
   const OPERATION &operation = OperationMap[operationString];
+  applicationManager->setProcessingROI(processROI);
   if (operationWay == "Process columns")
     applicationManager->process<ProcessCols>(operation, MorphElementType,
                                              StructElemParams);
@@ -116,7 +117,8 @@ void MainWindow::on_Process_clicked() {
   };
 
   Process(ui->ChooseOperation->currentText().toStdString(), MorphElementType,
-          StructElemParams, ui->ProcessingWay->currentText().toStdString());
+          StructElemParams, ui->ProcessingWay->currentText().toStdString(),
+          ui->processROI->isChecked());
   ui->Process->show();
   ui->ProcessingProgress->setText("Done");
 }
@@ -185,13 +187,26 @@ void MainWindow::on_saveCsvFile_clicked() {
 }
 
 void MainWindow::on_addToCsvFile_clicked() {
-  applicationManager->addToCSVFile(
-      { ui->ChooseOperation->currentText().toStdString(),
-        ui->MorphologicalElementType->currentText().toStdString(),
-        getDoubleText(ui->StructElementParam1->text()),
-        getDoubleText(ui->StructElementParam2->text()),
-        getDoubleText(ui->StructElementParam3->text()),
-        ui->ProcessingWay->currentText().toStdString() },ui->processROI->isChecked());
+  std::vector<std::string> operationsVector = {
+    ui->ChooseOperation->currentText().toStdString(),
+    ui->MorphologicalElementType->currentText().toStdString(),
+    getDoubleText(ui->StructElementParam1->text()),
+    getDoubleText(ui->StructElementParam2->text()),
+    getDoubleText(ui->StructElementParam3->text()),
+    ui->ProcessingWay->currentText().toStdString(),
+    ui->processROI->isChecked() ? "1" : "0"
+  };
+  if (ui->processROI->isChecked()) {
+    const ROI &roi = applicationManager->getROI();
+
+    std::vector<std::string> roiString = { std::to_string(roi.first.first),
+                                           std::to_string(roi.first.second),
+                                           std::to_string(roi.second.first),
+                                           std::to_string(roi.second.first) };
+    operationsVector.insert(operationsVector.end(), roiString.begin(),
+                            roiString.end());
+  }
+  applicationManager->addToCSVFile(operationsVector);
   updateCSVOperations();
 }
 
@@ -204,11 +219,19 @@ void MainWindow::on_loadCsvFile_clicked() {
 
 void MainWindow::on_processCsvSequence_clicked() {
   auto operationsVector = applicationManager->getOperationsVector();
+
+  applicationManager->setROI(roi);
   for (auto &tokens : operationsVector) {
     if (tokens[0] == "Binarize") {
       applicationManager->initProcessedImage(std::stoi(tokens[1]),
                                              std::stoi(tokens[2]));
     } else {
+      if (tokens[5] == "1") {
+        roi = std::make_pair(
+            std::make_pair(std::stoi(tokens[6]), std::stoi(tokens[7])),
+            std::make_pair(std::stoi(tokens[8]), std::stoi(tokens[9])));
+        applicationManager->setROI(roi);
+      }
       Process(
           tokens[0], tokens[1],
           { std::stof(tokens[2]), std::stof(tokens[3]), std::stof(tokens[4]) },

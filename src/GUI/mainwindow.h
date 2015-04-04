@@ -16,6 +16,8 @@ class VTKView;
 class QStringListModel;
 class MainWindow : public QMainWindow {
   Q_OBJECT
+  typedef std::pair<std::pair<u_int16_t, u_int16_t>,
+                    std::pair<u_int16_t, u_int16_t>> ROI;
 
 public:
   explicit MainWindow(QWidget *parent = 0);
@@ -24,7 +26,7 @@ public:
   void Process(const std::string &operationString,
                const std::string &MorphElementType,
                const std::vector<float> StructElemParams,
-               const std::string &operationWay);
+               const std::string &operationWay, bool processROI = false);
 private slots:
   void on_ChoosePlatform_currentIndexChanged(const QString &description);
   void on_Process_clicked();
@@ -48,6 +50,7 @@ private slots:
   void on_deleteFromCsvFile_clicked();
 
 private:
+  ROI roi;
   std::pair<int, int> chosenDevice;
   std::vector<std::tuple<int, int, std::string>> listPlatforms;
   Ui::MainWindow *ui;

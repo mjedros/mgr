@@ -47,6 +47,8 @@ public:
       return;
     processingImage->setROI(roi);
   }
+  void setROI(const ROI &newROI) { roi = newROI; }
+  const ROI &getROI() { return roi; }
   void setProcessingROI(bool processROINew) { processROI = processROINew; }
 
   void normalizeOriginalImage();
