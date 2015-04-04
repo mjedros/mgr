@@ -33,7 +33,7 @@ void ProcessingImagesTest::CheckImagesEqual(cv::Mat one, cv::Mat two) {
   cv::Mat result;
   cv::compare(one, two, result, cv::CMP_EQ);
   int nz = cv::countNonZero(result);
-  QVERIFY(nz = one.cols * one.rows);
+  QVERIFY(nz == one.cols * one.rows);
 }
 cv::Mat ProcessingImagesTest::skeletonizeOpenCV(cv::Mat img) {
   cv::Mat skel(img.size(), CV_8U, cv::Scalar(0));
@@ -183,13 +183,14 @@ void ProcessingImagesTest::processROI() {
   ProcessingImage RoiImage(openCLManager, true);
   RoiImage.setROI(roi);
   RoiImage.setImageToProcess(image);
-  RoiImage.binarize(127);
+  RoiImage.binarize(80);
   cv::Mat roiImage = RoiImage.getImage();
   cv::Mat smallImage(
       roiImage(cv::Rect(lowx, lowy, highx - lowx, highy - lowy)));
 
   img->setImageToProcess(smallOrigin.clone());
-  img->binarize(127);
+  img->binarize(80);
+
   CheckImagesEqual(smallImage, img->getImage());
 }
 
