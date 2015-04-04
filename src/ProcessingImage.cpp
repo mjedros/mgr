@@ -150,8 +150,9 @@ void ProcessingImage::getROIOOutOfMat() {
   if (!processROI)
     imageToProcess = std::unique_ptr<Mat>(&image);
   else {
-    roiImage = Mat(image(Range(roi.first.first, roi.first.second),
-                         Range(roi.second.first, roi.second.second))).clone();
+    roiImage = Mat(image, Rect(roi.first.first, roi.second.first,
+                               roi.first.second - roi.first.first,
+                               roi.second.second - roi.second.first)).clone();
     imageToProcess = std::unique_ptr<Mat>(&roiImage);
   }
   region[0] = imageToProcess->cols;
@@ -163,10 +164,10 @@ void ProcessingImage::updateFullImage() {
     image = *imageToProcess;
     return;
   }
-  image = Mat(image.cols, image.rows, imageToProcess->type(), 0.0);
+  image = Mat(image.rows, image.cols, imageToProcess->type(), 0.0);
   imageToProcess->copyTo(
       image(Rect(roi.first.first, roi.second.first, imageToProcess->cols,
-                 imageToProcess->rows)));
+                 imageToProcess->rows))); // wtf
 }
 
 int getAvarage() { return timeSum / counter; }

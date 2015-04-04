@@ -26,6 +26,7 @@ private Q_SLOTS:
   void ErodeRectangleTest();
   void skeletonizeTest();
   void binarizefragmentOfmatTest();
+  void processROI();
 };
 
 void ProcessingImagesTest::CheckImagesEqual(cv::Mat one, cv::Mat two) {
@@ -168,6 +169,28 @@ void ProcessingImagesTest::binarizefragmentOfmatTest() {
   img->setImageToProcess(imageFragment.clone());
   img->binarize(127);
   CheckImagesEqual(thresholded, img->getImage());
+}
+
+void ProcessingImagesTest::processROI() {
+  cv::Mat image = imageOriginal.clone();
+  int lowx = image.cols / 4;
+  int lowy = image.rows / 4;
+  int highx = image.cols / 2;
+  int highy = image.rows / 2;
+  cv::Mat smallOrigin(image(cv::Rect(lowx, lowy, highx - lowx, highy - lowy)));
+  ROI roi =
+      std::make_pair(std::make_pair(lowx, highx), std::make_pair(lowy, highy));
+  ProcessingImage RoiImage(openCLManager, true);
+  RoiImage.setROI(roi);
+  RoiImage.setImageToProcess(image);
+  RoiImage.binarize(127);
+  cv::Mat roiImage = RoiImage.getImage();
+  cv::Mat smallImage(
+      roiImage(cv::Rect(lowx, lowy, highx - lowx, highy - lowy)));
+
+  img->setImageToProcess(smallOrigin.clone());
+  img->binarize(127);
+  CheckImagesEqual(smallImage, img->getImage());
 }
 
 QTEST_APPLESS_MAIN(ProcessingImagesTest)
