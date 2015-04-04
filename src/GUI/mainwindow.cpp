@@ -191,7 +191,7 @@ void MainWindow::on_addToCsvFile_clicked() {
         getDoubleText(ui->StructElementParam1->text()),
         getDoubleText(ui->StructElementParam2->text()),
         getDoubleText(ui->StructElementParam3->text()),
-        ui->ProcessingWay->currentText().toStdString() });
+        ui->ProcessingWay->currentText().toStdString() },ui->processROI->isChecked());
   updateCSVOperations();
 }
 

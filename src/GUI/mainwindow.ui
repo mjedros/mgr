@@ -488,6 +488,19 @@
      <string>Delete selected</string>
     </property>
    </widget>
+   <widget class="QCheckBox" name="processROI">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>230</y>
+      <width>97</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>ROI</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
