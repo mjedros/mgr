@@ -14,21 +14,25 @@ class ApplicationManager {
 protected:
   std::shared_ptr<OpenCLManager> openCLManager;
   std::string sourceFilename;
-  std::shared_ptr<Image3d> image3d;
+  Image3d image3d;
   std::shared_ptr<Image3d> processedImage3d;
   Image3d image3dPrevious;
   CsvFile csvFile;
+  bool processROI;
+  ROI roi;
 
 public:
   ApplicationManager(const std::shared_ptr<OpenCLManager> &openCLManagerPtr)
-    : openCLManager(openCLManagerPtr) {}
+    : openCLManager(openCLManagerPtr), processROI(false) {}
   template <class T>
   void process(const OPERATION &operation, const std::string &structuralElement,
                const std::vector<float> &params) {
     cv::waitKey(1);
     image3dPrevious = *processedImage3d; // save image
 
-    std::shared_ptr<ProcessingImage> img(new ProcessingImage(openCLManager));
+    std::shared_ptr<ProcessingImage> img(
+        new ProcessingImage(openCLManager, processROI));
+    setROI(img);
     img->setStructuralElement(structuralElement, params);
     std::unique_ptr<Processing3dImage> processing3dImage;
     processing3dImage = std::unique_ptr<T>(new T);
@@ -38,6 +42,12 @@ public:
   void init(const SourceType &source, const std::string &name);
   void initProcessedImage(const unsigned int &minumum = 100,
                           const unsigned int &maximum = 255);
+  void setROI(const std::shared_ptr<ProcessingImage> &processingImage) {
+    if (!processROI)
+      return;
+    processingImage->setROI(roi);
+  }
+  void setProcessingROI(bool processROINew) { processROI = processROINew; }
 
   void normalizeOriginalImage();
   void saveOriginalImage(const std::string &filename);

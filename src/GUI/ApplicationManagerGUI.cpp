@@ -7,8 +7,8 @@ void ApplicationManagerGUI::showImages() {
   colsOriginal.reset(new cvImageWindow("Cols Original", this));
   colsProcessed.reset(new cvImageWindow("Cols Processed", this));
   setMaxValues();
-  showWindows(image3d->getDepth() / 2);
-  showCols(image3d->getCols() / 2);
+  showWindows(image3d.getDepth() / 2);
+  showCols(image3d.getCols() / 2);
 }
 
 void ApplicationManagerGUI::sliderValueChanged(const int &value,
@@ -19,12 +19,16 @@ void ApplicationManagerGUI::sliderValueChanged(const int &value,
     showCols(value);
 }
 
-void ApplicationManagerGUI::setMousePoint(QPointF) {
-  std::cout << "dupa" << std::endl;
+void ApplicationManagerGUI::setRectangle(QPoint startPoint, QPoint endPoint) {
+  roi = std::make_pair(std::make_pair(startPoint.rx(), endPoint.rx()),
+                       std::make_pair(startPoint.ry(), endPoint.ry()));
+  std::cout << startPoint.rx() << " " << endPoint.rx() << " " << startPoint.ry()
+            << " " << endPoint.ry() << std::endl;
+  processROI = true;
 }
 
 void ApplicationManagerGUI::showWindows(const int &depth) {
-  originalWindow->draw(image3d->getImageAtDepth(depth));
+  originalWindow->draw(image3d.getImageAtDepth(depth));
   processedWindow->draw(processedImage3d->getImageAtDepth(depth));
   processedWindow->update();
   originalWindow->update();
@@ -38,14 +42,14 @@ void ApplicationManagerGUI::closeWindows() {
 }
 
 void ApplicationManagerGUI::showCols(const int &col) {
-  colsOriginal->draw(image3d->getImageAtCol(col));
+  colsOriginal->draw(image3d.getImageAtCol(col));
   colsProcessed->draw(processedImage3d->getImageAtCol(col));
   colsProcessed->update();
   colsOriginal->update();
 }
 
 void ApplicationManagerGUI::setMaxValues() {
-  originalWindow->setMaxValue(image3d->getDepth() - 1);
-  colsOriginal->setMaxValue(image3d->getCols() - 1);
+  originalWindow->setMaxValue(image3d.getDepth() - 1);
+  colsOriginal->setMaxValue(image3d.getCols() - 1);
 }
 }

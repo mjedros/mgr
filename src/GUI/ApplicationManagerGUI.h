@@ -23,7 +23,7 @@ public:
 
 public slots:
   void sliderValueChanged(const int &value, const QString &title);
-  void setMousePoint(QPointF point);
+  void setRectangle(QPoint startPoint, QPoint endPoint);
 };
 }
 #endif // APPLICATIONMANAGERGUI_H

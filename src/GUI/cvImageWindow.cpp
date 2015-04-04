@@ -22,6 +22,8 @@ cvImageWindow::cvImageWindow(QString title, QObject *_parent)
     connect(this, SIGNAL(sliderValueChanged(const int &, const QString)),
             parentObject,
             SLOT(sliderValueChanged(const int &, const QString &)));
+    connect(this, SIGNAL(setRectangle(QPoint, QPoint)), parentObject,
+            SLOT(setRectangle(QPoint, QPoint)));
   }
   setScene(&scene);
 }
@@ -75,13 +77,15 @@ void cvImageWindow::mouseMoveEvent(QMouseEvent *event) {
 
 void cvImageWindow::mouseReleaseEvent(QMouseEvent *releaseEvent) {
   mousePressed = false;
-  rectEnd = releaseEvent->pos() - rectPosition;
+  rectEnd = releaseEvent->pos();
+  QPoint endPos = rectEnd - rectPosition;
   if (rectangle) {
     scene.removeItem(rectangle);
     delete rectangle;
   }
-  rectangle = scene.addRect(rectPosition.rx(), rectPosition.ry(), rectEnd.rx(),
-                            rectEnd.ry(), QPen(Qt::white));
+  rectangle = scene.addRect(rectPosition.rx(), rectPosition.ry(), endPos.rx(),
+                            endPos.ry(), QPen(Qt::white));
   rectangle->setZValue(999);
+  emit(setRectangle(rectPosition, rectEnd));
 }
 }

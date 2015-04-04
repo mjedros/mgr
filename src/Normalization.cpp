@@ -1,7 +1,7 @@
 #include "Normalization.h"
 namespace Mgr {
 static const int NORMALIZATION_WIDTH = 8;
-bool checkBrighness(cv::Mat image, const int &level) {
+bool checkBrighness(cv::Mat &image, const int &level) {
   int sum = 0;
   for (int col = 0; col < image.cols; col++) {
     for (int row = 0; row < image.rows; row++) {
@@ -10,7 +10,7 @@ bool checkBrighness(cv::Mat image, const int &level) {
   }
   return ((sum / (image.cols * image.rows) - level) < 2);
 }
-void changeContrast(cv::Mat image, const double &alfa) {
+void changeContrast(cv::Mat &image, const double &alfa) {
   for (int col = 0; col < image.cols; col++) {
     for (int row = 0; row < image.rows; row++) {
       if (alfa > 1) {
@@ -23,7 +23,7 @@ void changeContrast(cv::Mat image, const double &alfa) {
   }
 }
 
-void changeBrightness(cv::Mat image, const int &level) {
+void changeBrightness(cv::Mat &image, const int &level) {
   for (int col = 0; col < image.cols; col++) {
     for (int row = 0; row < image.rows; row++) {
       if ((image.at<uchar>(row, col) - level > 0)) {
@@ -32,22 +32,22 @@ void changeBrightness(cv::Mat image, const int &level) {
     }
   }
 }
-int setImageLight(std::shared_ptr<Image3d> image3d, const unsigned int &depth,
+int setImageLight(Image3d &image3d, const unsigned int &depth,
                   const int &newLevel) {
-  cv::Mat image = image3d->getImageAtDepth(depth);
+  cv::Mat image = image3d.getImageAtDepth(depth);
   while (!checkBrighness(image, newLevel)) {
     changeContrast(image, 0.9);
     changeBrightness(image, 2);
   }
-  image3d->setImageAtDepth(depth, image);
+  image3d.setImageAtDepth(depth, image);
   return newLevel;
 }
 
-void normalize(std::shared_ptr<Image3d> image3d) {
-  for (auto i = 0; i <= image3d->getDepth() - NORMALIZATION_WIDTH; i++) {
+void normalize(Image3d &image3d) {
+  for (auto i = 0; i <= image3d.getDepth() - NORMALIZATION_WIDTH; i++) {
     std::vector<int> levels(NORMALIZATION_WIDTH, 0);
     for (int curId = 0; curId < NORMALIZATION_WIDTH; curId++) {
-      cv::Mat image = image3d->getImageAtDepth(i + curId).clone();
+      cv::Mat image = image3d.getImageAtDepth(i + curId).clone();
       for (int col = 0; col < image.cols; col++) {
         for (int row = 0; row < image.rows; row++) {
           levels[curId] += image.at<uchar>(row, col);

@@ -43,6 +43,6 @@ private:
   QObject *parentObject;
 signals:
   void sliderValueChanged(const int &value, const QString &title);
-  void sendMousePoint(QPointF point);
+  void setRectangle(QPoint startPoint, QPoint endPoint);
 };
 }

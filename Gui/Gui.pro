@@ -64,7 +64,7 @@ win32:QMAKE_CXXFLAGS += -fpermissive
 unix {
     LIBS += -L/usr/lib/ -lOpenCL -lopencv_highgui -lopencv_core -lopencv_imgproc
     INCLUDEPATH += /usr/include
-    INCLUDEPATH += /usr/include/vtk-6.1
+    INCLUDEPATH += /usr/include/vtk-6.0
     DEPENDPATH += /usr/include
 }
 win32 {
