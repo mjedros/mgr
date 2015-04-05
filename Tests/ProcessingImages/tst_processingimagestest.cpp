@@ -14,7 +14,7 @@ class ProcessingImagesTest : public QObject {
 
 public:
   ProcessingImagesTest();
-  cv::Mat setToProcessAndBinarizeOriginalImage();
+  void setToProcessAndBinarizeOriginalImage();
 private Q_SLOTS:
   void EmptyImageTest();
   void SimpleImageTest();
@@ -31,8 +31,9 @@ private Q_SLOTS:
 
 void ProcessingImagesTest::CheckImagesEqual(cv::Mat one, cv::Mat two) {
   cv::Mat result;
+  QCOMPARE(*one.data, *two.data);
   cv::compare(one, two, result, cv::CMP_EQ);
-  int nz = cv::countNonZero(result);
+  const int nz = cv::countNonZero(result);
   QVERIFY(nz == one.cols * one.rows);
 }
 cv::Mat ProcessingImagesTest::skeletonizeOpenCV(cv::Mat img) {
@@ -42,7 +43,6 @@ cv::Mat ProcessingImagesTest::skeletonizeOpenCV(cv::Mat img) {
 
   cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
 
-  bool done;
   do {
     cv::erode(img, eroded, element);
     cv::dilate(eroded, temp, element);
@@ -50,16 +50,13 @@ cv::Mat ProcessingImagesTest::skeletonizeOpenCV(cv::Mat img) {
     cv::bitwise_or(skel, temp, skel);
     eroded.copyTo(img);
 
-    done = (cv::countNonZero(img) == 0);
-  } while (!done);
+  } while (!cv::countNonZero(img) == 0);
   return skel;
 }
 
-cv::Mat ProcessingImagesTest::setToProcessAndBinarizeOriginalImage() {
-  cv::Mat image = imageOriginal.clone();
-  img->setImageToProcess(image);
+void ProcessingImagesTest::setToProcessAndBinarizeOriginalImage() {
+  img->setImageToProcess(imageOriginal.clone());
   img->binarize(127);
-  return image;
 }
 ProcessingImagesTest::ProcessingImagesTest()
   : openCLManager(new OpenCLManager) {
@@ -76,15 +73,14 @@ ProcessingImagesTest::ProcessingImagesTest()
   imageOriginal = cv::Mat(512, 203, CV_8UC1);
   for (int i = 0; i < imageOriginal.cols; i++) {
     for (int j = 0; j < imageOriginal.rows; j++) {
-      imageOriginal.at<uchar>(j, i) = i;
+      imageOriginal.at<uchar>(j, i) = i * 2;
     }
   }
 }
 
 void ProcessingImagesTest::EmptyImageTest() {
-  cv::Mat img1 = img->getImage();
   cv::Mat empty;
-  QCOMPARE(img1.data, empty.data);
+  QCOMPARE(empty.data, (img->getImage()).data);
 }
 
 void ProcessingImagesTest::SimpleImageTest() {
@@ -105,8 +101,8 @@ void ProcessingImagesTest::binarizeTest() {
   CheckImagesEqual(thresholded, img->getImage());
 }
 void ProcessingImagesTest::binarizeTestTwoThresholds() {
-  cv::Mat image = imageOriginal.clone();
   cv::Mat thresholded;
+  cv::Mat image = imageOriginal.clone();
   cv::threshold(image, thresholded, 127, 255, cv::THRESH_BINARY);
   img->setImageToProcess(image);
   img->binarize(127, 255);
@@ -125,9 +121,9 @@ void ProcessingImagesTest::DilateCrossTest() {
 void ProcessingImagesTest::ErodeCrossTest() {
   setToProcessAndBinarizeOriginalImage();
   cv::Mat eroded;
-  cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(5, 5));
+  cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
   cv::erode(img->getImage(), eroded, element);
-  img->setStructuralElement("Cross", { 2, 2 });
+  img->setStructuralElement("Cross", { 1, 1 });
   img->erode();
   CheckImagesEqual(eroded, img->getImage());
 }
@@ -135,9 +131,9 @@ void ProcessingImagesTest::ErodeCrossTest() {
 void ProcessingImagesTest::DilateRectangleTest() {
   setToProcessAndBinarizeOriginalImage();
   cv::Mat dilated;
-  cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
+  cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
   cv::dilate(img->getImage(), dilated, element);
-  img->setStructuralElement("Rectangle", { 2, 2 });
+  img->setStructuralElement("Rectangle", { 1, 1 });
   img->dilate();
   CheckImagesEqual(dilated, img->getImage());
 }
@@ -145,9 +141,9 @@ void ProcessingImagesTest::DilateRectangleTest() {
 void ProcessingImagesTest::ErodeRectangleTest() {
   setToProcessAndBinarizeOriginalImage();
   cv::Mat dilated;
-  cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
+  cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
   cv::erode(img->getImage(), dilated, element);
-  img->setStructuralElement("Rectangle", { 2, 2 });
+  img->setStructuralElement("Rectangle", { 1, 1 });
   img->erode();
   CheckImagesEqual(dilated, img->getImage());
 }
