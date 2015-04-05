@@ -358,8 +358,8 @@
    <widget class="QPushButton" name="vtkViewButton">
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>320</y>
+      <x>540</x>
+      <y>390</y>
       <width>181</width>
       <height>27</height>
      </rect>
@@ -371,8 +371,8 @@
    <widget class="QPushButton" name="addNextVTKImage">
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>280</y>
+      <x>540</x>
+      <y>340</y>
       <width>181</width>
       <height>27</height>
      </rect>
@@ -499,6 +499,67 @@
     </property>
     <property name="text">
      <string>ROI</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="RedColor">
+    <property name="geometry">
+     <rect>
+      <x>540</x>
+      <y>310</y>
+      <width>51</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>255</number>
+    </property>
+    <property name="value">
+     <number>80</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="GreenColor">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>310</y>
+      <width>51</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>255</number>
+    </property>
+    <property name="value">
+     <number>80</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="BlueColor">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>310</y>
+      <width>51</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>255</number>
+    </property>
+    <property name="value">
+     <number>80</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>290</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>RGB</string>
     </property>
    </widget>
   </widget>
