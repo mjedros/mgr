@@ -40,11 +40,11 @@ void ApplicationManager::init(const SourceType &source, const string &name) {
 void ApplicationManager::initProcessedImage(const unsigned int &minumum,
                                             const unsigned int &maximum) {
   csvFile.clear();
+  processROI = false;
   processedImage3d.reset(
       new Image3d(image3d.getDepth(), image3d.getImageAtDepth(0)));
   std::shared_ptr<ProcessingImage> img(
       new ProcessingImage(openCLManager, processROI));
-  setROI(img);
   for (auto i = 0; i < processedImage3d->getDepth(); i++) {
     img->setImageToProcess(image3d.getImageAtDepth(i).clone());
     img->binarize(minumum, maximum);

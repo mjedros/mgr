@@ -202,7 +202,7 @@ void MainWindow::on_addToCsvFile_clicked() {
     std::vector<std::string> roiString = { std::to_string(roi.first.first),
                                            std::to_string(roi.first.second),
                                            std::to_string(roi.second.first),
-                                           std::to_string(roi.second.first) };
+                                           std::to_string(roi.second.second) };
     operationsVector.insert(operationsVector.end(), roiString.begin(),
                             roiString.end());
   }
@@ -215,6 +215,7 @@ void MainWindow::on_loadCsvFile_clicked() {
       QFileDialog::getOpenFileName(this, tr("Open CSV File"),
                                    QDir::currentPath(),
                                    tr("Csv Files(*.csv)")).toStdString());
+  updateCSVOperations();
 }
 
 void MainWindow::on_processCsvSequence_clicked() {
@@ -223,21 +224,25 @@ void MainWindow::on_processCsvSequence_clicked() {
   applicationManager->setROI(roi);
   for (auto &tokens : operationsVector) {
     if (tokens[0] == "Binarize") {
+      applicationManager->setProcessingROI(false);
       applicationManager->initProcessedImage(std::stoi(tokens[1]),
                                              std::stoi(tokens[2]));
     } else {
-      if (tokens[5] == "1") {
+      const bool processROI = tokens[6] == "1" ? true : false;
+      if (processROI) {
+        std::cout << "processing ROI" << std::endl;
         roi = std::make_pair(
-            std::make_pair(std::stoi(tokens[6]), std::stoi(tokens[7])),
-            std::make_pair(std::stoi(tokens[8]), std::stoi(tokens[9])));
+            std::make_pair(std::stoi(tokens[7]), std::stoi(tokens[8])),
+            std::make_pair(std::stoi(tokens[9]), std::stoi(tokens[10])));
         applicationManager->setROI(roi);
       }
       Process(
           tokens[0], tokens[1],
           { std::stof(tokens[2]), std::stof(tokens[3]), std::stof(tokens[4]) },
-          tokens[5]);
+          tokens[5], processROI);
     }
   }
+  std::cout << "Done processing sequence" << std::endl;
 }
 
 void MainWindow::on_CloseWindows_clicked() {

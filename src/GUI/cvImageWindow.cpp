@@ -22,9 +22,10 @@ cvImageWindow::cvImageWindow(QString title, QObject *_parent)
     connect(this, SIGNAL(sliderValueChanged(const int &, const QString)),
             parentObject,
             SLOT(sliderValueChanged(const int &, const QString &)));
+
+  } else
     connect(this, SIGNAL(setRectangle(QPoint, QPoint)), parentObject,
             SLOT(setRectangle(QPoint, QPoint)));
-  }
   setScene(&scene);
 }
 

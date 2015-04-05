@@ -22,8 +22,6 @@ void ApplicationManagerGUI::sliderValueChanged(const int &value,
 void ApplicationManagerGUI::setRectangle(QPoint startPoint, QPoint endPoint) {
   roi = std::make_pair(std::make_pair(startPoint.rx(), endPoint.rx()),
                        std::make_pair(startPoint.ry(), endPoint.ry()));
-  std::cout << startPoint.rx() << " " << endPoint.rx() << " " << startPoint.ry()
-            << " " << endPoint.ry() << std::endl;
   processROI = true;
 }
 
