@@ -144,6 +144,7 @@ void MainWindow::on_LoadImages_clicked() {
 
 void MainWindow::closeEvent(QCloseEvent *event) {
   applicationManager.reset();
+  vtkView.reset();
   QMainWindow::closeEvent(event);
 }
 

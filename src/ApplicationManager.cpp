@@ -39,7 +39,6 @@ void ApplicationManager::init(const SourceType &source, const string &name) {
 
 void ApplicationManager::initProcessedImage(const unsigned int &minumum,
                                             const unsigned int &maximum) {
-  csvFile.clear();
   processROI = false;
   processedImage3d.reset(
       new Image3d(image3d.getDepth(), image3d.getImageAtDepth(0)));

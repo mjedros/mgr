@@ -23,6 +23,7 @@ public:
   Image3d(const Image3d &source);
   Image3d() {}
   ~Image3d() { image.release(); }
+  Image3d &operator=(const Image3d &other);
 };
 }
 #endif // IMAGE3D_H

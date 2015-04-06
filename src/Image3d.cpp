@@ -36,6 +36,16 @@ const cv::Mat Image3d::getImageAtCol(const int &col) const {
   return image2d;
 }
 
+Image3d &Image3d::operator=(const Image3d &other) {
+  if (this != &other) {
+    image = other.image.clone();
+    depth = other.depth;
+    rows = other.rows;
+    cols = other.cols;
+  }
+  return *this;
+}
+
 Image3d::Image3d(const int &_depth, const cv::Mat image2d) : depth(_depth) {
   rows = image2d.rows;
   cols = image2d.cols;
@@ -45,5 +55,6 @@ Image3d::Image3d(const int &_depth, const cv::Mat image2d) : depth(_depth) {
 Image3d::Image3d(const Image3d &source)
   : depth(source.depth), rows(source.rows), cols(source.cols) {
   image = source.image.clone();
+  std::cout << "copy";
 }
 }
