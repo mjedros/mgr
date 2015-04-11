@@ -34,9 +34,8 @@ public:
         new ProcessingImage(openCLManager, processROI));
     setROI(img);
     img->setStructuralElement(structuralElement, params);
-    std::unique_ptr<Processing3dImage> processing3dImage;
-    processing3dImage = std::unique_ptr<T>(new T);
-    processing3dImage->process(processedImage3d, img, operation);
+    T processing3dImage;
+    processing3dImage.process(processedImage3d, img, operation);
   }
 
   void init(const SourceType &source, const std::string &name);
