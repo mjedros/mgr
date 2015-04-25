@@ -37,7 +37,8 @@ private:
   std::unique_ptr<QGraphicsPixmapItem> item;
   QGraphicsRectItem *rectangle;
   QPoint rectPosition;
-  QPoint rectEnd;
+  QPoint firstPosition;
+  QPoint rectSize;
 
   std::unique_ptr<QSlider> slider;
   QObject *parentObject;

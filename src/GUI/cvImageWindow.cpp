@@ -61,32 +61,34 @@ void cvImageWindow::sliderValueChanged(const int &value) {
 
 void cvImageWindow::mousePressEvent(QMouseEvent *e) {
   mousePressed = true;
-  rectPosition = e->pos();
+  firstPosition = e->pos();
 }
 
 void cvImageWindow::mouseMoveEvent(QMouseEvent *event) {
+  QPoint currentPos = event->pos();
   if (!mousePressed)
     return;
-  QPoint endPos = event->pos() - rectPosition;
+
   if (rectangle) {
     scene.removeItem(rectangle);
     delete rectangle;
   }
-  rectangle = scene.addRect(rectPosition.rx(), rectPosition.ry(), endPos.rx(),
-                            endPos.ry(), QPen(Qt::white));
+  rectSize = QPoint(std::abs(firstPosition.rx() - currentPos.rx()),
+                    std::abs(firstPosition.ry() - currentPos.ry()));
+  rectPosition = QPoint(std::min(firstPosition.rx(), currentPos.rx()),
+                         std::min(firstPosition.ry(), currentPos.ry()));
+
+  rectangle = scene.addRect(rectPosition.rx(), rectPosition.ry(), rectSize.rx(),
+                            rectSize.ry(), QPen(Qt::white));
 }
 
 void cvImageWindow::mouseReleaseEvent(QMouseEvent *releaseEvent) {
   mousePressed = false;
-  rectEnd = releaseEvent->pos();
-  QPoint endPos = rectEnd - rectPosition;
-  if (rectangle) {
-    scene.removeItem(rectangle);
-    delete rectangle;
-  }
-  rectangle = scene.addRect(rectPosition.rx(), rectPosition.ry(), endPos.rx(),
-                            endPos.ry(), QPen(Qt::white));
+  QPoint currentPos = releaseEvent->pos();
+  if (currentPos == firstPosition)
+    return;
   rectangle->setZValue(999);
-  emit(setRectangle(rectPosition, rectEnd));
+
+  emit(setRectangle(rectPosition, rectPosition + rectSize));
 }
 }
