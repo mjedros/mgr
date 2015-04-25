@@ -20,6 +20,7 @@ protected:
   CsvFile csvFile;
   bool processROI;
   ROI roi;
+  bool isROISizeValid(std::pair<int, int> imageSize);
 
 public:
   ApplicationManager(const std::shared_ptr<OpenCLManager> &openCLManagerPtr)
@@ -32,9 +33,12 @@ public:
 
     std::shared_ptr<ProcessingImage> img(
         new ProcessingImage(openCLManager, processROI));
+    T processing3dImage;
+    if (!isROISizeValid(processing3dImage.getImageSize(processedImage3d)))
+      throw new std::string("Wrong ROI size");
     setROI(img);
     img->setStructuralElement(structuralElement, params);
-    T processing3dImage;
+
     processing3dImage.process(processedImage3d, img, operation);
   }
 

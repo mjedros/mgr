@@ -95,6 +95,7 @@ void MainWindow::Process(const std::string &operationString,
                          const std::string &operationWay, bool processROI) {
   const OPERATION &operation = OperationMap[operationString];
   applicationManager->setProcessingROI(processROI);
+
   if (operationWay == "Process columns")
     applicationManager->process<ProcessCols>(operation, MorphElementType,
                                              StructElemParams);
@@ -115,12 +116,15 @@ void MainWindow::on_Process_clicked() {
     static_cast<float>(ui->StructElementParam2->value()),
     static_cast<float>(ui->StructElementParam3->value())
   };
-
-  Process(ui->ChooseOperation->currentText().toStdString(), MorphElementType,
-          StructElemParams, ui->ProcessingWay->currentText().toStdString(),
-          ui->processROI->isChecked());
-  ui->Process->show();
-  ui->ProcessingProgress->setText("Done");
+  try {
+    Process(ui->ChooseOperation->currentText().toStdString(), MorphElementType,
+            StructElemParams, ui->ProcessingWay->currentText().toStdString(),
+            ui->processROI->isChecked());
+    ui->Process->show();
+    ui->ProcessingProgress->setText("Done");
+  } catch (std::string *error) {
+    ui->ProcessingProgress->setText(QString::fromStdString(*error));
+  }
 }
 
 void MainWindow::openFileToProcess() {
@@ -258,6 +262,8 @@ void MainWindow::on_Revert_clicked() {
 }
 
 void MainWindow::on_deleteFromCsvFile_clicked() {
+  if (ui->csvOperations->currentIndex().row() == -1)
+    return;
   applicationManager->deleteOperation(ui->csvOperations->currentIndex().row());
   updateCSVOperations();
 }

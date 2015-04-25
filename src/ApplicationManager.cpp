@@ -20,6 +20,12 @@ void saveMovie(const Image3d &image, const std::string &filename) {
   }
 }
 
+bool ApplicationManager::isROISizeValid(std::pair<int, int> imageSize) {
+  return !(roi.first.second > imageSize.first ||
+           roi.second.second > imageSize.second || roi.first.second == 0 ||
+           roi.second.second == 0);
+}
+
 void ApplicationManager::init(const SourceType &source, const string &name) {
   std::unique_ptr<IImageSource> imageSource =
       SourceFactory::GetImageSource(source, name);

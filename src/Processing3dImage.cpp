@@ -21,6 +21,11 @@ void ProcessDepth::process(const std::shared_ptr<Image3d> &image3d,
   std::cout << getAvarage() << std::endl;
 }
 
+std::pair<int, int>
+ProcessDepth::getImageSize(const std::shared_ptr<Image3d> &image3d) {
+  return { image3d->getRows(), image3d->getCols() };
+}
+
 void ProcessCols::process(const std::shared_ptr<Image3d> &image3d,
                           const std::shared_ptr<ProcessingImage> &img,
                           const OPERATION &operation) {
@@ -29,5 +34,10 @@ void ProcessCols::process(const std::shared_ptr<Image3d> &image3d,
     (img.get()->*(OperationToMethodPointerMap.at(operation)))();
     image3d->setImageAtCol(i, img->getImage());
   }
+}
+
+std::pair<int, int>
+ProcessCols::getImageSize(const std::shared_ptr<Image3d> &image3d) {
+  return { image3d->getDepth(), image3d->getRows() };
 }
 }
