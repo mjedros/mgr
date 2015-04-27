@@ -1,9 +1,9 @@
-#ifndef VTKDATA_H
-#define VTKDATA_H
+#pragma once
+
 #include <vtkSmartPointer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
-#include "../src/Image3d.h"
+#include "Image3d.h"
 #include <memory>
 class VTKData {
   vtkSmartPointer<vtkRenderer> renderer;
@@ -20,5 +20,3 @@ public:
   vtkSmartPointer<vtkActor>
   createActorOutOf3dImage(std::tuple<double, double, double> colors);
 };
-
-#endif // VTKDATA_H

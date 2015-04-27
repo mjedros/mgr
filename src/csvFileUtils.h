@@ -1,5 +1,5 @@
-#ifndef CSVFILEUTILS_H
-#define CSVFILEUTILS_H
+#pragma once
+
 #include <vector>
 #include <string>
 namespace Mgr {
@@ -18,4 +18,3 @@ public:
   void deleteOperation(const int &number);
 };
 }
-#endif // CSVFILEUTILS_H

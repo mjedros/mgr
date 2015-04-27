@@ -1,4 +1,5 @@
 #include "OpenCLManager.h"
+
 #include <fstream>
 #include <iostream>
 #include <map>

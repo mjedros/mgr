@@ -1,4 +1,5 @@
 #pragma once
+
 #include <QGraphicsView>
 #include <QDialog>
 #include <QGraphicsScene>

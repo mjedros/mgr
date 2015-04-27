@@ -1,5 +1,5 @@
-#ifndef OPENCLMANAGER_H_
-#define OPENCLMANAGER_H_
+#pragma once
+
 #define LOGGING_ON
 #ifdef LOGGING_ON
 #define LOG(x) std::cout << x << std::endl;
@@ -33,4 +33,3 @@ public:
   ~OpenCLManager();
 };
 }
-#endif /* OpenCLManager_H_ */

@@ -1,11 +1,30 @@
 #include "ApplicationManager.h"
-#include <opencv2/opencv.hpp>
+
 #include "ImageSource/SourceFactory.h"
 #include "Normalization.h"
-
+#include "Processing3dImage.h"
+#include <opencv2/opencv.hpp>
 using namespace cv;
 
 namespace Mgr {
+
+template <class T>
+void ApplicationManager::process(const OPERATION &operation,
+                                 const std::string &structuralElement,
+                                 const std::vector<float> &params) {
+  cv::waitKey(1);
+  image3dPrevious = *processedImage3d; // save image
+
+  ProcessingImage img(openCLManager, processROI);
+  T processing3dImage;
+  if (!isROISizeValid(processing3dImage.getImageSize(processedImage3d)))
+    throw new std::string("Wrong ROI size");
+  setROI(img);
+  img.setStructuralElement(structuralElement, params);
+
+  processing3dImage.process(processedImage3d, img, operation);
+}
+
 void saveMovie(const Image3d &image, const std::string &filename) {
 
   VideoWriter videowriter(filename, CV_FOURCC('D', 'I', 'V', 'X'), 300,
@@ -68,4 +87,12 @@ void ApplicationManager::saveOriginalImage(const std::string &filename) {
 void ApplicationManager::saveProcessedImage(const std::string &filename) {
   saveMovie(*processedImage3d, filename);
 }
+template void
+ApplicationManager::process<ProcessCols>(const OPERATION &operation,
+                                         const std::string &structuralElement,
+                                         const std::vector<float> &params);
+template void
+ApplicationManager::process<ProcessDepth>(const OPERATION &operation,
+                                          const std::string &structuralElement,
+                                          const std::vector<float> &params);
 }

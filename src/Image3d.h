@@ -1,5 +1,5 @@
-#ifndef IMAGE3D_H
-#define IMAGE3D_H
+#pragma once
+
 #include <opencv2/opencv.hpp>
 namespace Mgr {
 class Image3d {
@@ -26,4 +26,3 @@ public:
   Image3d &operator=(const Image3d &other);
 };
 }
-#endif // IMAGE3D_H

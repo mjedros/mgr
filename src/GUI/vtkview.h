@@ -1,5 +1,5 @@
-#ifndef VTKVIEW_H
-#define VTKVIEW_H
+#pragma once
+
 #include <vtkRenderWindow.h>
 #include <QVTKInteractor.h>
 #include <vtkSmartPointer.h>
@@ -29,5 +29,3 @@ private:
   vtkSmartPointer<QVTKInteractor> iren;
   vtkSmartPointer<vtkRenderWindow> renWin;
 };
-
-#endif // VTKVIEW_H

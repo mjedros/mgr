@@ -1,11 +1,10 @@
+#include "ApplicationManager.h"
 
 #include "GUI/mainwindow.h"
-#include <QApplication>
-
-#include <iostream>
 #include "OpenCLManager.h"
-#include "ApplicationManager.h"
 #include <QDebug>
+#include <QApplication>
+#include <iostream>
 using namespace cl;
 
 int main(int argc, char *argv[]) {

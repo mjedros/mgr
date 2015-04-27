@@ -1,13 +1,17 @@
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
+
 #include "ui_mainwindow.h"
 #include <iostream>
-#include "ApplicationManagerGUI.h"
+
 #include <QFileDialog>
 #include <QStringListModel>
 #include "../build/src/include/Paths.h"
-#include "../ImageSource/SourceFactory.h"
-#include "vtkview.h"
-#include "../src/Image3d.h"
+#include "GUI/ApplicationManagerGUI.h"
+#include "GUI/vtkview.h"
+#include "Image3d.h"
+#include "ImageSource/SourceFactory.h"
+#include "Processing3dImage.h"
+
 using namespace Mgr;
 std::map<std::string, OPERATION> OperationMap = {
   { "Dilation", OPERATION::DILATION },

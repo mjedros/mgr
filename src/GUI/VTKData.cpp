@@ -1,4 +1,5 @@
-#include "VTKData.h"
+#include "GUI/VTKData.h"
+
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkActor.h>

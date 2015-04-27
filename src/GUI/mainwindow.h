@@ -1,9 +1,9 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
+#include "OpenCLManager.h"
 #include <QMainWindow>
 #include <QMenuBar>
-#include "../src/OpenCLManager.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -67,5 +67,3 @@ private:
   void initImages(const Mgr::SourceType &source, const std::string &name);
   void updateCSVOperations();
 };
-
-#endif // MAINWINDOW_H

@@ -1,4 +1,4 @@
-#include "IImageSource.h"
+#include "ImageSource/IImageSource.h"
 
 #include <string>
 #include <memory>

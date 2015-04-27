@@ -1,4 +1,6 @@
 #include "ProcessingImage.h"
+
+#include "OpenCLManager.h"
 #include <chrono>
 
 using namespace cv;
@@ -29,8 +31,8 @@ ProcessingImage::performMorphologicalOperation(const std::string &Operation) {
 
 ProcessingImage::ProcessingImage(
     const std::shared_ptr<OpenCLManager> &openCLManagerPtr, bool processRoi)
-  : processROI(processRoi), image(cv::Mat()), imageToProcess(nullptr),
-    openCLManager(std::move(openCLManagerPtr)) {
+  : image(cv::Mat()), imageToProcess(nullptr),
+    openCLManager(std::move(openCLManagerPtr)), processROI(processRoi) {
   origin[0] = origin[1] = origin[2] = 0;
 }
 

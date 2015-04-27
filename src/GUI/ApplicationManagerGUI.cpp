@@ -1,5 +1,5 @@
 #include "ApplicationManagerGUI.h"
-#include "../src/Image3d.h"
+
 namespace Mgr {
 void ApplicationManagerGUI::showImages() {
   originalWindow.reset(new cvImageWindow("Depth Original", this));

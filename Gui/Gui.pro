@@ -65,6 +65,7 @@ unix {
     LIBS += -L/usr/lib/ -lOpenCL -lopencv_highgui -lopencv_core -lopencv_imgproc
     INCLUDEPATH += /usr/include
     INCLUDEPATH += /usr/include/vtk-6.0
+    INCLUDEPATH += ../src
     DEPENDPATH += /usr/include
 }
 win32 {

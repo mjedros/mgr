@@ -1,12 +1,12 @@
-#include "cvImageWindow.h"
+#include "GUI/cvImageWindow.h"
+
+#include "ApplicationManager.h"
 #include <QPainter>
 #include <QFileDialog>
 #include <QApplication>
 #include <QStatusBar>
 #include <opencv2/opencv.hpp>
-#include "../ApplicationManager.h"
-#include <mutex>
-std::mutex g_mutex;
+
 namespace Mgr {
 
 cvImageWindow::cvImageWindow(QString title, QObject *_parent)
@@ -76,7 +76,7 @@ void cvImageWindow::mouseMoveEvent(QMouseEvent *event) {
   rectSize = QPoint(std::abs(firstPosition.rx() - currentPos.rx()),
                     std::abs(firstPosition.ry() - currentPos.ry()));
   rectPosition = QPoint(std::min(firstPosition.rx(), currentPos.rx()),
-                         std::min(firstPosition.ry(), currentPos.ry()));
+                        std::min(firstPosition.ry(), currentPos.ry()));
 
   rectangle = scene.addRect(rectPosition.rx(), rectPosition.ry(), rectSize.rx(),
                             rectSize.ry(), QPen(Qt::white));

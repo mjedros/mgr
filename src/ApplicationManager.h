@@ -1,14 +1,16 @@
-#ifndef APPLICATIONMANAGER_H
-#define APPLICATIONMANAGER_H
+#pragma once
+
+#include "Image3d.h"
 #include "ProcessingImage.h"
 #include "OpenCLManager.h"
-#include "Processing3dImage.h"
 #include "csvFileUtils.h"
 #include <QObject>
 #include <QEvent>
 namespace Mgr {
 class Image3d;
 enum SourceType : u_int8_t;
+enum class OPERATION : u_int8_t;
+class Image3d;
 
 class ApplicationManager {
 protected:
@@ -27,28 +29,15 @@ public:
     : openCLManager(openCLManagerPtr), processROI(false) {}
   template <class T>
   void process(const OPERATION &operation, const std::string &structuralElement,
-               const std::vector<float> &params) {
-    cv::waitKey(1);
-    image3dPrevious = *processedImage3d; // save image
-
-    std::shared_ptr<ProcessingImage> img(
-        new ProcessingImage(openCLManager, processROI));
-    T processing3dImage;
-    if (!isROISizeValid(processing3dImage.getImageSize(processedImage3d)))
-      throw new std::string("Wrong ROI size");
-    setROI(img);
-    img->setStructuralElement(structuralElement, params);
-
-    processing3dImage.process(processedImage3d, img, operation);
-  }
+               const std::vector<float> &params);
 
   void init(const SourceType &source, const std::string &name);
   void initProcessedImage(const unsigned int &minumum = 100,
                           const unsigned int &maximum = 255);
-  void setROI(const std::shared_ptr<ProcessingImage> &processingImage) {
+  void setROI(ProcessingImage &processingImage) {
     if (!processROI)
       return;
-    processingImage->setROI(roi);
+    processingImage.setROI(roi);
   }
   void setROI(const ROI &newROI) { roi = newROI; }
   const ROI &getROI() { return roi; }
@@ -75,4 +64,3 @@ public:
   }
 };
 }
-#endif // APPLICATIONMANAGER_H

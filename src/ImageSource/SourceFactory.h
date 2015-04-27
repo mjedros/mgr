@@ -1,4 +1,5 @@
 #pragma once
+
 #include "IImageSource.h"
 #include "FileVideo.h"
 #include "Directory.h"
@@ -16,9 +17,9 @@ public:
   GetImageSource(SourceType sourceType, const std::string &name = "") {
     switch (sourceType) {
     case VideoFile:
-      return std::unique_ptr<IImageSource>(new Mgr::FileVideo(name));
+      return std::unique_ptr<IImageSource>(new FileVideo(name));
     case DirectorySource:
-      return std::unique_ptr<IImageSource>(new Mgr::Directory(name));
+      return std::unique_ptr<IImageSource>(new Directory(name));
     default:
       throw std::string("Image source type unknown");
     }

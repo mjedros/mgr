@@ -1,10 +1,11 @@
+#include "GUI/vtkview.h"
+
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
 #include <QtGui/QHeaderView>
-#include "VTKData.h"
-#include "vtkview.h"
+#include "GUI/VTKData.h"
 #include <memory>
 QT_BEGIN_NAMESPACE
 

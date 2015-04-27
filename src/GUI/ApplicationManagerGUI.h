@@ -1,7 +1,8 @@
-#ifndef APPLICATIONMANAGERGUI_H
-#define APPLICATIONMANAGERGUI_H
-#include "../src/ApplicationManager.h"
-#include "cvImageWindow.h"
+#pragma once
+
+#include "ApplicationManager.h"
+
+#include "GUI/cvImageWindow.h"
 namespace Mgr {
 class ApplicationManagerGUI : public QObject, public ApplicationManager {
   Q_OBJECT
@@ -26,4 +27,3 @@ public slots:
   void setRectangle(QPoint startPoint, QPoint endPoint);
 };
 }
-#endif // APPLICATIONMANAGERGUI_H

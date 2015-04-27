@@ -1,5 +1,7 @@
 #include "Processing3dImage.h"
 
+#include "ProcessingImage.h"
+#include "Image3d.h"
 namespace Mgr {
 typedef void (ProcessingImage::*pointerToProcessingMethodType)();
 const std::map<OPERATION, pointerToProcessingMethodType>
@@ -10,13 +12,12 @@ const std::map<OPERATION, pointerToProcessingMethodType>
       { OPERATION::SKELETONIZATION, &ProcessingImage::skeletonize }
     };
 void ProcessDepth::process(const std::shared_ptr<Image3d> &image3d,
-                           const std::shared_ptr<ProcessingImage> &img,
-                           const OPERATION &operation) {
+                           ProcessingImage &img, const OPERATION &operation) {
   clear();
   for (auto i = 0; i < image3d->getDepth(); i++) {
-    img->setImageToProcess(image3d->getImageAtDepth(i).clone());
-    (img.get()->*(OperationToMethodPointerMap.at(operation)))();
-    image3d->setImageAtDepth(i, img->getImage());
+    img.setImageToProcess(image3d->getImageAtDepth(i).clone());
+    (&img->*(OperationToMethodPointerMap.at(operation)))();
+    image3d->setImageAtDepth(i, img.getImage());
   }
   std::cout << getAvarage() << std::endl;
 }
@@ -27,12 +28,11 @@ ProcessDepth::getImageSize(const std::shared_ptr<Image3d> &image3d) {
 }
 
 void ProcessCols::process(const std::shared_ptr<Image3d> &image3d,
-                          const std::shared_ptr<ProcessingImage> &img,
-                          const OPERATION &operation) {
+                          ProcessingImage &img, const OPERATION &operation) {
   for (auto i = 0; i < image3d->getCols(); i++) {
-    img->setImageToProcess(image3d->getImageAtCol(i));
-    (img.get()->*(OperationToMethodPointerMap.at(operation)))();
-    image3d->setImageAtCol(i, img->getImage());
+    img.setImageToProcess(image3d->getImageAtCol(i));
+    (&img->*(OperationToMethodPointerMap.at(operation)))();
+    image3d->setImageAtCol(i, img.getImage());
   }
 }
 

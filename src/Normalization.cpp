@@ -1,4 +1,5 @@
 #include "Normalization.h"
+
 namespace Mgr {
 static const int NORMALIZATION_WIDTH = 8;
 bool checkBrighness(cv::Mat &image, const int &level) {

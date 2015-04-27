@@ -1,7 +1,9 @@
-#ifndef PROCESSINGIMAGE_H
-#define PROCESSINGIMAGE_H
+#pragma once
+
+#define __CL_ENABLE_EXCEPTIONS
+#include <CL/cl.hpp>
 #include <opencv2/opencv.hpp>
-#include "OpenCLManager.h"
+#include <memory>
 
 namespace Mgr {
 int getAvarage();
@@ -10,12 +12,12 @@ enum StructuralElement : u_int8_t { ELLIPSE, CROSS, RECTANGLE };
 typedef std::pair<std::pair<u_int16_t, u_int16_t>,
                   std::pair<u_int16_t, u_int16_t>> ROI;
 
+class OpenCLManager;
 /**
  * @brief Class representing image that is being processed with OpenCL
  */
 class ProcessingImage {
 private:
-  bool processROI;
   cv::Mat image;
   cv::Mat roiImage;
   std::unique_ptr<cv::Mat> imageToProcess;
@@ -23,12 +25,14 @@ private:
   cl::size_t<3> region;
   cl::NDRange localRange;
   ROI roi;
-
-  void process(cl::Kernel &kernel, cl::Image2D &image_in,
-               cl::Image2D &image_out);
   std::shared_ptr<OpenCLManager> openCLManager;
   std::string structuralElementType;
   std::vector<float> structuralElementParams;
+  bool processROI;
+
+  void process(cl::Kernel &kernel, cl::Image2D &image_in,
+               cl::Image2D &image_out);
+
   void setStructuralElementArgument(cl::Kernel &kernel);
   /**
    * @brief Performs specific morphological operation
@@ -86,4 +90,3 @@ public:
   ~ProcessingImage() { imageToProcess.release(); }
 };
 }
-#endif // PROCESSINGIMAGE_H
