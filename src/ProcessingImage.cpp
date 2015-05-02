@@ -16,13 +16,23 @@ unsigned int timeSum = 0;
 void ProcessingImage::setKernel(const std::string &Operation) {
   const std::string kernelName = Operation + structuralElementType;
   kernel = Kernel(openCLManager->program, kernelName.c_str());
-  setStructuralElementArgument(kernel);
 }
 
-void
-ProcessingImage::performMorphologicalOperation(const std::string &Operation) {
+void ProcessingImage::setKernel(const OPERATION &Operation) {
+  switch (Operation) {
+  case OPERATION::DILATION:
+    setKernel("Dilate");
+    break;
+  case OPERATION::EROSION:
+    setKernel("Erode");
+    break;
+  default:
+    break;
+  }
+}
+
+void ProcessingImage::performMorphologicalOperation() {
   getROIOOutOfMat();
-  setKernel(Operation);
   const ImageFormat format(CL_R, CL_UNORM_INT8);
   Image2D image_in(
       openCLManager->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
@@ -49,9 +59,17 @@ void ProcessingImage::setImageToProcess(const cv::Mat &img) {
   region[2] = 1;
 }
 
-void ProcessingImage::dilate() { performMorphologicalOperation("Dilate"); }
+void ProcessingImage::dilate() {
+  setKernel("Dilate");
+  setStructuralElementArgument();
+  performMorphologicalOperation();
+}
 
-void ProcessingImage::erode() { performMorphologicalOperation("Erode"); }
+void ProcessingImage::erode() {
+  setKernel("Erode");
+  setStructuralElementArgument();
+  performMorphologicalOperation();
+}
 
 void ProcessingImage::contour() {
   erode();
@@ -86,7 +104,7 @@ void ProcessingImage::setStructuralElement(const std::string &element,
   structuralElementParams = params;
 }
 
-void ProcessingImage::setStructuralElementArgument(cl::Kernel &kernel) {
+void ProcessingImage::setStructuralElementArgument() {
   switch (StrElementMap[structuralElementType.c_str()]) {
   case ELLIPSE: {
     const cl_float3 ellipseParams =

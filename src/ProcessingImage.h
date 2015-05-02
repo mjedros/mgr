@@ -13,6 +13,8 @@ typedef std::pair<std::pair<u_int16_t, u_int16_t>,
                   std::pair<u_int16_t, u_int16_t>> ROI;
 
 class OpenCLManager;
+enum class OPERATION : uint8_t { DILATION, EROSION, CONTOUR, SKELETONIZATION };
+
 /**
  * @brief Class representing image that is being processed with OpenCL
  */
@@ -33,13 +35,6 @@ private:
 
   void process(cl::Kernel &kernel, cl::Image2D &image_in,
                cl::Image2D &image_out);
-
-  void setStructuralElementArgument(cl::Kernel &kernel);
-  /**
-   * @brief Performs specific morphological operation
-   * @param Operation - name of operation in kernel file
-   */
-  void performMorphologicalOperation(const std::string &Operation);
 
   void getROIOOutOfMat();
   void updateFullImage();
@@ -69,10 +64,16 @@ public:
    */
   void skeletonize();
   /**
+   * @brief Performs specific morphological operation
+   * @param Operation - name of operation in kernel file
+   */
+  void performMorphologicalOperation();
+  /**
    * @brief Set structural element for morphological operations
    * @param element - Type of element
    * @param params - sizes of element
    */
+
   void setStructuralElement(const std::string &element,
                             const std::vector<float> &params);
   /**
@@ -90,5 +91,7 @@ public:
                   bool processRoi = false);
   ~ProcessingImage() { imageToProcess.release(); }
   void setKernel(const std::string &Operation);
+  void setKernel(const OPERATION &Operation);
+  void setStructuralElementArgument();
 };
 }

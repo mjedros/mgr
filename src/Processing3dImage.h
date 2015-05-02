@@ -5,8 +5,7 @@
 namespace Mgr {
 class Image3d;
 class ProcessingImage;
-enum class OPERATION : uint8_t { DILATION, EROSION, CONTOUR, SKELETONIZATION };
-
+enum class OPERATION : uint8_t;
 class ProcessCols {
 public:
   void process(const std::shared_ptr<Image3d> &image3d, ProcessingImage &img,
