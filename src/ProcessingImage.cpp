@@ -13,18 +13,22 @@ std::map<std::string, StructuralElement> StrElementMap = {
 unsigned int counter = 0;
 unsigned int timeSum = 0;
 
+void ProcessingImage::setKernel(const std::string &Operation) {
+  const std::string kernelName = Operation + structuralElementType;
+  kernel = Kernel(openCLManager->program, kernelName.c_str());
+  setStructuralElementArgument(kernel);
+}
+
 void
 ProcessingImage::performMorphologicalOperation(const std::string &Operation) {
   getROIOOutOfMat();
-  const std::string kernelName = Operation + structuralElementType;
-  Kernel kernel(openCLManager->program, kernelName.c_str());
+  setKernel(Operation);
   const ImageFormat format(CL_R, CL_UNORM_INT8);
   Image2D image_in(
       openCLManager->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
       imageToProcess->cols, imageToProcess->rows, 0, imageToProcess->data);
   Image2D image_out(openCLManager->context, CL_MEM_WRITE_ONLY, format,
                     imageToProcess->cols, imageToProcess->rows);
-  setStructuralElementArgument(kernel);
   process(kernel, image_in, image_out);
   updateFullImage();
 }

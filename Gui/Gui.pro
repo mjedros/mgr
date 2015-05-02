@@ -6,13 +6,7 @@
 
 TEMPLATE = app
 
-QT      += core gui
-
-contains(QT_VERSION, ^4\\.[0-8]\\..*) {
-        message("* Using Qt $${QT_VERSION}.")
-        QT += widgets
-}
-
+QT      += core gui widgets
 
 TARGET = Gui
 TEMPLATE = app

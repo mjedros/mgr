@@ -3,20 +3,20 @@
 #include "ProcessingImage.h"
 #include "Image3d.h"
 namespace Mgr {
-typedef void (ProcessingImage::*pointerToProcessingMethodType)();
-const std::map<OPERATION, pointerToProcessingMethodType>
-    OperationToMethodPointerMap = {
-      { OPERATION::DILATION, &ProcessingImage::dilate },
-      { OPERATION::EROSION, &ProcessingImage::erode },
-      { OPERATION::CONTOUR, &ProcessingImage::contour },
-      { OPERATION::SKELETONIZATION, &ProcessingImage::skeletonize }
-    };
+typedef void (ProcessingImage::*ptrToMethodType)();
+const std::map<OPERATION, ptrToMethodType> OperationToMethodPtr = {
+  { OPERATION::DILATION, &ProcessingImage::dilate },
+  { OPERATION::EROSION, &ProcessingImage::erode },
+  { OPERATION::CONTOUR, &ProcessingImage::contour },
+  { OPERATION::SKELETONIZATION, &ProcessingImage::skeletonize }
+};
 void ProcessDepth::process(const std::shared_ptr<Image3d> &image3d,
                            ProcessingImage &img, const OPERATION &operation) {
   clear();
+  auto &operationFun = (OperationToMethodPtr.at(operation));
   for (auto i = 0; i < image3d->getDepth(); i++) {
     img.setImageToProcess(image3d->getImageAtDepth(i).clone());
-    (&img->*(OperationToMethodPointerMap.at(operation)))();
+    (img.*operationFun)();
     image3d->setImageAtDepth(i, img.getImage());
   }
   std::cout << getAvarage() << std::endl;
@@ -29,9 +29,10 @@ ProcessDepth::getImageSize(const std::shared_ptr<Image3d> &image3d) {
 
 void ProcessCols::process(const std::shared_ptr<Image3d> &image3d,
                           ProcessingImage &img, const OPERATION &operation) {
+  auto &operationFun = (OperationToMethodPtr.at(operation));
   for (auto i = 0; i < image3d->getCols(); i++) {
     img.setImageToProcess(image3d->getImageAtCol(i));
-    (&img->*(OperationToMethodPointerMap.at(operation)))();
+    (img.*operationFun)();
     image3d->setImageAtCol(i, img.getImage());
   }
 }

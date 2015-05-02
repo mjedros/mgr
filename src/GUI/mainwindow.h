@@ -1,6 +1,8 @@
 #pragma once
 
+#include "GUI/ApplicationManagerGUI.h"
 #include "OpenCLManager.h"
+
 #include <QMainWindow>
 #include <QMenuBar>
 
@@ -61,7 +63,7 @@ private:
   QString directory;
   std::unique_ptr<VTKView> vtkView;
   std::shared_ptr<Mgr::OpenCLManager> openCLManager;
-  std::unique_ptr<Mgr::ApplicationManagerGUI> applicationManager;
+  Mgr::ApplicationManagerGUI applicationManager;
   virtual void closeEvent(QCloseEvent *event);
   void setPlatformsList(void);
   void initImages(const Mgr::SourceType &source, const std::string &name);

@@ -1,16 +1,15 @@
 #include "GUI/mainwindow.h"
 
 #include "ui_mainwindow.h"
-#include <iostream>
-
-#include <QFileDialog>
-#include <QStringListModel>
 #include "../build/src/include/Paths.h"
-#include "GUI/ApplicationManagerGUI.h"
 #include "GUI/vtkview.h"
 #include "Image3d.h"
 #include "ImageSource/SourceFactory.h"
 #include "Processing3dImage.h"
+
+#include <iostream>
+#include <QFileDialog>
+#include <QStringListModel>
 
 using namespace Mgr;
 std::map<std::string, OPERATION> OperationMap = {
@@ -29,8 +28,7 @@ inline std::string getDoubleText(const QString &text) {
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent), ui(new Ui::MainWindow),
     csvOperationsModel(new QStringListModel(this)), menu(new QMenu("File")),
-    openCLManager(new OpenCLManager()),
-    applicationManager(new ApplicationManagerGUI(openCLManager)) {
+    openCLManager(new OpenCLManager()), applicationManager(openCLManager) {
   ui->setupUi(this);
   setPlatformsList();
   menu->addAction("Open file to process", this, SLOT(openFileToProcess()));
@@ -67,7 +65,7 @@ void MainWindow::setPlatformsList() {
 
 void MainWindow::initImages(const Mgr::SourceType &source,
                             const std::string &name) {
-  applicationManager->init(source, name);
+  applicationManager.init(source, name);
   initBinaryImage();
   ui->ImagesLoaded->setText("Images Loaded");
   ui->Process->setEnabled(true);
@@ -81,7 +79,7 @@ void MainWindow::initImages(const Mgr::SourceType &source,
 
 void MainWindow::updateCSVOperations() {
   QStringList List;
-  auto operationsVector = applicationManager->getOperationsVector();
+  auto operationsVector = applicationManager.getOperationsVector();
   QString parameters;
   for (auto &tokens : operationsVector) {
     parameters.clear();
@@ -98,14 +96,14 @@ void MainWindow::Process(const std::string &operationString,
                          const std::vector<float> StructElemParams,
                          const std::string &operationWay, bool processROI) {
   const OPERATION &operation = OperationMap[operationString];
-  applicationManager->setProcessingROI(processROI);
+  applicationManager.setProcessingROI(processROI);
 
   if (operationWay == "Process columns")
-    applicationManager->process<ProcessCols>(operation, MorphElementType,
-                                             StructElemParams);
+    applicationManager.process<ProcessCols>(operation, MorphElementType,
+                                            StructElemParams);
   else
-    applicationManager->process<ProcessDepth>(operation, MorphElementType,
-                                              StructElemParams);
+    applicationManager.process<ProcessDepth>(operation, MorphElementType,
+                                             StructElemParams);
 }
 
 void MainWindow::on_Process_clicked() {
@@ -151,41 +149,41 @@ void MainWindow::on_LoadImages_clicked() {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-  applicationManager.reset();
+  applicationManager.closeWindows();
   vtkView.reset();
   QMainWindow::closeEvent(event);
 }
 
-void MainWindow::on_ShowWindows_clicked() { applicationManager->showImages(); }
+void MainWindow::on_ShowWindows_clicked() { applicationManager.showImages(); }
 
 void MainWindow::on_Normalize_clicked() {
-  applicationManager->normalizeOriginalImage();
+  applicationManager.normalizeOriginalImage();
   initBinaryImage();
 }
 
 void MainWindow::initBinaryImage() {
-  applicationManager->initProcessedImage(ui->lowLewel->value(),
-                                         ui->highLevel->value());
+  applicationManager.initProcessedImage(ui->lowLewel->value(),
+                                        ui->highLevel->value());
   updateCSVOperations();
 }
 
 void MainWindow::on_ResetProcessed_clicked() { initBinaryImage(); }
 
 void MainWindow::on_SaveImage_clicked() {
-  applicationManager->saveOriginalImage(
+  applicationManager.saveOriginalImage(
       QFileDialog::getSaveFileName(this, tr("Save Image"), QDir::currentPath())
           .toStdString());
 }
 
 void MainWindow::on_vtkViewButton_clicked() {
   vtkView.reset(new VTKView());
-  vtkView->setImage3d(applicationManager->getProcessedImage3d());
+  vtkView->setImage3d(applicationManager.getProcessedImage3d());
   vtkView->initImage();
   vtkView->show();
 }
 
 void MainWindow::on_addNextVTKImage_clicked() {
-  vtkView->setImage3d(applicationManager->getProcessedImage3d());
+  vtkView->setImage3d(applicationManager.getProcessedImage3d());
   vtkView->renderNewImage(
       std::make_tuple((double)ui->RedColor->value() / 255.0,
                       (double)ui->GreenColor->value() / 255.0,
@@ -193,7 +191,7 @@ void MainWindow::on_addNextVTKImage_clicked() {
 }
 
 void MainWindow::on_saveCsvFile_clicked() {
-  applicationManager->saveCSVFile(
+  applicationManager.saveCSVFile(
       QFileDialog::getSaveFileName(this, tr("Save Image"), QDir::currentPath())
           .toStdString());
 }
@@ -209,7 +207,7 @@ void MainWindow::on_addToCsvFile_clicked() {
     ui->processROI->isChecked() ? "1" : "0"
   };
   if (ui->processROI->isChecked()) {
-    const ROI &roi = applicationManager->getROI();
+    const ROI &roi = applicationManager.getROI();
 
     std::vector<std::string> roiString = { std::to_string(roi.first.first),
                                            std::to_string(roi.first.second),
@@ -218,12 +216,12 @@ void MainWindow::on_addToCsvFile_clicked() {
     operationsVector.insert(operationsVector.end(), roiString.begin(),
                             roiString.end());
   }
-  applicationManager->addToCSVFile(operationsVector);
+  applicationManager.addToCSVFile(operationsVector);
   updateCSVOperations();
 }
 
 void MainWindow::on_loadCsvFile_clicked() {
-  applicationManager->loadCSVFile(
+  applicationManager.loadCSVFile(
       QFileDialog::getOpenFileName(this, tr("Open CSV File"),
                                    QDir::currentPath(),
                                    tr("Csv Files(*.csv)")).toStdString());
@@ -231,14 +229,14 @@ void MainWindow::on_loadCsvFile_clicked() {
 }
 
 void MainWindow::on_processCsvSequence_clicked() {
-  auto operationsVector = applicationManager->getOperationsVector();
+  auto operationsVector = applicationManager.getOperationsVector();
 
-  applicationManager->setROI(roi);
+  applicationManager.setROI(roi);
   for (auto &tokens : operationsVector) {
     if (tokens[0] == "Binarize") {
-      applicationManager->setProcessingROI(false);
-      applicationManager->initProcessedImage(std::stoi(tokens[1]),
-                                             std::stoi(tokens[2]));
+      applicationManager.setProcessingROI(false);
+      applicationManager.initProcessedImage(std::stoi(tokens[1]),
+                                            std::stoi(tokens[2]));
     } else {
       const bool processROI = tokens[6] == "1" ? true : false;
       if (processROI) {
@@ -246,7 +244,7 @@ void MainWindow::on_processCsvSequence_clicked() {
         roi = std::make_pair(
             std::make_pair(std::stoi(tokens[7]), std::stoi(tokens[8])),
             std::make_pair(std::stoi(tokens[9]), std::stoi(tokens[10])));
-        applicationManager->setROI(roi);
+        applicationManager.setROI(roi);
       }
       Process(
           tokens[0], tokens[1],
@@ -258,16 +256,16 @@ void MainWindow::on_processCsvSequence_clicked() {
 }
 
 void MainWindow::on_CloseWindows_clicked() {
-  applicationManager->closeWindows();
+  applicationManager.closeWindows();
 }
 
 void MainWindow::on_Revert_clicked() {
-  applicationManager->revertLastOperation();
+  applicationManager.revertLastOperation();
 }
 
 void MainWindow::on_deleteFromCsvFile_clicked() {
   if (ui->csvOperations->currentIndex().row() == -1)
     return;
-  applicationManager->deleteOperation(ui->csvOperations->currentIndex().row());
+  applicationManager.deleteOperation(ui->csvOperations->currentIndex().row());
   updateCSVOperations();
 }

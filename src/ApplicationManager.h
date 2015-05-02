@@ -27,6 +27,7 @@ protected:
 public:
   ApplicationManager(const std::shared_ptr<OpenCLManager> &openCLManagerPtr)
     : openCLManager(openCLManagerPtr), processROI(false) {}
+
   template <class T>
   void process(const OPERATION &operation, const std::string &structuralElement,
                const std::vector<float> &params);

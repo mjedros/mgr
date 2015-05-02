@@ -24,6 +24,7 @@ private:
   cl::size_t<3> origin;
   cl::size_t<3> region;
   cl::NDRange localRange;
+  cl::Kernel kernel;
   ROI roi;
   std::shared_ptr<OpenCLManager> openCLManager;
   std::string structuralElementType;
@@ -88,5 +89,6 @@ public:
   ProcessingImage(const std::shared_ptr<OpenCLManager> &openCLManagerPtr,
                   bool processRoi = false);
   ~ProcessingImage() { imageToProcess.release(); }
+  void setKernel(const std::string &Operation);
 };
 }
