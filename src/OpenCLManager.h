@@ -1,22 +1,15 @@
 #pragma once
 
-#define LOGGING_ON
-#ifdef LOGGING_ON
-#define LOG(x) std::cout << x << std::endl;
-#else
-#define LOG(x) ;
-#endif
-
 #define __CL_ENABLE_EXCEPTIONS
 #include <CL/cl.hpp>
 #include <memory>
 #include <string>
 namespace Mgr {
+class Logger;
 class OpenCLManager {
 private:
   cl::Device processingDevice;
   std::vector<cl::Platform> platforms;
-
   void createContext();
   void readPrograms(const std::string &kernelFileName);
 

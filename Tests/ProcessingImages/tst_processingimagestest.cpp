@@ -1,9 +1,11 @@
 #include <QtTest/QtTest>
+#include "../../src/Logger.h"
 #include "../../src/ProcessingImage.h"
 #include "../../src/OpenCLManager.h"
 #include "../src/include/Paths.h"
 
 using namespace Mgr;
+static Logger &logger = Logger::getInstance();
 class ProcessingImagesTest : public QObject {
   Q_OBJECT
   std::shared_ptr<OpenCLManager> openCLManager;
@@ -27,6 +29,7 @@ private Q_SLOTS:
   void skeletonizeTest();
   void binarizefragmentOfmatTest();
   void processROI();
+  void processMorphOperation();
 };
 
 void ProcessingImagesTest::CheckImagesEqual(cv::Mat one, cv::Mat two) {
@@ -65,10 +68,10 @@ ProcessingImagesTest::ProcessingImagesTest()
                 [this](std::tuple<int, int, std::string> &platform) {
     std::cout << (std::get<2>(platform)) << std::endl;
   });
-  LOG("configuring")
+  logger.printText("configuring");
   openCLManager->configure(std::string(KERNELS_DIR) + "Kernels.cl",
                            std::make_pair(0, 0));
-  LOG("configured correctly!")
+  logger.printText("configured correctly!");
   img = std::unique_ptr<ProcessingImage>(new ProcessingImage(openCLManager));
   imageOriginal = cv::Mat(512, 203, CV_8UC1);
   for (int i = 0; i < imageOriginal.cols; i++) {
@@ -188,6 +191,17 @@ void ProcessingImagesTest::processROI() {
   img->binarize(80);
 
   CheckImagesEqual(smallImage, img->getImage());
+}
+
+void ProcessingImagesTest::processMorphOperation() {
+  setToProcessAndBinarizeOriginalImage();
+  cv::Mat eroded;
+  cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
+  cv::erode(img->getImage(), eroded, element);
+  img->setStructuralElement("Cross", { 1, 1 });
+  img->setKernel(OPERATION::EROSION);
+  img->performMorphologicalOperation();
+  CheckImagesEqual(eroded, img->getImage());
 }
 
 QTEST_APPLESS_MAIN(ProcessingImagesTest)

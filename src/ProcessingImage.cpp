@@ -1,11 +1,14 @@
 #include "ProcessingImage.h"
 
+#include "Logger.h"
 #include "OpenCLManager.h"
 #include <chrono>
 
 using namespace cv;
 using namespace cl;
 namespace Mgr {
+
+static Logger &logger = Logger::getInstance();
 
 std::map<std::string, StructuralElement> StrElementMap = {
   { "Ellipse", ELLIPSE }, { "Cross", CROSS }, { "Rectangle", RECTANGLE }
@@ -16,6 +19,7 @@ unsigned int timeSum = 0;
 void ProcessingImage::setKernel(const std::string &Operation) {
   const std::string kernelName = Operation + structuralElementType;
   kernel = Kernel(openCLManager->program, kernelName.c_str());
+  setStructuralElementArgument();
 }
 
 void ProcessingImage::setKernel(const OPERATION &Operation) {
@@ -27,7 +31,7 @@ void ProcessingImage::setKernel(const OPERATION &Operation) {
     setKernel("Erode");
     break;
   default:
-    break;
+    return;
   }
 }
 
@@ -61,13 +65,11 @@ void ProcessingImage::setImageToProcess(const cv::Mat &img) {
 
 void ProcessingImage::dilate() {
   setKernel("Dilate");
-  setStructuralElementArgument();
   performMorphologicalOperation();
 }
 
 void ProcessingImage::erode() {
   setKernel("Erode");
-  setStructuralElementArgument();
   performMorphologicalOperation();
 }
 
@@ -145,10 +147,9 @@ void ProcessingImage::binarize(const unsigned int &minimum,
     process(kernel, image_in, image_out);
     updateFullImage();
   } catch (Error &e) {
-    LOG(e.what());
-    LOG(e.err());
+    logger.printError(e);
   } catch (...) {
-    LOG("Unknown Error");
+    logger.printText("Unknown Error");
   }
 }
 

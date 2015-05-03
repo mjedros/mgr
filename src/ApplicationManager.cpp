@@ -1,6 +1,7 @@
 #include "ApplicationManager.h"
 
 #include "ImageSource/SourceFactory.h"
+#include "Logger.h"
 #include "Normalization.h"
 #include "Processing3dImage.h"
 #include <opencv2/opencv.hpp>
@@ -8,6 +9,7 @@ using namespace cv;
 
 namespace Mgr {
 
+static Logger &logger = Logger::getInstance();
 template <class T>
 void ApplicationManager::process(const OPERATION &operation,
                                  const std::string &structuralElement,

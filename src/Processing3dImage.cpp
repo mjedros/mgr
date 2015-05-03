@@ -14,11 +14,7 @@ const std::map<OPERATION, ptrToMethodType> OperationToMethodPtr = {
 namespace {
 void setKernelAndStructuralElement(ProcessingImage &img,
                                    const OPERATION &operation) {
-  if (operation != OPERATION::CONTOUR &&
-      operation != OPERATION::SKELETONIZATION) {
-    img.setKernel(operation);
-    img.setStructuralElementArgument();
-  }
+  img.setKernel(operation);
 }
 }
 

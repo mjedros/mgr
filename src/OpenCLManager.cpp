@@ -1,5 +1,6 @@
 #include "OpenCLManager.h"
 
+#include "Logger.h"
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -8,6 +9,8 @@ using namespace std;
 using namespace cl;
 
 namespace Mgr {
+
+static Logger &logger = Logger::getInstance();
 
 map<cl_device_type, std::string> DeviceNameToStringMap = {
   { CL_DEVICE_TYPE_GPU, "GPU" },
@@ -18,25 +21,26 @@ map<cl_device_type, std::string> DeviceNameToStringMap = {
 OpenCLManager::OpenCLManager() {
   try {
     Platform::get(&platforms);
-  } catch (Error &e) {
-    LOG(e.what());
-    LOG(e.err());
-    throw std::string(e.what());
+  } catch (Error &error) {
+    logger.printError(error);
+    throw std::string(error.what());
   }
 }
 
-OpenCLManager::~OpenCLManager() { LOG("OpenCLManager destructor"); }
+OpenCLManager::~OpenCLManager() {
+  logger.printText("OpenCLManager destructor");
+}
 
 void OpenCLManager::configure(
     const std::string &kernelFileName,
     const std::pair<unsigned int, unsigned int> &ChosenDevice) {
   try {
     chooseDevice(ChosenDevice.first, ChosenDevice.second);
-    LOG("Device chosen")
+    logger.printText("Device chosen");
     createContext();
-    LOG("Context Created")
+    logger.printText("Context Created");
     readPrograms(kernelFileName);
-    LOG("Programs Loaded")
+    logger.printText("Programs Loaded");
     queue = CommandQueue(context, processingDevice);
   } catch (std::string &e) {
     throw std::string("Configure error: " + e);
@@ -63,7 +67,7 @@ void OpenCLManager::readPrograms(const std::string &kernelFileName) {
         "Build error:" +
         program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(processingDevice) +
         e.what());
-    LOG(ErrorString);
+    logger.printText(ErrorString);
     throw std::string(ErrorString);
   }
 }
