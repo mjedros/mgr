@@ -20,7 +20,6 @@ void setKernelAndStructuralElement(ProcessingImage &img,
 
 void ProcessDepth::process(const std::shared_ptr<Image3d> &image3d,
                            ProcessingImage &img, const OPERATION &operation) {
-  clear();
   auto &operationFun = (OperationToMethodPtr.at(operation));
   setKernelAndStructuralElement(img, operation);
   for (auto i = 0; i < image3d->getDepth(); i++) {
@@ -28,7 +27,6 @@ void ProcessDepth::process(const std::shared_ptr<Image3d> &image3d,
     (img.*operationFun)();
     image3d->setImageAtDepth(i, img.getImage());
   }
-  std::cout << getAvarage() << std::endl;
 }
 
 std::pair<int, int>

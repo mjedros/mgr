@@ -13,8 +13,6 @@ static Logger &logger = Logger::getInstance();
 std::map<std::string, StructuralElement> StrElementMap = {
   { "Ellipse", ELLIPSE }, { "Cross", CROSS }, { "Rectangle", RECTANGLE }
 };
-unsigned int counter = 0;
-unsigned int timeSum = 0;
 
 void ProcessingImage::setKernel(const std::string &Operation) {
   const std::string kernelName = Operation + structuralElementType;
@@ -157,18 +155,14 @@ void ProcessingImage::process(cl::Kernel &kernel, cl::Image2D &image_in,
                               cl::Image2D &image_out) {
   kernel.setArg(0, image_in);
   kernel.setArg(1, image_out);
-  counter++;
-  std::chrono::time_point<std::chrono::system_clock> start, end;
-  start = std::chrono::system_clock::now();
+  logger.beginOperation();
   openCLManager->queue.enqueueNDRangeKernel(
       kernel, cl::NDRange(0, 0),
       cl::NDRange(imageToProcess->cols, imageToProcess->rows), cl::NullRange,
       NULL, NULL);
   openCLManager->queue.enqueueReadImage(image_out, CL_TRUE, origin, region, 0,
                                         0, imageToProcess->data);
-  end = std::chrono::system_clock::now();
-  timeSum += std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
-                 .count();
+  logger.endOperation();
 }
 void ProcessingImage::getROIOOutOfMat() {
   imageToProcess.release();
@@ -194,7 +188,4 @@ void ProcessingImage::updateFullImage() {
       image(Rect(roi.first.first, roi.second.first, imageToProcess->cols,
                  imageToProcess->rows))); // wtf
 }
-
-int getAvarage() { return timeSum / counter; }
-void clear() { timeSum = counter = 0; }
 }

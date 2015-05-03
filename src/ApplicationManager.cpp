@@ -23,8 +23,9 @@ void ApplicationManager::process(const OPERATION &operation,
     throw new std::string("Wrong ROI size");
   setROI(img);
   img.setStructuralElement(structuralElement, params);
-
+  logger.resetTimer();
   processing3dImage.process(processedImage3d, img, operation);
+  logger.printAvarageTime();
 }
 
 void saveMovie(const Image3d &image, const std::string &filename) {
@@ -78,7 +79,6 @@ void ApplicationManager::initProcessedImage(const unsigned int &minumum,
     img->binarize(minumum, maximum);
     processedImage3d->setImageAtDepth(i, img->getImage());
   }
-  std::cout << getAvarage() << std::endl;
   csvFile.addOperations(
       { "Binarize", std::to_string(minumum), std::to_string(maximum) });
 }

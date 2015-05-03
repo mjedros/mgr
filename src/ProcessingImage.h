@@ -6,8 +6,7 @@
 #include <memory>
 
 namespace Mgr {
-int getAvarage();
-void clear();
+
 enum StructuralElement : u_int8_t { ELLIPSE, CROSS, RECTANGLE };
 typedef std::pair<std::pair<u_int16_t, u_int16_t>,
                   std::pair<u_int16_t, u_int16_t>> ROI;
