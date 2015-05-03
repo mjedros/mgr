@@ -33,6 +33,8 @@ void ApplicationManagerGUI::showWindows(const int &depth) {
 }
 
 void ApplicationManagerGUI::closeWindows() {
+  if (originalWindow == nullptr)
+    return;
   colsProcessed->close();
   colsOriginal->close();
   processedWindow->close();

@@ -72,12 +72,11 @@ void ApplicationManager::initProcessedImage(const unsigned int &minumum,
   processROI = false;
   processedImage3d.reset(
       new Image3d(image3d.getDepth(), image3d.getImageAtDepth(0)));
-  std::shared_ptr<ProcessingImage> img(
-      new ProcessingImage(openCLManager, processROI));
+  ProcessingImage img(openCLManager, processROI);
   for (auto i = 0; i < processedImage3d->getDepth(); i++) {
-    img->setImageToProcess(image3d.getImageAtDepth(i).clone());
-    img->binarize(minumum, maximum);
-    processedImage3d->setImageAtDepth(i, img->getImage());
+    img.setImageToProcess(image3d.getImageAtDepth(i).clone());
+    img.binarize(minumum, maximum);
+    processedImage3d->setImageAtDepth(i, img.getImage());
   }
   csvFile.addOperations(
       { "Binarize", std::to_string(minumum), std::to_string(maximum) });

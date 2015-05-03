@@ -5,11 +5,11 @@
 #include "GUI/vtkview.h"
 #include "Image3d.h"
 #include "ImageSource/SourceFactory.h"
+#include "Logger.h"
 #include "Processing3dImage.h"
 
 #include <iostream>
 #include <QFileDialog>
-#include <QStringListModel>
 
 using namespace Mgr;
 std::map<std::string, OPERATION> OperationMap = {
@@ -25,15 +25,17 @@ inline std::string getDoubleText(const QString &text) {
   return doubleText;
 }
 }
+static Logger &logger = Logger::getInstance();
+
 MainWindow::MainWindow(QWidget *parent)
-  : QMainWindow(parent), ui(new Ui::MainWindow),
-    csvOperationsModel(new QStringListModel(this)), menu(new QMenu("File")),
-    openCLManager(new OpenCLManager()), applicationManager(openCLManager) {
+  : QMainWindow(parent), ui(new Ui::MainWindow), csvOperationsModel(this),
+    menu("File"), openCLManager(new OpenCLManager()),
+    applicationManager(openCLManager) {
   ui->setupUi(this);
   setPlatformsList();
-  menu->addAction("Open file to process", this, SLOT(openFileToProcess()));
-  menu->addAction("Open directory to process", this, SLOT(openDirToProcess()));
-  menu_bar.addMenu(menu);
+  menu.addAction("Open file to process", this, SLOT(openFileToProcess()));
+  menu.addAction("Open directory to process", this, SLOT(openDirToProcess()));
+  menu_bar.addMenu(&menu);
   ui->ChooseOperation->addItems(
       { "Dilation", "Erosion", "Contour", "Skeletonize" });
   ui->MorphologicalElementType->addItems({ "Ellipse", "Cross", "Rectangle" });
@@ -41,10 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
   setMenuBar(&menu_bar);
 }
 
-MainWindow::~MainWindow() {
-  delete ui;
-  delete menu;
-}
+MainWindow::~MainWindow() {}
 
 void
 MainWindow::on_ChoosePlatform_currentIndexChanged(const QString &description) {
@@ -87,14 +86,15 @@ void MainWindow::updateCSVOperations() {
       parameters += QString::fromStdString(params) + " ";
     List << parameters;
   }
-  csvOperationsModel->setStringList(List);
-  ui->csvOperations->setModel(csvOperationsModel);
+  csvOperationsModel.setStringList(List);
+  ui->csvOperations->setModel(&csvOperationsModel);
 }
 
 void MainWindow::Process(const std::string &operationString,
                          const std::string &MorphElementType,
                          const std::vector<float> StructElemParams,
                          const std::string &operationWay, bool processROI) {
+  logger.printText("Performing " + operationString);
   const OPERATION &operation = OperationMap[operationString];
   applicationManager.setProcessingROI(processROI);
 

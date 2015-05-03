@@ -14,7 +14,6 @@ private:
   void showWindows(const int &depth);
   void showCols(const int &cols);
   void setMaxValues();
-  void closeEvent(QCloseEvent *event);
 
 public:
   ApplicationManagerGUI(std::shared_ptr<OpenCLManager> openCLManager)

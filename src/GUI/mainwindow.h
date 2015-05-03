@@ -5,6 +5,7 @@
 
 #include <QMainWindow>
 #include <QMenuBar>
+#include <QStringListModel>
 
 namespace Ui {
 class MainWindow;
@@ -55,9 +56,9 @@ private:
   ROI roi;
   std::pair<int, int> chosenDevice;
   std::vector<std::tuple<int, int, std::string>> listPlatforms;
-  Ui::MainWindow *ui;
-  QStringListModel *csvOperationsModel;
-  QMenu *menu;
+  std::unique_ptr<Ui::MainWindow> ui;
+  QStringListModel csvOperationsModel;
+  QMenu menu;
   QMenuBar menu_bar;
   QString filename;
   QString directory;
