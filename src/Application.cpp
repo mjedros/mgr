@@ -17,9 +17,9 @@ int main(int argc, char *argv[]) {
     w.show();
     return a.exec();
   } catch (std::string &e) {
-    logger.printText(" error, number= " + e);
+    logger.printLine(" error, number= " + e);
   } catch (cl::Error &e) {
-    logger.printText(" error, number= " + (int)e.err());
+    logger.printLine(" error, number= " + (int)e.err());
   }
   std::terminate();
 }

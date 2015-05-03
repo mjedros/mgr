@@ -28,7 +28,7 @@ OpenCLManager::OpenCLManager() {
 }
 
 OpenCLManager::~OpenCLManager() {
-  logger.printText("OpenCLManager destructor");
+  logger.printLine("OpenCLManager destructor");
 }
 
 void OpenCLManager::configure(
@@ -36,11 +36,11 @@ void OpenCLManager::configure(
     const std::pair<unsigned int, unsigned int> &ChosenDevice) {
   try {
     chooseDevice(ChosenDevice.first, ChosenDevice.second);
-    logger.printText("Device chosen");
+    logger.printLine("Device chosen");
     createContext();
-    logger.printText("Context Created");
+    logger.printLine("Context Created");
     readPrograms(kernelFileName);
-    logger.printText("Programs Loaded");
+    logger.printLine("Programs Loaded");
     queue = CommandQueue(context, processingDevice);
   } catch (std::string &e) {
     throw std::string("Configure error: " + e);
@@ -67,7 +67,7 @@ void OpenCLManager::readPrograms(const std::string &kernelFileName) {
         "Build error:" +
         program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(processingDevice) +
         e.what());
-    logger.printText(ErrorString);
+    logger.printLine(ErrorString);
     throw std::string(ErrorString);
   }
 }

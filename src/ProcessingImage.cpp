@@ -147,7 +147,7 @@ void ProcessingImage::binarize(const unsigned int &minimum,
   } catch (Error &e) {
     logger.printError(e);
   } catch (...) {
-    logger.printText("Unknown Error");
+    logger.printLine("Unknown Error");
   }
 }
 

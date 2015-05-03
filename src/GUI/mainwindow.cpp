@@ -95,6 +95,8 @@ void MainWindow::Process(const std::string &operationString,
                          const std::vector<float> StructElemParams,
                          const std::string &operationWay, bool processROI) {
   logger.printText("Performing " + operationString);
+  logger.printText(", " + operationWay);
+  logger.printProcessingROI(processROI);
   const OPERATION &operation = OperationMap[operationString];
   applicationManager.setProcessingROI(processROI);
 
