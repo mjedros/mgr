@@ -56,6 +56,7 @@ public:
     csvFile.addOperations(operationsVector);
   }
   void deleteOperation(const int &number) { csvFile.deleteOperation(number); }
+  void processCsvSequence();
 
   const std::vector<std::vector<std::string>> &getOperationsVector() const {
     return csvFile.getOperationsVector();
@@ -63,5 +64,9 @@ public:
   const std::shared_ptr<Image3d> &getProcessedImage3d() const {
     return processedImage3d;
   }
+  void process(const std::string &operationString,
+               const std::string &MorphElementType,
+               const std::vector<float> StructElemParams,
+               const std::string &operationWay);
 };
 }

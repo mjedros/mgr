@@ -12,12 +12,7 @@
 #include <QFileDialog>
 
 using namespace Mgr;
-std::map<std::string, OPERATION> OperationMap = {
-  { "Dilation", OPERATION::DILATION },
-  { "Erosion", OPERATION::EROSION },
-  { "Contour", OPERATION::CONTOUR },
-  { "Skeletonize", OPERATION::SKELETONIZATION }
-};
+
 namespace {
 inline std::string getDoubleText(const QString &text) {
   std::string doubleText = text.toStdString();
@@ -90,24 +85,6 @@ void MainWindow::updateCSVOperations() {
   ui->csvOperations->setModel(&csvOperationsModel);
 }
 
-void MainWindow::Process(const std::string &operationString,
-                         const std::string &MorphElementType,
-                         const std::vector<float> StructElemParams,
-                         const std::string &operationWay, bool processROI) {
-  logger.printText("Performing " + operationString);
-  logger.printText(", " + operationWay);
-  logger.printProcessingROI(processROI);
-  const OPERATION &operation = OperationMap[operationString];
-  applicationManager.setProcessingROI(processROI);
-
-  if (operationWay == "Process columns")
-    applicationManager.process<ProcessCols>(operation, MorphElementType,
-                                            StructElemParams);
-  else
-    applicationManager.process<ProcessDepth>(operation, MorphElementType,
-                                             StructElemParams);
-}
-
 void MainWindow::on_Process_clicked() {
   ui->ProcessingProgress->setEnabled(true);
   ui->ProcessingProgress->setText("In progress");
@@ -121,9 +98,10 @@ void MainWindow::on_Process_clicked() {
     static_cast<float>(ui->StructElementParam3->value())
   };
   try {
-    Process(ui->ChooseOperation->currentText().toStdString(), MorphElementType,
-            StructElemParams, ui->ProcessingWay->currentText().toStdString(),
-            ui->processROI->isChecked());
+    applicationManager.setProcessingROI(ui->processROI->isChecked());
+    applicationManager.process(ui->ChooseOperation->currentText().toStdString(),
+                               MorphElementType, StructElemParams,
+                               ui->ProcessingWay->currentText().toStdString());
     ui->Process->show();
     ui->ProcessingProgress->setText("Done");
   } catch (std::string *error) {
@@ -166,6 +144,9 @@ void MainWindow::on_Normalize_clicked() {
 void MainWindow::initBinaryImage() {
   applicationManager.initProcessedImage(ui->lowLewel->value(),
                                         ui->highLevel->value());
+  applicationManager.addToCSVFile({ "Binarize",
+                                    std::to_string(ui->lowLewel->value()),
+                                    std::to_string(ui->highLevel->value()) });
   updateCSVOperations();
 }
 
@@ -231,30 +212,10 @@ void MainWindow::on_loadCsvFile_clicked() {
 }
 
 void MainWindow::on_processCsvSequence_clicked() {
-  auto operationsVector = applicationManager.getOperationsVector();
-
-  applicationManager.setROI(roi);
-  for (auto &tokens : operationsVector) {
-    if (tokens[0] == "Binarize") {
-      applicationManager.setProcessingROI(false);
-      applicationManager.initProcessedImage(std::stoi(tokens[1]),
-                                            std::stoi(tokens[2]));
-    } else {
-      const bool processROI = tokens[6] == "1" ? true : false;
-      if (processROI) {
-        std::cout << "processing ROI" << std::endl;
-        roi = std::make_pair(
-            std::make_pair(std::stoi(tokens[7]), std::stoi(tokens[8])),
-            std::make_pair(std::stoi(tokens[9]), std::stoi(tokens[10])));
-        applicationManager.setROI(roi);
-      }
-      Process(
-          tokens[0], tokens[1],
-          { std::stof(tokens[2]), std::stof(tokens[3]), std::stof(tokens[4]) },
-          tokens[5], processROI);
-    }
-  }
-  std::cout << "Done processing sequence" << std::endl;
+  logger.printFancyLine("Starting sequence");
+  applicationManager.processCsvSequence();
+  logger.printLine("Done processing sequence");
+  logger.printFancyLine("");
 }
 
 void MainWindow::on_CloseWindows_clicked() {

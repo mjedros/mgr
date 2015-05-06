@@ -9,6 +9,13 @@ using namespace cv;
 
 namespace Mgr {
 
+std::map<std::string, OPERATION> OperationMap = {
+  { "Dilation", OPERATION::DILATION },
+  { "Erosion", OPERATION::EROSION },
+  { "Contour", OPERATION::CONTOUR },
+  { "Skeletonize", OPERATION::SKELETONIZATION }
+};
+
 static Logger &logger = Logger::getInstance();
 template <class T>
 void ApplicationManager::process(const OPERATION &operation,
@@ -33,7 +40,7 @@ void saveMovie(const Image3d &image, const std::string &filename) {
   VideoWriter videowriter(filename, CV_FOURCC('D', 'I', 'V', 'X'), 300,
                           cv::Size(image.getRows(), image.getCols()), false);
   if (!videowriter.isOpened()) {
-    std::cout << "Could not open the output video for write " << std::endl;
+    logger.printLine("Could not open the output video for write ");
     return;
   }
 
@@ -69,6 +76,7 @@ void ApplicationManager::init(const SourceType &source, const string &name) {
 
 void ApplicationManager::initProcessedImage(const unsigned int &minumum,
                                             const unsigned int &maximum) {
+  logger.printLine("Init binary image");
   processROI = false;
   processedImage3d.reset(
       new Image3d(image3d.getDepth(), image3d.getImageAtDepth(0)));
@@ -78,8 +86,6 @@ void ApplicationManager::initProcessedImage(const unsigned int &minumum,
     img.binarize(minumum, maximum);
     processedImage3d->setImageAtDepth(i, img.getImage());
   }
-  csvFile.addOperations(
-      { "Binarize", std::to_string(minumum), std::to_string(maximum) });
 }
 void ApplicationManager::normalizeOriginalImage() { normalize(image3d); }
 
@@ -89,6 +95,41 @@ void ApplicationManager::saveOriginalImage(const std::string &filename) {
 
 void ApplicationManager::saveProcessedImage(const std::string &filename) {
   saveMovie(*processedImage3d, filename);
+}
+
+void ApplicationManager::processCsvSequence() {
+  const auto &operVect = getOperationsVector();
+  for (auto &tokens : operVect) {
+    if (tokens[0] == "Binarize") {
+      setProcessingROI(false);
+      initProcessedImage(std::stoi(tokens[1]), std::stoi(tokens[2]));
+    } else {
+      processROI = (tokens[6] == "1" ? true : false);
+      if (processROI) {
+        roi = std::make_pair(
+            std::make_pair(std::stoi(tokens[7]), std::stoi(tokens[8])),
+            std::make_pair(std::stoi(tokens[9]), std::stoi(tokens[10])));
+      }
+      process(
+          tokens[0], tokens[1],
+          { std::stof(tokens[2]), std::stof(tokens[3]), std::stof(tokens[4]) },
+          tokens[5]);
+    }
+  }
+}
+void ApplicationManager::process(const std::string &operationString,
+                                 const std::string &MorphElementType,
+                                 const std::vector<float> StructElemParams,
+                                 const std::string &operationWay) {
+  logger.printText("Performing " + operationString);
+  logger.printText(", " + operationWay);
+  logger.printProcessingROI(processROI);
+  const OPERATION &operation = OperationMap[operationString];
+
+  if (operationWay == "Process columns")
+    process<ProcessCols>(operation, MorphElementType, StructElemParams);
+  else
+    process<ProcessDepth>(operation, MorphElementType, StructElemParams);
 }
 template void
 ApplicationManager::process<ProcessCols>(const OPERATION &operation,

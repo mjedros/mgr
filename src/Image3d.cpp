@@ -56,6 +56,5 @@ Image3d::Image3d(const int &_depth, const cv::Mat image2d) : depth(_depth) {
 Image3d::Image3d(const Image3d &source)
   : depth(source.depth), rows(source.rows), cols(source.cols) {
   image = source.image.clone();
-  std::cout << "copy";
 }
 }

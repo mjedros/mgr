@@ -47,9 +47,14 @@ void Logger::printAvarageTime() {
   file << endl;
 }
 
+void Logger::printFancyLine(string line) {
+  file << "******************************" << endl;
+  printLine(line);
+}
+
 Logger::Logger() {
   file.open("logMgr.tx", ios::out | fstream::app);
-  file << "***************** New log ********************" << endl;
+  file << "***************** New log *****************" << endl;
   const auto now = chrono::system_clock::now();
   const auto in_time_t = chrono::system_clock::to_time_t(now);
   file << ctime(&in_time_t);

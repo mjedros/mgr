@@ -26,10 +26,7 @@ public:
   explicit MainWindow(QWidget *parent = 0);
   ~MainWindow();
   void initBinaryImage();
-  void Process(const std::string &operationString,
-               const std::string &MorphElementType,
-               const std::vector<float> StructElemParams,
-               const std::string &operationWay, bool processROI = false);
+
 private slots:
   void on_ChoosePlatform_currentIndexChanged(const QString &description);
   void on_Process_clicked();

@@ -21,6 +21,7 @@ public:
   void resetTimer();
   void beginOperation();
   void printAvarageTime();
+  void printFancyLine(std::string line);
 
 private:
   std::fstream file;
