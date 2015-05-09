@@ -32,7 +32,7 @@ __kernel void Binarize(__read_only image2d_t imageIn, __write_only image2d_t ima
    }
    write_imagef(imageOut, image_coord,  out_color);
 }
-__constant int squareSize = 14;
+__constant int squareSize = 12;
 __kernel void ErodeEllipse(__read_only image2d_t imageIn, __write_only image2d_t imageOut,
                     const float3 ellipseParams)
 {

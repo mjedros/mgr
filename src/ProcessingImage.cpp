@@ -156,10 +156,12 @@ void ProcessingImage::process(cl::Kernel &kernel, cl::Image2D &image_in,
   kernel.setArg(0, image_in);
   kernel.setArg(1, image_out);
   logger.beginOperation();
+  cl::Event event;
   openCLManager->queue.enqueueNDRangeKernel(
       kernel, cl::NDRange(0, 0),
       cl::NDRange(imageToProcess->cols, imageToProcess->rows), cl::NullRange,
-      NULL, NULL);
+      NULL, &event);
+  event.wait();
   openCLManager->queue.enqueueReadImage(image_out, CL_TRUE, origin, region, 0,
                                         0, imageToProcess->data);
   logger.endOperation();

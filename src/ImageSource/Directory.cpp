@@ -15,7 +15,7 @@ std::set<std::string> readDir(const std::string &directory) {
     }
     closedir(dir);
   } else {
-    perror("could not open directory");
+    throw std::string("could not open directory");
   }
   return filenames;
 }

@@ -24,8 +24,8 @@ static Logger &logger = Logger::getInstance();
 
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent), ui(new Ui::MainWindow), csvOperationsModel(this),
-    menu("File"), openCLManager(new OpenCLManager()),
-    applicationManager(openCLManager) {
+    menu("File"), directory(QString("../Data/")),
+    openCLManager(new OpenCLManager()), applicationManager(openCLManager) {
   ui->setupUi(this);
   setPlatformsList();
   menu.addAction("Open file to process", this, SLOT(openFileToProcess()));
@@ -33,8 +33,8 @@ MainWindow::MainWindow(QWidget *parent)
   menu_bar.addMenu(&menu);
   ui->ChooseOperation->addItems(
       { "Dilation", "Erosion", "Contour", "Skeletonize" });
-  ui->MorphologicalElementType->addItems({ "Ellipse", "Cross", "Rectangle" });
-  ui->ProcessingWay->addItems({ "Process columns", "Process depth" });
+  ui->MorphologicalElementType->addItems({ "Cross", "Rectangle", "Ellipse" });
+  ui->ProcessingWay->addItems({ "Process depth", "Process columns" });
   setMenuBar(&menu_bar);
 }
 
@@ -59,7 +59,16 @@ void MainWindow::setPlatformsList() {
 
 void MainWindow::initImages(const Mgr::SourceType &source,
                             const std::string &name) {
-  applicationManager.init(source, name);
+  try {
+    applicationManager.init(source, name);
+  } catch (std::string &err) {
+    logger.printLine(err);
+    return;
+  } catch (...) {
+    logger.printLine("Unknown init error!");
+    return;
+  }
+
   initBinaryImage();
   ui->ImagesLoaded->setText("Images Loaded");
   ui->Process->setEnabled(true);
