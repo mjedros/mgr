@@ -1,5 +1,5 @@
 #include "GUI/VTKData.h"
-
+#include "Logger.h"
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkActor.h>
@@ -7,8 +7,34 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkContourFilter.h>
 #include <vtkCellArray.h>
+
+#include <thread>
+#include <mutex>
+static Mgr::Logger &logger = Mgr::Logger::getInstance();
+static const u_int8_t THREAD_NUMBER = 3;
 VTKData::VTKData() : renderer(vtkRenderer::New()) {
   renderer->SetBackground(.1, .1, .1);
+}
+static std::mutex Mutex;
+
+void VTKData::insertPoints(const int &threadNum,
+                           const std::shared_ptr<Mgr::Image3d> &image3d,
+                           vtkSmartPointer<vtkCellArray> vertices,
+                           vtkSmartPointer<vtkPoints> points) {
+  for (int depth = threadNum * image3d->getDepth() / THREAD_NUMBER;
+       depth < (1 + threadNum) * image3d->getDepth() / THREAD_NUMBER; ++depth) {
+    const cv::Mat image = image3d->getImageAtDepth(depth);
+    for (int col = 0; col < image3d->getCols(); ++col) {
+      for (int row = 0; row < image3d->getRows(); ++row) {
+        if (image.at<uchar>(row, col) == 255) {
+          std::unique_lock<std::mutex> lock(Mutex);
+          vtkIdType pid[1];
+          pid[0] = points->InsertNextPoint(col, row, depth);
+          vertices->InsertNextCell(1, pid);
+        }
+      }
+    }
+  }
 }
 
 vtkSmartPointer<vtkActor>
@@ -18,19 +44,19 @@ VTKData::createActorOutOf3dImage(std::tuple<double, double, double> colors) {
   vtkSmartPointer<vtkPolyDataMapper> mapper = vtkPolyDataMapper::New();
   vtkSmartPointer<vtkActor> actor = vtkActor::New();
   vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
-
-  for (int depth = 0; depth < image3d->getDepth(); depth++) {
-    for (int col = 0; col < image3d->getCols(); col++) {
-      for (int row = 0; row < image3d->getRows(); row++) {
-        if (image3d->getImageAtDepth(depth).at<uchar>(row, col) == 255) {
-          vtkIdType pid[1];
-          pid[0] = points->InsertNextPoint(col, row, depth);
-          vertices->InsertNextCell(1, pid);
-        }
-      }
-    }
+  logger.printFancyLine("Inserting 3d points");
+  logger.resetTimer();
+  logger.beginOperation();
+  std::thread t[THREAD_NUMBER];
+  for (int i = 0; i < THREAD_NUMBER; ++i) {
+    t[i] = std::thread(&VTKData::insertPoints, i, image3d, vertices, points);
   }
 
+  for (int i = 0; i < THREAD_NUMBER; ++i) {
+    t[i].join();
+  }
+  logger.endOperation();
+  logger.printAvarageTime();
   polyData->SetPoints(points);
   polyData->SetVerts(vertices);
   mapper->SetInputData(polyData);

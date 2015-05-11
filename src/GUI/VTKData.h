@@ -3,6 +3,8 @@
 #include <vtkSmartPointer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
+#include <vtkPoints.h>
+#include <vtkCellArray.h>
 #include "Image3d.h"
 #include <memory>
 class VTKData {
@@ -19,4 +21,10 @@ public:
   vtkSmartPointer<vtkRenderer> getVTKRenderer() const { return renderer; }
   vtkSmartPointer<vtkActor>
   createActorOutOf3dImage(std::tuple<double, double, double> colors);
+
+private:
+  static void insertPoints(const int &threadNum,
+                           const std::shared_ptr<Mgr::Image3d> &image3d,
+                           vtkSmartPointer<vtkCellArray> vertices,
+                           vtkSmartPointer<vtkPoints> points);
 };
