@@ -5,7 +5,9 @@ INCLUDE(../CMakeLists.common)
 SET(COMMON_SOURCES
   OpenCLManager.cpp 
   ProcessingImage.cpp
-   Logger.cpp
+  ProcessingImage3d.cpp
+  Image3d.cpp 
+  Logger.cpp
   csvFileUtils.cpp
 )
 SET(SOURCES
@@ -18,7 +20,6 @@ SET(SOURCES
   ApplicationManager.cpp
   ImageSource/FileVideo.cpp
   ImageSource/Directory.cpp
-  Image3d.cpp 
   Processing3dImage.cpp
   Normalization.cpp
 )

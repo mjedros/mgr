@@ -1,8 +1,10 @@
 #include "ProcessingImage.h"
 
 #include "Logger.h"
+#include "Image3d.h"
 #include "OpenCLManager.h"
 #include <chrono>
+#include <vector>
 
 using namespace cv;
 using namespace cl;
@@ -15,9 +17,7 @@ std::map<std::string, StructuralElement> StrElementMap = {
 };
 
 void ProcessingImage::setKernel(const std::string &Operation) {
-  const std::string kernelName = Operation + structuralElementType;
-  kernel = Kernel(openCLManager->program, kernelName.c_str());
-  setStructuralElementArgument();
+  setKernelOperation(Operation);
 }
 
 void ProcessingImage::setKernel(const OPERATION &Operation) {
@@ -50,6 +50,12 @@ ProcessingImage::ProcessingImage(
   : image(cv::Mat()), imageToProcess(nullptr),
     openCLManager(std::move(openCLManagerPtr)), processROI(processRoi) {
   origin[0] = origin[1] = origin[2] = 0;
+}
+
+void ProcessingImage::setKernelOperation(const std::string &Operation) {
+  const std::string kernelName = Operation + structuralElementType;
+  kernel = Kernel(openCLManager->program, kernelName.c_str());
+  setStructuralElementArgument();
 }
 
 Mat ProcessingImage::getImage() { return image; }
@@ -107,16 +113,16 @@ void ProcessingImage::setStructuralElement(const std::string &element,
 void ProcessingImage::setStructuralElementArgument() {
   switch (StrElementMap[structuralElementType.c_str()]) {
   case ELLIPSE: {
-    const cl_float3 ellipseParams =
-        (cl_float3){ { structuralElementParams[0], structuralElementParams[1],
-                       structuralElementParams[2] } };
+    const cl_float3 ellipseParams = { { structuralElementParams[0],
+                                        structuralElementParams[1],
+                                        structuralElementParams[2] } };
     kernel.setArg(2, ellipseParams);
     break;
   }
   case RECTANGLE:
   case CROSS: {
-    const cl_int2 rectParams = (cl_int2){ {(int)structuralElementParams[0],
-                                           (int)structuralElementParams[1] } };
+    const cl_int2 rectParams = { {(int)structuralElementParams[0],
+                                  (int)structuralElementParams[1] } };
     kernel.setArg(2, rectParams);
     break;
   }

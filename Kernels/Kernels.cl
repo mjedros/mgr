@@ -1,4 +1,13 @@
 constant sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_ADDRESS_CLAMP;
+
+#pragma OPENCL EXTENSION cl_khr_3d_image_writes : enable
+
+__kernel void image3dTest(__read_only image3d_t imageIn, __write_only image3d_t imageOut)
+{
+  int4 image_coord = (int4) {get_global_id(0), get_global_id(1), get_global_id(2), get_global_id(3)};
+  float4 inPixel = read_imagef(imageIn, sampler, image_coord);
+  write_imagef(imageOut, image_coord, inPixel);
+}
 __kernel void threshold(__read_only image2d_t imageIn, __write_only image2d_t imageOut,
                         const float threshold)
 {
@@ -7,6 +16,7 @@ __kernel void threshold(__read_only image2d_t imageIn, __write_only image2d_t im
    int2 image_coord = (int2) {get_global_id(0), get_global_id(1)};
 
    float pixel = read_imagef(imageIn, sampler, image_coord).x;
+
    if (pixel > threshold)
    {
       out_color = 1;

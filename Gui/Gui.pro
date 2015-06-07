@@ -28,7 +28,8 @@ SOURCES +=\
     ../src/GUI/vtkview.cpp \
     ../src/GUI/VTKData.cpp \
     ../src/csvFileUtils.cpp \
-    ../src/Logger.cpp
+    ../src/Logger.cpp \
+    ../src/ProcessingImage3d.cpp
 
 HEADERS  += ../src/GUI/mainwindow.h\
         ../src/OpenCLManager.h \
@@ -46,7 +47,8 @@ HEADERS  += ../src/GUI/mainwindow.h\
     ../src/GUI/vtkview.h \
     ../src/GUI/VTKData.h \
     ../src/csvFileUtils.h \
-    ../src/Logger.h
+    ../src/Logger.h \
+    ../src/ProcessingImage3d.h
 
 FORMS    += ../src/GUI/mainwindow.ui
 CONFIG += c++0x

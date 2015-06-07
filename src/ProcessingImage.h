@@ -17,8 +17,9 @@ enum class OPERATION : uint8_t { DILATION, EROSION, CONTOUR, SKELETONIZATION };
 /**
  * @brief Class representing image that is being processed with OpenCL
  */
+class Image3d;
 class ProcessingImage {
-private:
+protected:
   cv::Mat image;
   cv::Mat roiImage;
   std::unique_ptr<cv::Mat> imageToProcess;
@@ -89,8 +90,9 @@ public:
   ProcessingImage(const std::shared_ptr<OpenCLManager> &openCLManagerPtr,
                   bool processRoi = false);
   ~ProcessingImage() { imageToProcess.release(); }
-  void setKernel(const std::string &Operation);
-  void setKernel(const OPERATION &Operation);
+  void setKernelOperation(const std::string &Operation);
+  virtual void setKernel(const std::string &Operation);
+  virtual void setKernel(const OPERATION &Operation);
   void setStructuralElementArgument();
 };
 }
