@@ -17,21 +17,21 @@ std::map<std::string, OPERATION> OperationMap = {
 };
 
 static Logger &logger = Logger::getInstance();
-template <class T>
+template <class T, class I>
 void ApplicationManager::process(const OPERATION &operation,
                                  const std::string &structuralElement,
                                  const std::vector<float> &params) {
   cv::waitKey(1);
   image3dPrevious = *processedImage3d; // save image
 
-  ProcessingImage img(openCLManager, processROI);
+  I img(openCLManager, processROI);
   T processing3dImage;
-  if (!isROISizeValid(processing3dImage.getImageSize(processedImage3d)))
+  if (!isROISizeValid(processing3dImage.getImageSize(*processedImage3d)))
     throw new std::string("Wrong ROI size");
   setROI(img);
   img.setStructuralElement(structuralElement, params);
   logger.resetTimer();
-  processing3dImage.process(processedImage3d, img, operation);
+  processing3dImage.process(*processedImage3d, img, operation);
   logger.printAvarageTime();
 }
 
@@ -128,8 +128,11 @@ void ApplicationManager::process(const std::string &operationString,
 
   if (operationWay == "Process columns")
     process<ProcessCols>(operation, MorphElementType, StructElemParams);
-  else
+  else if (operationWay == "Process depth")
     process<ProcessDepth>(operation, MorphElementType, StructElemParams);
+  else
+    process<ProcessDepthIn3D, ProcessingImage3d>(operation, MorphElementType,
+                                                 StructElemParams);
 }
 template void
 ApplicationManager::process<ProcessCols>(const OPERATION &operation,
@@ -139,4 +142,7 @@ template void
 ApplicationManager::process<ProcessDepth>(const OPERATION &operation,
                                           const std::string &structuralElement,
                                           const std::vector<float> &params);
+template void ApplicationManager::process<ProcessDepthIn3D, ProcessingImage3d>(
+    const OPERATION &operation, const std::string &structuralElement,
+    const std::vector<float> &params);
 }

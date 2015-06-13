@@ -1,6 +1,7 @@
 #include "Processing3dImage.h"
 
 #include "ProcessingImage.h"
+#include "ProcessingImage3d.h"
 #include "Image3d.h"
 namespace Mgr {
 typedef void (ProcessingImage::*ptrToMethodType)();
@@ -18,35 +19,44 @@ void setKernelAndStructuralElement(ProcessingImage &img,
 }
 }
 
-void ProcessDepth::process(const std::shared_ptr<Image3d> &image3d,
-                           ProcessingImage &img, const OPERATION &operation) {
+void ProcessDepth::process(Image3d &image3d, ProcessingImage &img,
+                           const OPERATION &operation) {
   auto &operationFun = (OperationToMethodPtr.at(operation));
   setKernelAndStructuralElement(img, operation);
-  for (auto i = 0; i < image3d->getDepth(); i++) {
-    img.setImageToProcess(image3d->getImageAtDepth(i).clone());
+  for (auto i = 0; i < image3d.getDepth(); i++) {
+    img.setImageToProcess(image3d.getImageAtDepth(i).clone());
     (img.*operationFun)();
-    image3d->setImageAtDepth(i, img.getImage());
+    image3d.setImageAtDepth(i, img.getImage());
   }
 }
 
-std::pair<int, int>
-ProcessDepth::getImageSize(const std::shared_ptr<Image3d> &image3d) {
-  return { image3d->getRows(), image3d->getCols() };
+std::pair<int, int> ProcessDepth::getImageSize(const Image3d &image3d) const {
+  return { image3d.getRows(), image3d.getCols() };
 }
 
-void ProcessCols::process(const std::shared_ptr<Image3d> &image3d,
-                          ProcessingImage &img, const OPERATION &operation) {
+void ProcessCols::process(Image3d &image3d, ProcessingImage &img,
+                          const OPERATION &operation) {
   auto &operationFun = (OperationToMethodPtr.at(operation));
   setKernelAndStructuralElement(img, operation);
-  for (auto i = 0; i < image3d->getCols(); i++) {
-    img.setImageToProcess(image3d->getImageAtCol(i));
+  for (auto i = 0; i < image3d.getCols(); i++) {
+    img.setImageToProcess(image3d.getImageAtCol(i));
     (img.*operationFun)();
-    image3d->setImageAtCol(i, img.getImage());
+    image3d.setImageAtCol(i, img.getImage());
   }
 }
 
-std::pair<int, int>
-ProcessCols::getImageSize(const std::shared_ptr<Image3d> &image3d) {
-  return { image3d->getDepth(), image3d->getRows() };
+std::pair<int, int> ProcessCols::getImageSize(const Image3d &image3d) const {
+  return { image3d.getDepth(), image3d.getRows() };
+}
+
+void ProcessDepthIn3D::process(Image3d &image3d, ProcessingImage3d &img,
+                               const OPERATION &operation) {
+  auto &operationFun = (OperationToMethodPtr.at(operation));
+  setKernelAndStructuralElement(img, operation);
+  img.set3dImageToProcess(image3d);
+  (img.*operationFun)();
+}
+std::pair<int, int> ProcessDepthIn3D::getImageSize(const Image3d &) const {
+  return std::make_pair(1, 1);
 }
 }

@@ -80,7 +80,7 @@ public:
    * @brief Image getter
    * @return Image data
    */
-  cv::Mat getImage();
+  cv::Mat getImage() const;
   /**
    * @brief Set image data
    * @param img - image sent to process
@@ -92,7 +92,7 @@ public:
   ~ProcessingImage() { imageToProcess.release(); }
   void setKernelOperation(const std::string &Operation);
   virtual void setKernel(const std::string &Operation);
-  virtual void setKernelWithOperation(const OPERATION &Operation);
+  void setKernelWithOperation(const OPERATION &Operation);
   void setStructuralElementArgument();
 };
 }

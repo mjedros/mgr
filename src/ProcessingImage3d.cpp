@@ -9,8 +9,8 @@ using namespace cv;
 namespace Mgr {
 
 ProcessingImage3d::ProcessingImage3d(
-    const std::shared_ptr<OpenCLManager> &openCLManagerPtr)
-  : ProcessingImage(openCLManagerPtr) {}
+    const std::shared_ptr<OpenCLManager> &openCLManagerPtr, bool processRoi)
+  : ProcessingImage(openCLManagerPtr, processRoi) {}
 
 void ProcessingImage3d::setKernel(const std::string &Operation) {
   setKernelOperation(Operation + "3d");

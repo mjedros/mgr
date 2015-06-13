@@ -2,6 +2,7 @@
 
 #include "Image3d.h"
 #include "ProcessingImage.h"
+#include "ProcessingImage3d.h"
 #include "OpenCLManager.h"
 #include "csvFileUtils.h"
 #include <QObject>
@@ -28,14 +29,14 @@ public:
   ApplicationManager(const std::shared_ptr<OpenCLManager> &openCLManagerPtr)
     : openCLManager(openCLManagerPtr), processROI(false) {}
 
-  template <class T>
+  template <class T, class I = ProcessingImage>
   void process(const OPERATION &operation, const std::string &structuralElement,
                const std::vector<float> &params);
 
   void init(const SourceType &source, const std::string &name);
   void initProcessedImage(const unsigned int &minumum = 100,
                           const unsigned int &maximum = 255);
-  void setROI(ProcessingImage &processingImage) {
+  template <class I = ProcessingImage> void setROI(I &processingImage) {
     if (!processROI)
       return;
     processingImage.setROI(roi);

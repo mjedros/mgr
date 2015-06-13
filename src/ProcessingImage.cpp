@@ -59,7 +59,7 @@ void ProcessingImage::setKernelOperation(const std::string &Operation) {
   setStructuralElementArgument();
 }
 
-Mat ProcessingImage::getImage() { return image; }
+Mat ProcessingImage::getImage() const { return image; }
 void ProcessingImage::setImageToProcess(const cv::Mat &img) {
   image.release();
   image = img;
