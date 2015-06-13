@@ -14,7 +14,7 @@ const std::map<OPERATION, ptrToMethodType> OperationToMethodPtr = {
 namespace {
 void setKernelAndStructuralElement(ProcessingImage &img,
                                    const OPERATION &operation) {
-  img.setKernel(operation);
+  img.setKernelWithOperation(operation);
 }
 }
 

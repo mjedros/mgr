@@ -204,7 +204,7 @@ void ProcessingImagesTest::processMorphOperation() {
   cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
   cv::erode(img.getImage(), eroded, element);
   img.setStructuralElement("Cross", { 1, 1 });
-  img.setKernel(OPERATION::EROSION);
+  img.setKernelWithOperation(OPERATION::EROSION);
   img.performMorphologicalOperation();
   CheckImagesEqual(eroded, img.getImage());
 }
@@ -217,6 +217,7 @@ void ProcessingImagesTest::image3dCreation() {
   for (auto i = 0; i < depth; i++)
     image3d.setImageAtDepth(i, img.getImage().clone());
   img3d.set3dImageToProcess(image3d);
+  img3d.setKernelWithOperation(OPERATION::SKELETONIZATION);
 }
 
 QTEST_APPLESS_MAIN(ProcessingImagesTest)

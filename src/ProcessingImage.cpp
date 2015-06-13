@@ -20,7 +20,7 @@ void ProcessingImage::setKernel(const std::string &Operation) {
   setKernelOperation(Operation);
 }
 
-void ProcessingImage::setKernel(const OPERATION &Operation) {
+void ProcessingImage::setKernelWithOperation(const OPERATION &Operation) {
   switch (Operation) {
   case OPERATION::DILATION:
     setKernel("Dilate");
@@ -29,6 +29,7 @@ void ProcessingImage::setKernel(const OPERATION &Operation) {
     setKernel("Erode");
     break;
   default:
+    logger.printLine("Wrong Kernel Operation!");
     return;
   }
 }

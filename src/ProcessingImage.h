@@ -92,7 +92,7 @@ public:
   ~ProcessingImage() { imageToProcess.release(); }
   void setKernelOperation(const std::string &Operation);
   virtual void setKernel(const std::string &Operation);
-  virtual void setKernel(const OPERATION &Operation);
+  virtual void setKernelWithOperation(const OPERATION &Operation);
   void setStructuralElementArgument();
 };
 }
