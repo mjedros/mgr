@@ -32,7 +32,7 @@ void ApplicationManager::process(const OPERATION &operation,
   img.setStructuralElement(structuralElement, params);
   logger.resetTimer();
   processing3dImage.process(*processedImage3d, img, operation);
-  logger.printAvarageTime();
+  // logger.printAvarageTime();
 }
 
 void saveMovie(const Image3d &image, const std::string &filename) {

@@ -59,6 +59,6 @@ endif(NOT MSVC)
 set(KERNELS_DIR "${PROJECT_SOURCE_DIR}/../Kernels/")
 configure_file (
   "Paths.h.in"
-  "${PROJECT_BINARY_DIR}/include/Paths.h"
+  "${PROJECT_SOURCE_DIR}/include/Paths.h"
   )
 include_directories("${PROJECT_BINARY_DIR}/include")

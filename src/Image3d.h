@@ -16,6 +16,7 @@ public:
   void setImageAtDepth(const int &depth, const cv::Mat image2d);
   void setImageAtRow(const int &row, const cv::Mat image2d);
   void setImageAtCol(const int &col, const cv::Mat image2d);
+  void set3dImage(cv::Mat newImage) { image = newImage; }
   const cv::Mat getImageAtDepth(const int &_depth) const;
   const cv::Mat getImageAtRow(const int &row) const;
   const cv::Mat getImageAtCol(const int &col) const;

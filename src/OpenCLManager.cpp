@@ -1,6 +1,7 @@
 #include "OpenCLManager.h"
 
 #include "Logger.h"
+#include "include/Paths.h"
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -61,7 +62,9 @@ void OpenCLManager::readPrograms(const std::string &kernelFileName) {
       Program::Sources(1, make_pair(prog.c_str(), prog.length() + 1));
   program = Program(context, source);
   try {
-    program.build({ processingDevice }, "");
+    std::string includeDir = "-I" + std::string(KERNELS_DIR);
+    char * inc = const_cast<char*>(includeDir.c_str());
+    program.build({ processingDevice }, inc);
   } catch (Error &e) {
     std::string ErrorString(
         "Build error:" +

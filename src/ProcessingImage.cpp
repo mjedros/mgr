@@ -2,7 +2,6 @@
 
 #include "Logger.h"
 #include "Image3d.h"
-#include "OpenCLManager.h"
 #include <chrono>
 #include <vector>
 
@@ -51,12 +50,6 @@ ProcessingImage::ProcessingImage(
   : image(cv::Mat()), imageToProcess(nullptr),
     openCLManager(std::move(openCLManagerPtr)), processROI(processRoi) {
   origin[0] = origin[1] = origin[2] = 0;
-}
-
-void ProcessingImage::setKernelOperation(const std::string &Operation) {
-  const std::string kernelName = Operation + structuralElementType;
-  kernel = Kernel(openCLManager->program, kernelName.c_str());
-  setStructuralElementArgument();
 }
 
 Mat ProcessingImage::getImage() const { return image; }
@@ -195,6 +188,6 @@ void ProcessingImage::updateFullImage() {
   image = Mat(image.rows, image.cols, imageToProcess->type(), 0.0);
   imageToProcess->copyTo(
       image(Rect(roi.first.first, roi.second.first, imageToProcess->cols,
-                 imageToProcess->rows))); // wtf
+                 imageToProcess->rows)));
 }
 }

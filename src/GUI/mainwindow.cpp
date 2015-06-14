@@ -1,7 +1,7 @@
 #include "GUI/mainwindow.h"
 
 #include "ui_mainwindow.h"
-#include "../build/src/include/Paths.h"
+#include "include/Paths.h"
 #include "GUI/vtkview.h"
 #include "Image3d.h"
 #include "ImageSource/SourceFactory.h"
@@ -34,7 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
   ui->ChooseOperation->addItems(
       { "Dilation", "Erosion", "Contour", "Skeletonize" });
   ui->MorphologicalElementType->addItems({ "Cross", "Rectangle", "Ellipse" });
-  ui->ProcessingWay->addItems({ "Process depth", "Process columns" });
+  ui->ProcessingWay->addItems(
+      { "Process depth", "Process columns", "Process in 3d" });
   setMenuBar(&menu_bar);
 }
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "OpenCLManager.h"
+
 #define __CL_ENABLE_EXCEPTIONS
 #include <CL/cl.hpp>
 #include <opencv2/opencv.hpp>
@@ -67,7 +69,7 @@ public:
    * @brief Performs specific morphological operation
    * @param Operation - name of operation in kernel file
    */
-  void performMorphologicalOperation();
+  virtual void performMorphologicalOperation();
   /**
    * @brief Set structural element for morphological operations
    * @param element - Type of element
@@ -90,9 +92,14 @@ public:
   ProcessingImage(const std::shared_ptr<OpenCLManager> &openCLManagerPtr,
                   bool processRoi = false);
   ~ProcessingImage() { imageToProcess.release(); }
-  void setKernelOperation(const std::string &Operation);
+  inline void setKernelOperation(const std::string &Operation) {
+    const std::string kernelName = Operation + structuralElementType;
+    kernel = cl::Kernel(openCLManager->program, kernelName.c_str());
+    setStructuralElementArgument();
+  }
   virtual void setKernel(const std::string &Operation);
   void setKernelWithOperation(const OPERATION &Operation);
-  void setStructuralElementArgument();
+
+  virtual void setStructuralElementArgument();
 };
 }

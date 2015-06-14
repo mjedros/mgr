@@ -11,5 +11,7 @@ public:
                     bool processRoi = false);
   void setKernel(const std::string &Operation) override;
   void set3dImageToProcess(const Image3d &image3d);
+  void setStructuralElementArgument() override;
+  void performMorphologicalOperation() override;
 };
 } // Mgr namespace

@@ -25,8 +25,8 @@ public:
 
 private:
   std::fstream file;
-  unsigned int operationsCounter;
-  unsigned int timeSum;
+  unsigned int operationsCounter = 1;
+  unsigned int timeSum = 0;
   std::chrono::time_point<std::chrono::system_clock> start;
 
   Logger();
