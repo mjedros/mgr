@@ -19,11 +19,15 @@ TEMPLATE = app
 
 SOURCES += tst_processingimagestest.cpp\
 ../../src/OpenCLManager.cpp\
-../../src/ProcessingImage.cpp
+../../src/ProcessingImage.cpp \
+    ../../src/Image3d.cpp \
+    ../../src/Logger.cpp \
+    ../../src/ProcessingImage3d.cpp
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 unix {
     LIBS += -L/usr/lib/ -lOpenCL -lopencv_highgui -lopencv_core -lopencv_imgproc
     INCLUDEPATH += /usr/include
+    INCLUDEPATH += ../../src
     DEPENDPATH += /usr/include
 }
 win32 {
@@ -36,4 +40,7 @@ win32 {
     INCLUDEPATH += $(OPENCV_DIR)/build/include
 }
 
-HEADERS +=
+HEADERS += \
+    ../../src/Image3d.h \
+    ../../src/Logger.h \
+    ../../src/ProcessingImage3d.h

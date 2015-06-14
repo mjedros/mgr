@@ -32,7 +32,7 @@ void ApplicationManager::process(const OPERATION &operation,
   img.setStructuralElement(structuralElement, params);
   logger.resetTimer();
   processing3dImage.process(*processedImage3d, img, operation);
-  // logger.printAvarageTime();
+  logger.printAvarageTime();
 }
 
 void saveMovie(const Image3d &image, const std::string &filename) {
@@ -130,6 +130,8 @@ void ApplicationManager::process(const std::string &operationString,
     process<ProcessCols>(operation, MorphElementType, StructElemParams);
   else if (operationWay == "Process depth")
     process<ProcessDepth>(operation, MorphElementType, StructElemParams);
+  else if (operationWay == "Process rows")
+    process<ProcessRows>(operation, MorphElementType, StructElemParams);
   else
     process<ProcessDepthIn3D, ProcessingImage3d>(operation, MorphElementType,
                                                  StructElemParams);
@@ -142,6 +144,10 @@ template void
 ApplicationManager::process<ProcessDepth>(const OPERATION &operation,
                                           const std::string &structuralElement,
                                           const std::vector<float> &params);
+template void
+ApplicationManager::process<ProcessRows>(const OPERATION &operation,
+                                         const std::string &structuralElement,
+                                         const std::vector<float> &params);
 template void ApplicationManager::process<ProcessDepthIn3D, ProcessingImage3d>(
     const OPERATION &operation, const std::string &structuralElement,
     const std::vector<float> &params);

@@ -48,7 +48,8 @@ HEADERS  += ../src/GUI/mainwindow.h\
     ../src/GUI/VTKData.h \
     ../src/csvFileUtils.h \
     ../src/Logger.h \
-    ../src/ProcessingImage3d.h
+    ../src/ProcessingImage3d.h \
+    ../src/include/Paths.h
 
 FORMS    += ../src/GUI/mainwindow.ui
 CONFIG += c++0x
@@ -75,4 +76,8 @@ win32 {
 
     INCLUDEPATH += $(OPENCV_DIR)/build/include
 }
+
+DISTFILES += \
+    ../Kernels/Kernels.cl \
+    ../Kernels/Kernels3d.cl
 

@@ -1,10 +1,10 @@
 #include <QtTest/QtTest>
-#include "../../src/Logger.h"
-#include "../../src/ProcessingImage.h"
-#include "../../src/ProcessingImage3d.h"
-#include "../../src/OpenCLManager.h"
-#include "../../src/Image3d.h"
-#include "../src/include/Paths.h"
+#include "Logger.h"
+#include "ProcessingImage.h"
+#include "ProcessingImage3d.h"
+#include "OpenCLManager.h"
+#include "Image3d.h"
+#include "include/Paths.h"
 
 using namespace Mgr;
 static Logger &logger = Logger::getInstance();
@@ -212,12 +212,13 @@ void ProcessingImagesTest::processMorphOperation() {
 void ProcessingImagesTest::image3dCreation() {
   img.setImageToProcess(imageOriginal.clone());
   img.binarize(127, 255);
-  const int depth = 444;
+  const int depth = 12;
   Mgr::Image3d image3d(depth, img.getImage().clone());
   for (auto i = 0; i < depth; i++)
     image3d.setImageAtDepth(i, img.getImage().clone());
   img3d.set3dImageToProcess(image3d);
-  img3d.setKernelWithOperation(OPERATION::SKELETONIZATION);
+  img3d.setStructuralElement("Cross", { 1, 1, 1 });
+  img3d.contour();
 }
 
 QTEST_APPLESS_MAIN(ProcessingImagesTest)

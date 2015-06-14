@@ -28,7 +28,7 @@ void Logger::printProcessingROI(bool roi) {
 
 void Logger::endOperation() {
   auto end = chrono::system_clock::now();
-  timeSum += chrono::duration_cast<chrono::milliseconds>(end - start).count();
+  timeSum += chrono::duration_cast<chrono::microseconds>(end - start).count();
 }
 
 void Logger::resetTimer() {
@@ -42,8 +42,11 @@ void Logger::beginOperation() {
 }
 
 void Logger::printAvarageTime() {
+  double inMiliseconds = timeSum / 1000.0;
+  file << "Full time:" << timeSum << " us, " << inMiliseconds << " ms" << endl;
   file << "Avarage time: ";
-  file << timeSum / operationsCounter << endl;
+  file << timeSum / operationsCounter << " us, "
+       << inMiliseconds / operationsCounter << " ms" << endl;
   file << endl;
 }
 

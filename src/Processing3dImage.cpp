@@ -49,6 +49,21 @@ std::pair<int, int> ProcessCols::getImageSize(const Image3d &image3d) const {
   return { image3d.getDepth(), image3d.getRows() };
 }
 
+void ProcessRows::process(Image3d &image3d, ProcessingImage &img,
+                          const OPERATION &operation) {
+  auto &operationFun = (OperationToMethodPtr.at(operation));
+  setKernelAndStructuralElement(img, operation);
+  for (auto i = 0; i < image3d.getRows(); i++) {
+    img.setImageToProcess(image3d.getImageAtRow(i));
+    (img.*operationFun)();
+    image3d.setImageAtRow(i, img.getImage());
+  }
+}
+
+std::pair<int, int> ProcessRows::getImageSize(const Image3d &image3d) const {
+  return { image3d.getCols(), image3d.getDepth() };
+}
+
 void ProcessDepthIn3D::process(Image3d &image3d, ProcessingImage3d &img,
                                const OPERATION &operation) {
   auto &operationFun = (OperationToMethodPtr.at(operation));

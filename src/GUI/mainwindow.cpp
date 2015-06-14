@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
       { "Dilation", "Erosion", "Contour", "Skeletonize" });
   ui->MorphologicalElementType->addItems({ "Cross", "Rectangle", "Ellipse" });
   ui->ProcessingWay->addItems(
-      { "Process depth", "Process columns", "Process in 3d" });
+      { "Process depth", "Process columns", "Process rows", "Process in 3d" });
   setMenuBar(&menu_bar);
 }
 

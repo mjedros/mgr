@@ -13,9 +13,6 @@ ProcessingImage3d::ProcessingImage3d(
     const std::shared_ptr<OpenCLManager> &openCLManagerPtr, bool processRoi)
   : ProcessingImage(openCLManagerPtr, processRoi) {}
 
-void ProcessingImage3d::setKernel(const std::string &Operation) {
-  setKernelOperation(Operation + "3d");
-}
 void ProcessingImage3d::set3dImageToProcess(const Image3d &image3d) {
   image.release();
   image = image3d.get3dMatImage().clone();
@@ -24,6 +21,10 @@ void ProcessingImage3d::set3dImageToProcess(const Image3d &image3d) {
   region[2] = image3d.getDepth();
   imageToProcess.release();
   imageToProcess = std::unique_ptr<Mat>(&image);
+}
+
+void ProcessingImage3d::setKernel(const std::string &Operation) {
+  setKernelOperation(Operation + "3d");
 }
 
 void ProcessingImage3d::setStructuralElementArgument() {

@@ -42,7 +42,6 @@ void cvImageWindow::wheelEvent(QWheelEvent *event) {
 void cvImageWindow::draw(cv::Mat img) {
   if (image != nullptr)
     scene.removeItem(item.get());
-
   image.reset(new QImage(img.data, img.cols, img.rows, img.step,
                          QImage::Format_Indexed8));
   item.reset(new QGraphicsPixmapItem(QPixmap::fromImage(*image)));

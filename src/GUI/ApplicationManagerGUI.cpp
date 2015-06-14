@@ -4,11 +4,15 @@ namespace Mgr {
 void ApplicationManagerGUI::showImages() {
   originalWindow.reset(new cvImageWindow("Depth Original", this));
   processedWindow.reset(new cvImageWindow("Depth Processed", this));
+  rowsOriginal.reset(new cvImageWindow("Rows Original", this));
+  rowsProcessed.reset(new cvImageWindow("Rows Processed", this));
   colsOriginal.reset(new cvImageWindow("Cols Original", this));
   colsProcessed.reset(new cvImageWindow("Cols Processed", this));
   setMaxValues();
+
   showWindows(image3d.getDepth() / 2);
   showCols(image3d.getCols() / 2);
+  showRows(image3d.getRows() / 2);
 }
 
 void ApplicationManagerGUI::sliderValueChanged(const int &value,
@@ -17,6 +21,8 @@ void ApplicationManagerGUI::sliderValueChanged(const int &value,
     showWindows(value);
   else if (title.startsWith("Cols"))
     showCols(value);
+  else
+    showRows(value);
 }
 
 void ApplicationManagerGUI::setRectangle(QPoint startPoint, QPoint endPoint) {
@@ -37,10 +43,17 @@ void ApplicationManagerGUI::closeWindows() {
     return;
   colsProcessed->close();
   colsOriginal->close();
+  rowsProcessed->close();
+  rowsOriginal->close();
   processedWindow->close();
   originalWindow->close();
 }
-
+void ApplicationManagerGUI::showRows(const int &row) {
+  rowsOriginal->draw(image3d.getImageAtRow(row));
+  rowsProcessed->draw(processedImage3d->getImageAtRow(row));
+  rowsProcessed->update();
+  rowsOriginal->update();
+}
 void ApplicationManagerGUI::showCols(const int &col) {
   colsOriginal->draw(image3d.getImageAtCol(col));
   colsProcessed->draw(processedImage3d->getImageAtCol(col));
@@ -51,5 +64,6 @@ void ApplicationManagerGUI::showCols(const int &col) {
 void ApplicationManagerGUI::setMaxValues() {
   originalWindow->setMaxValue(image3d.getDepth() - 1);
   colsOriginal->setMaxValue(image3d.getCols() - 1);
+  rowsOriginal->setMaxValue(image3d.getRows() - 1);
 }
 }

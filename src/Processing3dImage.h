@@ -18,6 +18,12 @@ public:
                const OPERATION &operation);
   std::pair<int, int> getImageSize(const Image3d &image3d) const;
 };
+class ProcessRows {
+public:
+  void process(Image3d &image3d, ProcessingImage &img,
+               const OPERATION &operation);
+  std::pair<int, int> getImageSize(const Image3d &image3d) const;
+};
 class ProcessDepthIn3D {
 public:
   void process(Image3d &image3d, ProcessingImage3d &img,

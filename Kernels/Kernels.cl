@@ -1,12 +1,5 @@
 #include "Kernels3d.cl"
 
-__kernel void image3dTest(__read_only image3d_t imageIn,
-                          __write_only image3d_t imageOut) {
-  int4 image_coord = (int4){ get_global_id(0), get_global_id(1),
-                             get_global_id(2), get_global_id(3) };
-  float4 inPixel = read_imagef(imageIn, sampler, image_coord);
-  write_imagef(imageOut, image_coord, inPixel);
-}
 __kernel void threshold(__read_only image2d_t imageIn,
                         __write_only image2d_t imageOut,
                         const float threshold) {
