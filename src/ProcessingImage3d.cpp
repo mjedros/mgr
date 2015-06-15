@@ -28,9 +28,9 @@ void ProcessingImage3d::setKernel(const std::string &Operation) {
 }
 
 void ProcessingImage3d::setStructuralElementArgument() {
-  const cl_float3 params = { { structuralElementParams[0],
-                               structuralElementParams[1],
-                               structuralElementParams[2] } };
+  const cl_int3 params = { {(int)structuralElementParams[0],
+                            (int)structuralElementParams[1],
+                            (int)structuralElementParams[2] } };
   kernel.setArg(2, params);
 }
 

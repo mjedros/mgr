@@ -35,7 +35,7 @@ private Q_SLOTS:
   void processROI();
   void processMorphOperation();
 
-  void image3dCreation();
+  void image3dDilationEqual();
 };
 ProcessingImagesTest::ProcessingImagesTest()
   : openCLManager(new OpenCLManager), img(openCLManager), img3d(openCLManager) {
@@ -57,11 +57,8 @@ ProcessingImagesTest::ProcessingImagesTest()
   }
 }
 void ProcessingImagesTest::CheckImagesEqual(cv::Mat one, cv::Mat two) {
-  cv::Mat result;
   QCOMPARE(*one.data, *two.data);
-  cv::compare(one, two, result, cv::CMP_EQ);
-  const int nz = cv::countNonZero(result);
-  QVERIFY(nz == one.cols * one.rows);
+  QVERIFY(cv::countNonZero(one != two) == 0);
 }
 cv::Mat ProcessingImagesTest::skeletonizeOpenCV(cv::Mat img) {
   cv::Mat skel(img.size(), CV_8U, cv::Scalar(0));
@@ -76,8 +73,7 @@ cv::Mat ProcessingImagesTest::skeletonizeOpenCV(cv::Mat img) {
     cv::subtract(img, temp, temp);
     cv::bitwise_or(skel, temp, skel);
     eroded.copyTo(img);
-
-  } while (!cv::countNonZero(img) == 0);
+  } while (!cv::countNonZero(eroded) == 0);
   return skel;
 }
 
@@ -148,12 +144,12 @@ void ProcessingImagesTest::DilateRectangleTest() {
 
 void ProcessingImagesTest::ErodeRectangleTest() {
   setToProcessAndBinarizeOriginalImage();
-  cv::Mat dilated;
+  cv::Mat eroded;
   cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
-  cv::erode(img.getImage(), dilated, element);
+  cv::erode(img.getImage(), eroded, element);
   img.setStructuralElement("Rectangle", { 1, 1 });
   img.erode();
-  CheckImagesEqual(dilated, img.getImage());
+  CheckImagesEqual(eroded, img.getImage());
 }
 
 void ProcessingImagesTest::skeletonizeTest() {
@@ -200,25 +196,28 @@ void ProcessingImagesTest::processROI() {
 
 void ProcessingImagesTest::processMorphOperation() {
   setToProcessAndBinarizeOriginalImage();
-  cv::Mat eroded;
+  cv::Mat dilated;
   cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
-  cv::erode(img.getImage(), eroded, element);
+  cv::dilate(img.getImage(), dilated, element);
   img.setStructuralElement("Cross", { 1, 1 });
-  img.setKernelWithOperation(OPERATION::EROSION);
+  img.setKernelWithOperation(OPERATION::DILATION);
   img.performMorphologicalOperation();
-  CheckImagesEqual(eroded, img.getImage());
+  CheckImagesEqual(dilated, img.getImage());
 }
 
-void ProcessingImagesTest::image3dCreation() {
-  img.setImageToProcess(imageOriginal.clone());
-  img.binarize(127, 255);
+void ProcessingImagesTest::image3dDilationEqual() {
+  setToProcessAndBinarizeOriginalImage();
   const int depth = 12;
   Mgr::Image3d image3d(depth, img.getImage().clone());
   for (auto i = 0; i < depth; i++)
     image3d.setImageAtDepth(i, img.getImage().clone());
   img3d.set3dImageToProcess(image3d);
-  img3d.setStructuralElement("Cross", { 1, 1, 1 });
-  img3d.contour();
+  img3d.setStructuralElement("Rectangle", { 1, 2, 0 });
+  img.setStructuralElement("Rectangle", { 1, 2 });
+  img.dilate();
+  img3d.dilate();
+  image3d.set3dImage(img3d.getImage());
+  CheckImagesEqual(img.getImage(), image3d.getImageAtDepth(0));
 }
 
 QTEST_APPLESS_MAIN(ProcessingImagesTest)
