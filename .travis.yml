@@ -3,7 +3,7 @@ compiler: g++
 script:
  - mkdir build
  - cd build
- - cmake .. && make -j
+ - cmake .. && make -j5 && ./Tests/Tests
 branches:
   only:
     - master
