@@ -28,10 +28,18 @@ void ProcessingImage3d::setKernel(const std::string &Operation) {
 }
 
 void ProcessingImage3d::setStructuralElementArgument() {
-  const cl_int3 params = { {(int)structuralElementParams[0],
-                            (int)structuralElementParams[1],
-                            (int)structuralElementParams[2] } };
-  kernel.setArg(2, params);
+  if (strElementMap[structuralElementType.c_str()] ==
+      StructuralElement::ELLIPSE) {
+    const cl_float3 ellipseParams = { { structuralElementParams[0],
+                                        structuralElementParams[1],
+                                        structuralElementParams[2] } };
+    kernel.setArg(2, ellipseParams);
+  } else {
+    const cl_int3 params = { {(int)structuralElementParams[0],
+                              (int)structuralElementParams[1],
+                              (int)structuralElementParams[2] } };
+    kernel.setArg(2, params);
+  }
 }
 
 void ProcessingImage3d::performMorphologicalOperation() {

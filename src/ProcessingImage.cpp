@@ -11,10 +11,6 @@ namespace Mgr {
 
 static Logger &logger = Logger::getInstance();
 
-std::map<std::string, StructuralElement> StrElementMap = {
-  { "Ellipse", ELLIPSE }, { "Cross", CROSS }, { "Rectangle", RECTANGLE }
-};
-
 void ProcessingImage::setKernel(const std::string &Operation) {
   setKernelOperation(Operation);
 }
@@ -50,6 +46,9 @@ ProcessingImage::ProcessingImage(
   : image(cv::Mat()), imageToProcess(nullptr),
     openCLManager(std::move(openCLManagerPtr)), processROI(processRoi) {
   origin[0] = origin[1] = origin[2] = 0;
+  strElementMap = { { "Ellipse", ELLIPSE },
+                    { "Cross", CROSS },
+                    { "Rectangle", RECTANGLE } };
 }
 
 Mat ProcessingImage::getImage() const { return image; }
@@ -96,7 +95,7 @@ void ProcessingImage::skeletonize() {
 
 void ProcessingImage::setStructuralElement(const std::string &element,
                                            const std::vector<float> &params) {
-  if (StrElementMap.find(element.c_str()) == StrElementMap.end()) {
+  if (strElementMap.find(element.c_str()) == strElementMap.end()) {
     throw std::string("Not existing structural element");
   }
 
@@ -105,7 +104,7 @@ void ProcessingImage::setStructuralElement(const std::string &element,
 }
 
 void ProcessingImage::setStructuralElementArgument() {
-  switch (StrElementMap[structuralElementType.c_str()]) {
+  switch (strElementMap[structuralElementType.c_str()]) {
   case ELLIPSE: {
     const cl_float3 ellipseParams = { { structuralElementParams[0],
                                         structuralElementParams[1],

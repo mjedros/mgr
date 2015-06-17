@@ -41,6 +41,8 @@ protected:
   void getROIOOutOfMat();
   void updateFullImage();
 
+  std::map<std::string, StructuralElement> strElementMap;
+
 public:
   /**
    * @brief Performs binary operation with mininum and maximum value

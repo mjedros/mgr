@@ -4,6 +4,7 @@ script:
  - mkdir build
  - cd build
  - cmake .. && make -j5 && ./Tests/Tests
+ - cat logMgr.txt
 branches:
   only:
     - master
