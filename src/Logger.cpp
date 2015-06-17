@@ -56,7 +56,7 @@ void Logger::printFancyLine(string line) {
 }
 
 Logger::Logger() {
-  file.open("logMgr.tx", ios::out | fstream::app);
+  file.open("logMgr.txt", ios::out | fstream::app);
   file << "***************** New log *****************" << endl;
   const auto now = chrono::system_clock::now();
   const auto in_time_t = chrono::system_clock::to_time_t(now);
