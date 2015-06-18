@@ -3,8 +3,7 @@ compiler: g++
 script:
  - mkdir build
  - cd build
- - cmake .. && make -j5 && ./Tests/Tests
- - cat logMgr.txt
+ - cmake .. && make -j5 
 branches:
   only:
     - master

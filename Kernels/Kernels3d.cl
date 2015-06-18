@@ -3,60 +3,102 @@ constant sampler_t sampler =
 
 #pragma OPENCL EXTENSION cl_khr_3d_image_writes : enable
 
+void printImage(__write_only image3d_t imageOut, int i, int j, int k,
+                int4 image_coord) {
+  write_imagef(imageOut, image_coord + (int4){ i, j, k, 0 }, 1);
+  write_imagef(imageOut, image_coord + (int4){ i, -j, k, 0 }, 1);
+  write_imagef(imageOut, image_coord + (int4){ i, j, -k, 0 }, 1);
+  write_imagef(imageOut, image_coord + (int4){ i, -j, -k, 0 }, 1);
+  write_imagef(imageOut, image_coord + (int4){ -i, j, k, 0 }, 1);
+  write_imagef(imageOut, image_coord + (int4){ -i, -j, k, 0 }, 1);
+  write_imagef(imageOut, image_coord + (int4){ -i, j, -k, 0 }, 1);
+  write_imagef(imageOut, image_coord + (int4){ -i, -j, -k, 0 }, 1);
+}
+bool checkImage(int i, int j, int k, int4 coord, __read_only image3d_t image,
+                const int value) {
+  if (read_imagef(image, sampler, coord + (int4){ i, j, k, 0 }).x == value)
+    return true;
+  if (read_imagef(image, sampler, coord + (int4){ i, -j, k, 0 }).x == value)
+    return true;
+  if (read_imagef(image, sampler, coord + (int4){ i, j, -k, 0 }).x == value)
+    return true;
+  if (read_imagef(image, sampler, coord + (int4){ i, -j, -k, 0 }).x == value)
+    return true;
+  if (read_imagef(image, sampler, coord + (int4){ -i, j, k, 0 }).x == value)
+    return true;
+  if (read_imagef(image, sampler, coord + (int4){ -i, -j, k, 0 }).x == value)
+    return true;
+  if (read_imagef(image, sampler, coord + (int4){ -i, j, -k, 0 }).x == value)
+    return true;
+  if (read_imagef(image, sampler, coord + (int4){ -i, -j, -k, 0 }).x == value)
+    return true;
+  return false;
+}
 __kernel void Erode3dEllipse(__read_only image3d_t imageIn,
                              __write_only image3d_t imageOut,
                              const float3 structParams) {
-  int4 image_coord = (int4){ get_global_id(0), get_global_id(1),
-                             get_global_id(2), get_global_id(3) };
-  float inPixel = read_imagef(imageIn, sampler, image_coord).x;
-  write_imagef(imageOut, image_coord, 0);
-}
-void printImage(__write_only image3d_t imageOut, int i, int j, int k,
-                int4 image_coord) {
-  int4 ijCoord = image_coord + (int4){ i, j, k, 0 };
-  write_imagef(imageOut, ijCoord, 1);
-  ijCoord = image_coord + (int4){ i, -j, k, 0 };
-  write_imagef(imageOut, ijCoord, 1);
-  ijCoord = image_coord + (int4){ i, j, -k, 0 };
-  write_imagef(imageOut, ijCoord, 1);
-  ijCoord = image_coord + (int4){ i, -j, -k, 0 };
-  write_imagef(imageOut, ijCoord, 1);
-  ijCoord = image_coord + (int4){ -i, j, k, 0 };
-  write_imagef(imageOut, ijCoord, 1);
-  ijCoord = image_coord + (int4){ -i, -j, k, 0 };
-  write_imagef(imageOut, ijCoord, 1);
-  ijCoord = image_coord + (int4){ -i, j, -k, 0 };
-  write_imagef(imageOut, ijCoord, 1);
-  ijCoord = image_coord + (int4){ -i, -j, -k, 0 };
-  write_imagef(imageOut, ijCoord, 1);
-}
-__kernel void Dilate3dEllipse(__read_only image3d_t imageIn,
-                              __write_only image3d_t imageOut,
-                              const float3 structParams) {
-  int4 image_coord = (int4){ get_global_id(0), get_global_id(1),
-                             get_global_id(2), get_global_id(3) };
+  int4 coord = (int4){ get_global_id(0), get_global_id(1), get_global_id(2),
+                       get_global_id(3) };
   const float c = (float)structParams.z;
-
-  if (image_coord.x != 40 || image_coord.y != 40 || image_coord.z != 40)
+  write_imagef(imageOut, coord, 1);
+  if (read_imagef(imageIn, sampler, coord + (int4){ 0, 0, (int)-c, 0 }).x ==
+          0 ||
+      (read_imagef(imageIn, sampler, coord + (int4){ 0, 0, (int)c, 0 }).x ==
+       0)) {
+    write_imagef(imageOut, coord, 0);
     return;
+  }
   for (float k = 0; k <= c; ++k) {
     float xRadius =
         (float)structParams.x * sqrt(1.0 - (c - k) * (c - k) / (c * c));
     float yRadius =
         (float)structParams.y * sqrt(1.0 - (c - k) * (c - k) / (c * c));
-    if (xRadius == 0) {
-      ;
-    } else {
-      for (float i = 0; i <= (int)xRadius; ++i) {
-        float yRadiusNew =
-            yRadius *
-            sqrt(1.0 - (xRadius - i) * (xRadius - i) / (xRadius * xRadius));
-        for (int j = 0; j <= (int)yRadiusNew; ++j) {
-          ;
+
+    for (float i = 0; i <= (int)xRadius; ++i) {
+      int yRadiusNew =
+          yRadius *
+          sqrt(1.0 - (xRadius - i) * (xRadius - i) / (xRadius * xRadius));
+      for (int j = 0; j <= yRadiusNew; ++j) {
+        if (checkImage((int)xRadius - i, j, (int)c - k, coord, imageIn, 0)) {
+          write_imagef(imageOut, coord, 0);
+          return;
         }
       }
     }
   }
+}
+__kernel void Dilate3dEllipse(__read_only image3d_t imageIn,
+                              __write_only image3d_t imageOut,
+                              const float3 structParams) {
+  int4 coord = (int4){ get_global_id(0), get_global_id(1), get_global_id(2),
+                       get_global_id(3) };
+  const float c = (float)structParams.z;
+  if (read_imagef(imageIn, sampler, coord + (int4){ 0, 0, (int)-c, 0 }).x ==
+          1 ||
+      (read_imagef(imageIn, sampler, coord + (int4){ 0, 0, (int)c, 0 }).x ==
+       1)) {
+    write_imagef(imageOut, coord, 1);
+    return;
+  }
+  for (float k = 0; k <= c; ++k) {
+    float xRadius =
+        (float)structParams.x * sqrt(1.0 - (c - k) * (c - k) / (c * c));
+    float yRadius =
+        (float)structParams.y * sqrt(1.0 - (c - k) * (c - k) / (c * c));
+
+    for (float i = 0; i <= (int)xRadius; ++i) {
+      int yRadiusNew =
+          yRadius *
+          sqrt(1.0 - (xRadius - i) * (xRadius - i) / (xRadius * xRadius));
+      for (int j = 0; j <= yRadiusNew; ++j) {
+        if (checkImage((int)xRadius - i, j, (int)c - k, coord, imageIn, 1)) {
+          write_imagef(imageOut, coord, 1);
+          return;
+        }
+      }
+    }
+  }
+  write_imagef(imageOut, coord, 0);
 }
 
 __kernel void Erode3dRectangle(__read_only image3d_t imageIn,
