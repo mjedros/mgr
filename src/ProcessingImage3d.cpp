@@ -53,13 +53,16 @@ void ProcessingImage3d::performMorphologicalOperation() {
                           region[0], region[1], region[2]);
   kernel.setArg(0, image_in3d);
   kernel.setArg(1, image_out3d);
-
+  cl::Event event;
   openCLManager.queue.enqueueNDRangeKernel(
       kernel, cl::NDRange(0, 0), cl::NDRange(region[0], region[1], region[2]),
-      cl::NullRange, NULL);
+      cl::NullRange, NULL, &event);
+  event.wait();
   openCLManager.queue.enqueueReadImage(image_out3d, CL_TRUE, origin, region, 0,
                                        0, imageToProcess->data);
-  logger.endOperation();
+  const auto elapsed = event.getProfilingInfo<CL_PROFILING_COMMAND_END>() -
+                       event.getProfilingInfo<CL_PROFILING_COMMAND_START>();
+  logger.endOperation(elapsed);
   updateFullImage();
 }
 }

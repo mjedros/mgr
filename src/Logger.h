@@ -17,7 +17,7 @@ public:
   void printText(std::string text);
   void printLine(std::string line);
   void printProcessingROI(bool roi);
-  void endOperation();
+  void endOperation(const unsigned long &clDuration = 0);
   void resetTimer();
   void beginOperation();
   void printAvarageTime();
@@ -27,6 +27,8 @@ private:
   std::fstream file;
   unsigned int operationsCounter = 1;
   unsigned int timeSum = 0;
+  std::chrono::time_point<std::chrono::system_clock> allSum;
+  unsigned long int clSum = 0;
   std::chrono::time_point<std::chrono::system_clock> start;
 
   Logger();

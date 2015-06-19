@@ -26,27 +26,37 @@ void Logger::printProcessingROI(bool roi) {
   file << endl;
 }
 
-void Logger::endOperation() {
+void Logger::endOperation(const unsigned long int &clDuration) {
   auto end = chrono::system_clock::now();
   timeSum += chrono::duration_cast<chrono::microseconds>(end - start).count();
+  clSum += clDuration;
 }
 
 void Logger::resetTimer() {
   operationsCounter = 0;
   timeSum = 0;
+  allSum = chrono::system_clock::now();
 }
 
 void Logger::beginOperation() {
   start = chrono::system_clock::now();
+  clSum = 0;
   operationsCounter++;
 }
 
 void Logger::printAvarageTime() {
+  auto end = chrono::system_clock::now();
+  unsigned int allSumTime =
+      chrono::duration_cast<chrono::microseconds>(end - allSum).count();
   double inMiliseconds = timeSum / 1000.0;
-  file << "Full time:" << timeSum << " us, " << inMiliseconds << " ms" << endl;
+  file << "All time: " << allSumTime << " us, " << allSumTime / 1000.0 << " ms"
+       << endl;
+  file << "Full time: " << timeSum << " us, " << inMiliseconds << " ms" << endl;
   file << "Avarage time: ";
   file << timeSum / operationsCounter << " us, "
        << inMiliseconds / operationsCounter << " ms" << endl;
+  file << "Avarage OpenCL profiling: " << clSum << " ns, " << clSum / 1000000.0
+       << " ms" << endl;
   file << endl;
 }
 

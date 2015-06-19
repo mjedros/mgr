@@ -161,9 +161,13 @@ void ProcessingImage::process(cl::Kernel &kernel, cl::Image2D &image_in,
       cl::NDRange(imageToProcess->cols, imageToProcess->rows), cl::NullRange,
       NULL, &event);
   event.wait();
+
   openCLManager.queue.enqueueReadImage(image_out, CL_TRUE, origin, region, 0, 0,
                                        imageToProcess->data);
-  logger.endOperation();
+
+  const auto elapsed = event.getProfilingInfo<CL_PROFILING_COMMAND_END>() -
+                       event.getProfilingInfo<CL_PROFILING_COMMAND_START>();
+  logger.endOperation(elapsed);
 }
 void ProcessingImage::getROIOOutOfMat() {
   imageToProcess.release();

@@ -42,7 +42,7 @@ void OpenCLManager::configure(
     logger.printLine("Context Created");
     readPrograms(kernelFileName);
     logger.printLine("Programs Loaded");
-    queue = CommandQueue(context, processingDevice);
+    queue = CommandQueue(context, processingDevice, CL_QUEUE_PROFILING_ENABLE);
   } catch (std::string &e) {
     throw std::string("Configure error: " + e);
   } catch (...) {
