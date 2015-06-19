@@ -24,8 +24,8 @@ static Logger &logger = Logger::getInstance();
 
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent), ui(new Ui::MainWindow), csvOperationsModel(this),
-    menu("File"), directory(QString("../Data/")),
-    openCLManager(new OpenCLManager()), applicationManager(openCLManager) {
+    menu("File"), directory(QString("../Data/")), openCLManager(),
+    applicationManager(openCLManager) {
   ui->setupUi(this);
   setPlatformsList();
   menu.addAction("Open file to process", this, SLOT(openFileToProcess()));
@@ -51,7 +51,7 @@ MainWindow::on_ChoosePlatform_currentIndexChanged(const QString &description) {
 }
 
 void MainWindow::setPlatformsList() {
-  listPlatforms = openCLManager->listPlatforms();
+  listPlatforms = openCLManager.listPlatforms();
   std::for_each(listPlatforms.begin(), listPlatforms.end(),
                 [this](std::tuple<int, int, std::string> &platform) {
     ui->ChoosePlatform->addItem(QString::fromStdString(std::get<2>(platform)));
@@ -130,8 +130,8 @@ void MainWindow::openDirToProcess() {
 
 void MainWindow::on_LoadImages_clicked() {
   ui->ImagesLoaded->setText("Images not loaded!");
-  openCLManager->configure(std::string(KERNELS_DIR) + "Kernels.cl",
-                           chosenDevice);
+  openCLManager.configure(std::string(KERNELS_DIR) + "Kernels.cl",
+                          chosenDevice);
   if (ui->File->isChecked() && filename.size() != 0)
     initImages(VideoFile, filename.toStdString());
   else if (ui->Directory->isChecked() && directory.size() != 0)

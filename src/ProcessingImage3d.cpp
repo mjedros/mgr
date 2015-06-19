@@ -9,9 +9,9 @@ using namespace cv;
 
 namespace Mgr {
 static Logger &logger = Logger::getInstance();
-ProcessingImage3d::ProcessingImage3d(
-    const std::shared_ptr<OpenCLManager> &openCLManagerPtr, bool processRoi)
-  : ProcessingImage(openCLManagerPtr, processRoi) {}
+ProcessingImage3d::ProcessingImage3d(OpenCLManager &openCLManagerRef,
+                                     bool processRoi)
+  : ProcessingImage(openCLManagerRef, processRoi) {}
 
 void ProcessingImage3d::set3dImageToProcess(const Image3d &image3d) {
   image.release();
@@ -47,18 +47,18 @@ void ProcessingImage3d::performMorphologicalOperation() {
 
   logger.beginOperation();
   cl::Image3D image_in3d(
-      openCLManager->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
+      openCLManager.context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
       region[0], region[1], region[2], 0, 0, imageToProcess->data);
-  cl::Image3D image_out3d(openCLManager->context, CL_MEM_WRITE_ONLY, format,
+  cl::Image3D image_out3d(openCLManager.context, CL_MEM_WRITE_ONLY, format,
                           region[0], region[1], region[2]);
   kernel.setArg(0, image_in3d);
   kernel.setArg(1, image_out3d);
 
-  openCLManager->queue.enqueueNDRangeKernel(
+  openCLManager.queue.enqueueNDRangeKernel(
       kernel, cl::NDRange(0, 0), cl::NDRange(region[0], region[1], region[2]),
       cl::NullRange, NULL);
-  openCLManager->queue.enqueueReadImage(image_out3d, CL_TRUE, origin, region, 0,
-                                        0, imageToProcess->data);
+  openCLManager.queue.enqueueReadImage(image_out3d, CL_TRUE, origin, region, 0,
+                                       0, imageToProcess->data);
   logger.endOperation();
   updateFullImage();
 }

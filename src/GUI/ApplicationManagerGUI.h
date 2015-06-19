@@ -19,7 +19,7 @@ private:
   void showRows(const int &row);
 
 public:
-  ApplicationManagerGUI(std::shared_ptr<OpenCLManager> openCLManager)
+  ApplicationManagerGUI(OpenCLManager &openCLManager)
     : ApplicationManager(openCLManager) {}
   void showImages();
   void closeWindows();

@@ -10,7 +10,7 @@ using namespace Mgr;
 static Logger &logger = Logger::getInstance();
 class ProcessingImagesTest : public QObject {
   Q_OBJECT
-  std::shared_ptr<OpenCLManager> openCLManager;
+  OpenCLManager openCLManager;
   void CheckImagesEqual(cv::Mat one, cv::Mat two);
   ProcessingImage img;
   ProcessingImage3d img3d;
@@ -38,15 +38,15 @@ private Q_SLOTS:
   void image3dDilationEqual();
 };
 ProcessingImagesTest::ProcessingImagesTest()
-  : openCLManager(new OpenCLManager), img(openCLManager), img3d(openCLManager) {
-  auto listPlatforms = openCLManager->listPlatforms();
+  : openCLManager(), img(openCLManager), img3d(openCLManager) {
+  auto listPlatforms = openCLManager.listPlatforms();
   std::for_each(listPlatforms.begin(), listPlatforms.end(),
                 [this](std::tuple<int, int, std::string> &platform) {
     std::cout << (std::get<2>(platform)) << std::endl;
   });
   logger.printText("configuring");
-  openCLManager->configure(std::string(KERNELS_DIR) + "Kernels.cl",
-                           std::make_pair(0, 0));
+  openCLManager.configure(std::string(KERNELS_DIR) + "Kernels.cl",
+                          std::make_pair(0, 0));
   logger.printText("configured correctly!");
 
   imageOriginal = cv::Mat(220, 350, CV_8UC1);

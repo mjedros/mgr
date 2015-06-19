@@ -60,7 +60,7 @@ private:
   QString filename;
   QString directory;
   std::unique_ptr<VTKView> vtkView;
-  std::shared_ptr<Mgr::OpenCLManager> openCLManager;
+  Mgr::OpenCLManager openCLManager;
   Mgr::ApplicationManagerGUI applicationManager;
   virtual void closeEvent(QCloseEvent *event);
   void setPlatformsList(void);

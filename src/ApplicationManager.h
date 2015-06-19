@@ -15,7 +15,7 @@ class Image3d;
 
 class ApplicationManager {
 protected:
-  std::shared_ptr<OpenCLManager> openCLManager;
+  OpenCLManager &openCLManager;
   std::string sourceFilename;
   Image3d image3d;
   std::shared_ptr<Image3d> processedImage3d;
@@ -26,8 +26,8 @@ protected:
   bool isROISizeValid(std::pair<int, int> imageSize);
 
 public:
-  ApplicationManager(const std::shared_ptr<OpenCLManager> &openCLManagerPtr)
-    : openCLManager(openCLManagerPtr), processROI(false) {}
+  ApplicationManager(OpenCLManager &openCLManagerRef)
+    : openCLManager(openCLManagerRef), processROI(false) {}
 
   template <class T, class I = ProcessingImage>
   void process(const OPERATION &operation, const std::string &structuralElement,

@@ -30,7 +30,7 @@ protected:
   cl::NDRange localRange;
   cl::Kernel kernel;
   ROI roi;
-  std::shared_ptr<OpenCLManager> openCLManager;
+  OpenCLManager &openCLManager;
   std::string structuralElementType;
   std::vector<float> structuralElementParams;
   bool processROI;
@@ -91,12 +91,11 @@ public:
    */
   void setImageToProcess(const cv::Mat &img);
   void setROI(const ROI NewRoi) { roi = NewRoi; }
-  ProcessingImage(const std::shared_ptr<OpenCLManager> &openCLManagerPtr,
-                  bool processRoi = false);
+  ProcessingImage(OpenCLManager &openCLManagerPtr, bool processRoi = false);
   ~ProcessingImage() { imageToProcess.release(); }
   inline void setKernelOperation(const std::string &Operation) {
     const std::string kernelName = Operation + structuralElementType;
-    kernel = cl::Kernel(openCLManager->program, kernelName.c_str());
+    kernel = cl::Kernel(openCLManager.program, kernelName.c_str());
     setStructuralElementArgument();
   }
   virtual void setKernel(const std::string &Operation);

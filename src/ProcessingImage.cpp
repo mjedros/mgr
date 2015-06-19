@@ -33,18 +33,18 @@ void ProcessingImage::performMorphologicalOperation() {
   getROIOOutOfMat();
   const ImageFormat format(CL_R, CL_UNORM_INT8);
   Image2D image_in(
-      openCLManager->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
+      openCLManager.context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
       imageToProcess->cols, imageToProcess->rows, 0, imageToProcess->data);
-  Image2D image_out(openCLManager->context, CL_MEM_WRITE_ONLY, format,
+  Image2D image_out(openCLManager.context, CL_MEM_WRITE_ONLY, format,
                     imageToProcess->cols, imageToProcess->rows);
   process(kernel, image_in, image_out);
   updateFullImage();
 }
 
-ProcessingImage::ProcessingImage(
-    const std::shared_ptr<OpenCLManager> &openCLManagerPtr, bool processRoi)
-  : image(cv::Mat()), imageToProcess(nullptr),
-    openCLManager(std::move(openCLManagerPtr)), processROI(processRoi) {
+ProcessingImage::ProcessingImage(OpenCLManager &openCLManagerRef,
+                                 bool processRoi)
+  : image(cv::Mat()), imageToProcess(nullptr), openCLManager(openCLManagerRef),
+    processROI(processRoi) {
   origin[0] = origin[1] = origin[2] = 0;
   strElementMap = { { "Ellipse", ELLIPSE },
                     { "Cross", CROSS },
@@ -126,18 +126,18 @@ void ProcessingImage::setStructuralElementArgument() {
 
 void ProcessingImage::binarize(const unsigned int &minimum,
                                const unsigned int &maximum) {
-  cl::Kernel kernel = cl::Kernel(openCLManager->program, "Binarize");
+  cl::Kernel kernel = cl::Kernel(openCLManager.program, "Binarize");
   const cl::ImageFormat format(CL_A, CL_UNSIGNED_INT8);
   const cl::ImageFormat formatOut(CL_R, CL_UNORM_INT8);
 
   try {
     getROIOOutOfMat();
-    cl::Image2D image_in(openCLManager->context, CL_MEM_READ_ONLY, format,
+    cl::Image2D image_in(openCLManager.context, CL_MEM_READ_ONLY, format,
                          imageToProcess->cols, imageToProcess->rows, 0);
-    cl::Image2D image_out(openCLManager->context, CL_MEM_WRITE_ONLY, formatOut,
+    cl::Image2D image_out(openCLManager.context, CL_MEM_WRITE_ONLY, formatOut,
                           imageToProcess->cols, imageToProcess->rows, 0);
-    openCLManager->queue.enqueueWriteImage(image_in, CL_TRUE, origin, region, 0,
-                                           0, imageToProcess->data);
+    openCLManager.queue.enqueueWriteImage(image_in, CL_TRUE, origin, region, 0,
+                                          0, imageToProcess->data);
 
     kernel.setArg(2, minimum);
     kernel.setArg(3, maximum);
@@ -156,13 +156,13 @@ void ProcessingImage::process(cl::Kernel &kernel, cl::Image2D &image_in,
   kernel.setArg(1, image_out);
   logger.beginOperation();
   cl::Event event;
-  openCLManager->queue.enqueueNDRangeKernel(
+  openCLManager.queue.enqueueNDRangeKernel(
       kernel, cl::NDRange(0, 0),
       cl::NDRange(imageToProcess->cols, imageToProcess->rows), cl::NullRange,
       NULL, &event);
   event.wait();
-  openCLManager->queue.enqueueReadImage(image_out, CL_TRUE, origin, region, 0,
-                                        0, imageToProcess->data);
+  openCLManager.queue.enqueueReadImage(image_out, CL_TRUE, origin, region, 0, 0,
+                                       imageToProcess->data);
   logger.endOperation();
 }
 void ProcessingImage::getROIOOutOfMat() {
