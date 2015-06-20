@@ -24,7 +24,6 @@ void ProcessingImage::setKernelWithOperation(const OPERATION &Operation) {
     setKernel("Erode");
     break;
   default:
-    logger.printLine("Wrong Kernel Operation!");
     return;
   }
 }
@@ -48,7 +47,8 @@ ProcessingImage::ProcessingImage(OpenCLManager &openCLManagerRef,
   origin[0] = origin[1] = origin[2] = 0;
   strElementMap = { { "Ellipse", ELLIPSE },
                     { "Cross", CROSS },
-                    { "Rectangle", RECTANGLE } };
+                    { "Rectangle", RECTANGLE },
+                    { "EllipseImage", ELLIPSEIMG } };
 }
 
 Mat ProcessingImage::getImage() const { return image; }

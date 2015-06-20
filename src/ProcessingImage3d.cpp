@@ -9,6 +9,12 @@ using namespace cv;
 
 namespace Mgr {
 static Logger &logger = Logger::getInstance();
+namespace {
+cv::Mat getEllipsoidImage(std::vector<float> params, cv::Mat image) {
+  cv::Mat ellipsoid(params[0] * params[1], params[2], image.type());
+  return ellipsoid;
+}
+}
 ProcessingImage3d::ProcessingImage3d(OpenCLManager &openCLManagerRef,
                                      bool processRoi)
   : ProcessingImage(openCLManagerRef, processRoi) {}
@@ -28,17 +34,34 @@ void ProcessingImage3d::setKernel(const std::string &Operation) {
 }
 
 void ProcessingImage3d::setStructuralElementArgument() {
-  if (strElementMap[structuralElementType.c_str()] ==
-      StructuralElement::ELLIPSE) {
+  switch (strElementMap[structuralElementType.c_str()]) {
+  case StructuralElement::ELLIPSE: {
     const cl_float3 ellipseParams = { { structuralElementParams[0],
                                         structuralElementParams[1],
                                         structuralElementParams[2] } };
     kernel.setArg(2, ellipseParams);
-  } else {
+    break;
+  }
+  case StructuralElement::RECTANGLE:
+  case StructuralElement::CROSS: {
     const cl_int3 params = { {(int)structuralElementParams[0],
                               (int)structuralElementParams[1],
                               (int)structuralElementParams[2] } };
     kernel.setArg(2, params);
+    break;
+  }
+  case StructuralElement::ELLIPSEIMG: {
+    auto elipsoid = getEllipsoidImage(structuralElementParams, image);
+    const ImageFormat format(CL_R, CL_UNORM_INT8);
+    cl::Image3D ellipseIn3d(
+        openCLManager.context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
+        structuralElementParams[0], structuralElementParams[1],
+        structuralElementParams[2], 0, 0, elipsoid.data);
+    kernel.setArg(2, ellipseIn3d);
+    break;
+  }
+  default:
+    break;
   }
 }
 

@@ -9,12 +9,18 @@
 
 namespace Mgr {
 
-enum StructuralElement : u_int8_t { ELLIPSE, CROSS, RECTANGLE };
+enum StructuralElement : u_int8_t { ELLIPSE, CROSS, RECTANGLE, ELLIPSEIMG };
 typedef std::pair<std::pair<u_int16_t, u_int16_t>,
                   std::pair<u_int16_t, u_int16_t>> ROI;
 
 class OpenCLManager;
-enum class OPERATION : uint8_t { DILATION, EROSION, CONTOUR, SKELETONIZATION };
+enum class OPERATION : uint8_t {
+  DILATION,
+  DILATIONIMG,
+  EROSION,
+  CONTOUR,
+  SKELETONIZATION
+};
 
 /**
  * @brief Class representing image that is being processed with OpenCL
