@@ -2,8 +2,10 @@
 
 namespace Mgr {
 void Image3d::setImageAtDepth(const int &_depth, const cv::Mat image2d) {
-  size_t sizeOfImg = image2d.rows * image2d.cols * sizeof(uchar);
-  memmove(image.data + _depth * sizeOfImg, image2d.data, sizeOfImg);
+  for (int i = 0; i < rows; ++i)
+    image2d.row(i).copyTo(image.row(_depth).colRange(i * cols, (i + 1) * cols));
+  // size_t sizeOfImg = image2d.rows * image2d.cols * sizeof(uchar);
+  // memmove(image.data + _depth * sizeOfImg, image2d.data, sizeOfImg);
 }
 
 void Image3d::setImageAtRow(const int &row, const cv::Mat image2d) {
@@ -19,9 +21,15 @@ void Image3d::setImageAtCol(const int &col, const cv::Mat image2d) {
 }
 
 const cv::Mat Image3d::getImageAtDepth(const int &_depth) const {
+  //  cv::Mat image2d(rows, cols, image.type());
+  //  const size_t sizeOfImg = image2d.rows * image2d.cols * sizeof(uchar);
+  //  memmove(image2d.data, image.data + _depth * sizeOfImg, sizeOfImg);
+  //  return image2d;
   cv::Mat image2d(rows, cols, image.type());
-  const size_t sizeOfImg = image2d.rows * image2d.cols * sizeof(uchar);
-  memmove(image2d.data, image.data + _depth * sizeOfImg, sizeOfImg);
+  for (int j = 0; j < rows; j++) {
+    (image.row(_depth).colRange(cols * j, cols * (j + 1)))
+        .copyTo(image2d.row(j));
+  }
   return image2d;
 }
 
@@ -49,10 +57,10 @@ Image3d &Image3d::operator=(const Image3d &other) {
   return *this;
 }
 
-Image3d::Image3d(const int &_depth, const cv::Mat image2d) : depth(_depth) {
+Image3d::Image3d(const int &_depth, const cv::Mat &image2d) : depth(_depth) {
   rows = image2d.rows;
   cols = image2d.cols;
-  image = cv::Mat(_depth, rows * cols, image2d.type());
+  image = cv::Mat(_depth, rows * cols, image2d.type(), 255);
 }
 
 Image3d::Image3d(const Image3d &source)

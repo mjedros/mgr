@@ -20,8 +20,8 @@ public:
   const cv::Mat getImageAtDepth(const int &_depth) const;
   const cv::Mat getImageAtRow(const int &row) const;
   const cv::Mat getImageAtCol(const int &col) const;
-  const cv::Mat &get3dMatImage() const { return image; }
-  Image3d(const int &_depth, const cv::Mat image2d);
+  const cv::Mat get3dMatImage() const { return image; }
+  Image3d(const int &_depth, const cv::Mat &image2d);
   Image3d(const Image3d &source);
   Image3d() {}
   ~Image3d() { image.release(); }

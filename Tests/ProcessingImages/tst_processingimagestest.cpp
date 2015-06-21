@@ -36,6 +36,8 @@ private Q_SLOTS:
   void processMorphOperation();
 
   void image3dDilationEqual();
+  void image3dDilationWithEllipsoid();
+  void image3dDilationWithEllipsoidImage();
 };
 ProcessingImagesTest::ProcessingImagesTest()
   : openCLManager(), img(openCLManager), img3d(openCLManager) {
@@ -218,6 +220,30 @@ void ProcessingImagesTest::image3dDilationEqual() {
   img3d.dilate();
   image3d.set3dImage(img3d.getImage());
   CheckImagesEqual(img.getImage(), image3d.getImageAtDepth(0));
+}
+
+void ProcessingImagesTest::image3dDilationWithEllipsoid() {
+  setToProcessAndBinarizeOriginalImage();
+  const int depth = 5;
+  Mgr::Image3d image3d(depth, img.getImage().clone());
+  for (auto i = 0; i < depth; i++)
+    image3d.setImageAtDepth(i, img.getImage().clone());
+  img3d.set3dImageToProcess(image3d);
+  img3d.setStructuralElement("Ellipse", { 2, 2, 2 });
+  img3d.dilate();
+  image3d.set3dImage(img3d.getImage());
+}
+
+void ProcessingImagesTest::image3dDilationWithEllipsoidImage() {
+  setToProcessAndBinarizeOriginalImage();
+  const int depth = 5;
+  Mgr::Image3d image3d(depth, img.getImage().clone());
+  for (auto i = 0; i < depth; i++)
+    image3d.setImageAtDepth(i, img.getImage().clone());
+  img3d.set3dImageToProcess(image3d);
+  img3d.setStructuralElement("EllipseImage", { 5, 15, 25 });
+  img3d.dilate();
+  image3d.set3dImage(img3d.getImage());
 }
 
 QTEST_APPLESS_MAIN(ProcessingImagesTest)

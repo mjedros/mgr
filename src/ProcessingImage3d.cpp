@@ -10,11 +10,47 @@ using namespace cv;
 namespace Mgr {
 static Logger &logger = Logger::getInstance();
 namespace {
-cv::Mat getEllipsoidImage(std::vector<float> params, cv::Mat image) {
-  cv::Mat ellipsoid(params[0] * params[1], params[2], image.type());
-  return ellipsoid;
+cv::Mat getEllipse(int xRadius, int y, int rows, int cols, int type) {
+  cv::Mat ellipse(rows, cols, type, cv::Scalar(0, 0, 0));
+
+  cv::Point point(rows / 2, cols / 2);
+  std::cout << "x,y :" << xRadius << ", " << y << std::endl;
+  cv::Size size(y, xRadius);
+
+  cv::ellipse(ellipse, point, size, 0, 0, 360, cv::Scalar(255, 255, 255), -1);
+  return ellipse;
+}
+cv::Mat getEllipsoidImage(std::vector<float> params, cv::Mat img) {
+  Image3d ellipse3d(params[2] * 2 + 1,
+                    cv::Mat(params[0] * 2 + 1, params[1] * 2 + 1, img.type()));
+  const auto cols = ellipse3d.getCols();
+  const auto rows = ellipse3d.getRows();
+  const float radius = params[2];
+  for (float i = 0; i <= radius; i++) {
+
+    float xRadius = (float)params[0] *
+                    sqrt(1.0 - (radius - i) * (radius - i) / (radius * radius));
+    float yRadius = (float)params[1] *
+                    sqrt(1.0 - (radius - i) * (radius - i) / (radius * radius));
+    std::cout << "Radiuses x,y :" << xRadius << ", " << yRadius << std::endl;
+
+    if ((int)xRadius == 0) {
+      cv::Mat xyEllipse(rows, cols, img.type());
+      xyEllipse.at<uchar>(rows / 2, cols / 2) = 255;
+      ellipse3d.setImageAtDepth(i, xyEllipse);
+      ellipse3d.setImageAtDepth(ellipse3d.getDepth() - i - 1, xyEllipse);
+      continue;
+    }
+    auto ellipse = getEllipse(xRadius, yRadius, ellipse3d.getRows(),
+                              ellipse3d.getCols(), img.type());
+    ellipse3d.setImageAtDepth(i, ellipse);
+    ellipse3d.setImageAtDepth(ellipse3d.getDepth() - i - 1, ellipse);
+  }
+  cv::imwrite("~/ellipseDepth.jpg", ellipse3d.getImageAtDepth(params[2] / 2));
+  return ellipse3d.get3dMatImage();
 }
 }
+
 ProcessingImage3d::ProcessingImage3d(OpenCLManager &openCLManagerRef,
                                      bool processRoi)
   : ProcessingImage(openCLManagerRef, processRoi) {}
@@ -51,13 +87,26 @@ void ProcessingImage3d::setStructuralElementArgument() {
     break;
   }
   case StructuralElement::ELLIPSEIMG: {
-    auto elipsoid = getEllipsoidImage(structuralElementParams, image);
+    ellipsoidImage = getEllipsoidImage(structuralElementParams, image).clone();
+
     const ImageFormat format(CL_R, CL_UNORM_INT8);
+
+    //    ProcessingImage img(openCLManager);
+    //    img.setImageToProcess(ellipsoidImage.clone());
+    //    img.binarize();
+    //    ellipsoidImage = img.getImage();
+
     cl::Image3D ellipseIn3d(
         openCLManager.context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
-        structuralElementParams[0], structuralElementParams[1],
-        structuralElementParams[2], 0, 0, elipsoid.data);
+        structuralElementParams[1] * 2 + 1, structuralElementParams[2] * 2 + 1,
+        structuralElementParams[2] * 2 + 1, 0, 0, ellipsoidImage.data);
     kernel.setArg(2, ellipseIn3d);
+    cv::imwrite("~/ellipse.jpg", ellipsoidImage);
+
+    const cl_float3 ellipseParams = { { structuralElementParams[0],
+                                        structuralElementParams[1],
+                                        structuralElementParams[2] } };
+    kernel.setArg(3, ellipseParams);
     break;
   }
   default:
@@ -76,16 +125,22 @@ void ProcessingImage3d::performMorphologicalOperation() {
                           region[0], region[1], region[2]);
   kernel.setArg(0, image_in3d);
   kernel.setArg(1, image_out3d);
+  std::cout << "Performing morph operation" << std::endl;
   cl::Event event;
-  openCLManager.queue.enqueueNDRangeKernel(
-      kernel, cl::NDRange(0, 0), cl::NDRange(region[0], region[1], region[2]),
-      cl::NullRange, NULL, &event);
-  event.wait();
-  openCLManager.queue.enqueueReadImage(image_out3d, CL_TRUE, origin, region, 0,
-                                       0, imageToProcess->data);
-  const auto elapsed = event.getProfilingInfo<CL_PROFILING_COMMAND_END>() -
-                       event.getProfilingInfo<CL_PROFILING_COMMAND_START>();
-  logger.endOperation(elapsed);
-  updateFullImage();
+  try {
+    openCLManager.queue.enqueueNDRangeKernel(
+        kernel, cl::NDRange(0, 0), cl::NDRange(region[0], region[1], region[2]),
+        cl::NullRange, NULL, &event);
+
+    openCLManager.queue.enqueueReadImage(image_out3d, CL_TRUE, origin, region,
+                                         0, 0, imageToProcess->data);
+    event.wait();
+    const auto elapsed = event.getProfilingInfo<CL_PROFILING_COMMAND_END>() -
+                         event.getProfilingInfo<CL_PROFILING_COMMAND_START>();
+    logger.endOperation(elapsed);
+    updateFullImage();
+  } catch (cl::Error &e) {
+    logger.printError(e);
+  }
 }
 }

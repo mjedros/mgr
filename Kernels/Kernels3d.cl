@@ -1,5 +1,5 @@
 constant sampler_t sampler =
-    CLK_NORMALIZED_COORDS_TRUE | CLK_ADDRESS_CLAMP_TO_EDGE;
+    CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
 
 #pragma OPENCL EXTENSION cl_khr_3d_image_writes : enable
 
@@ -100,7 +100,30 @@ __kernel void Dilate3dEllipse(__read_only image3d_t imageIn,
   }
   write_imagef(imageOut, coord, 0);
 }
+constant sampler_t sampler2 = CLK_NORMALIZED_COORDS_TRUE | CLK_ADDRESS_NONE;
 
+__kernel void Dilate3dEllipseImage(__read_only image3d_t imageIn,
+                                   __write_only image3d_t imageOut,
+                                   __read_only image3d_t ellipse,
+                                   const float3 structParams) {
+  int4 coord = (int4){ get_global_id(0), get_global_id(1), get_global_id(2),
+                       get_global_id(3) };
+
+  if (coord.x != 40 || coord.y != 40 || coord.z != 40)
+    return;
+  for (int i = 0; i <= structParams.x * 2; ++i) {
+    for (int j = 0; j <= structParams.y * 2; ++j) {
+      for (int k = 0; k <= structParams.z * 2; ++k) {
+        float inPixel = read_imagef(ellipse, sampler, (int4){ i, j, k, 0 }).x;
+        float inPixelOrg =
+            read_imagef(imageIn, sampler, coord + (int4){ i, j, k, 0 }).x;
+        if (inPixel == 0.0)
+          write_imagef(imageOut, coord + (int4){ i, j, k, 0 }, 1);
+      }
+    }
+  }
+  // write_imagef(imageOut, coord, 0);
+}
 __kernel void Erode3dRectangle(__read_only image3d_t imageIn,
                                __write_only image3d_t imageOut,
                                const int3 structParams) {
@@ -125,6 +148,8 @@ __kernel void Dilate3dRectangle(__read_only image3d_t imageIn,
                                 const int3 structParams) {
   int4 image_coord = (int4){ get_global_id(0), get_global_id(1),
                              get_global_id(2), get_global_id(3) };
+
+  write_imagef(imageOut, image_coord, 0);
   for (int i = -structParams.x; i <= structParams.x; i++) {
     for (int j = -structParams.y; j <= structParams.y; j++) {
       for (int k = -structParams.z; k <= structParams.z; k++) {
@@ -137,7 +162,6 @@ __kernel void Dilate3dRectangle(__read_only image3d_t imageIn,
       }
     }
   }
-  write_imagef(imageOut, image_coord, 0);
 }
 
 __kernel void Erode3dCross(__read_only image3d_t imageIn,

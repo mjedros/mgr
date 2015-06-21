@@ -6,6 +6,8 @@
 namespace Mgr {
 class OpenCLManager;
 class ProcessingImage3d : public ProcessingImage {
+  cv::Mat ellipsoidImage;
+
 public:
   ProcessingImage3d(OpenCLManager &openCLManagerRef, bool processRoi = false);
 

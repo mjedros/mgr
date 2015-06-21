@@ -86,6 +86,7 @@ void ApplicationManager::initProcessedImage(const unsigned int &minumum,
     img.binarize(minumum, maximum);
     processedImage3d->setImageAtDepth(i, img.getImage());
   }
+  cv::imwrite("/home/michal/data.jpg", processedImage3d->get3dMatImage());
 }
 void ApplicationManager::normalizeOriginalImage() { normalize(image3d); }
 
@@ -122,7 +123,7 @@ void ApplicationManager::process(const std::string &operationString,
                                  const std::vector<float> StructElemParams,
                                  const std::string &operationWay) {
   logger.printText("Performing " + operationString);
-  logger.printText(", " + operationWay);
+  logger.printText(", " + operationWay + ", " + MorphElementType);
   logger.printProcessingROI(processROI);
   const OPERATION &operation = OperationMap[operationString];
 
