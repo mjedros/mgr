@@ -115,10 +115,8 @@ __kernel void Dilate3dEllipseImage(__read_only image3d_t imageIn,
     for (int j = 0; j <= structParams.y * 2; ++j) {
       for (int k = 0; k <= structParams.z * 2; ++k) {
         float inPixel = read_imagef(ellipse, sampler, (int4){ i, j, k, 0 }).x;
-        float inPixelOrg =
-            read_imagef(imageIn, sampler, coord + (int4){ i, j, k, 0 }).x;
-        if (inPixel == 0.0)
-          write_imagef(imageOut, coord + (int4){ i, j, k, 0 }, 1);
+        if (inPixel == 1)
+          write_imagef(imageOut, coord + (int4){ i, j, k, 0 }, inPixel);
       }
     }
   }

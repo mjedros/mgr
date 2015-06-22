@@ -15,5 +15,6 @@ public:
   void setKernel(const std::string &Operation) override;
   void setStructuralElementArgument() override;
   void performMorphologicalOperation() override;
+  void performOperation(cl::Image3D& image_out3d);
 };
 } // Mgr namespace

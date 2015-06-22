@@ -17,7 +17,8 @@ cv::Mat getEllipse(int xRadius, int y, int rows, int cols, int type) {
   std::cout << "x,y :" << xRadius << ", " << y << std::endl;
   cv::Size size(y, xRadius);
 
-  cv::ellipse(ellipse, point, size, 0, 0, 360, cv::Scalar(255, 255, 255), -1);
+  cv::ellipse(ellipse, point, size, 0, 0, 360, cv::Scalar(255, 255, 255), -1,
+              0);
   return ellipse;
 }
 cv::Mat getEllipsoidImage(std::vector<float> params, cv::Mat img) {
@@ -89,18 +90,6 @@ void ProcessingImage3d::setStructuralElementArgument() {
   case StructuralElement::ELLIPSEIMG: {
     ellipsoidImage = getEllipsoidImage(structuralElementParams, image).clone();
 
-    const ImageFormat format(CL_R, CL_UNORM_INT8);
-
-    //    ProcessingImage img(openCLManager);
-    //    img.setImageToProcess(ellipsoidImage.clone());
-    //    img.binarize();
-    //    ellipsoidImage = img.getImage();
-
-    cl::Image3D ellipseIn3d(
-        openCLManager.context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
-        structuralElementParams[1] * 2 + 1, structuralElementParams[2] * 2 + 1,
-        structuralElementParams[2] * 2 + 1, 0, 0, ellipsoidImage.data);
-    kernel.setArg(2, ellipseIn3d);
     cv::imwrite("~/ellipse.jpg", ellipsoidImage);
 
     const cl_float3 ellipseParams = { { structuralElementParams[0],
@@ -114,17 +103,7 @@ void ProcessingImage3d::setStructuralElementArgument() {
   }
 }
 
-void ProcessingImage3d::performMorphologicalOperation() {
-  const ImageFormat format(CL_R, CL_UNORM_INT8);
-
-  logger.beginOperation();
-  cl::Image3D image_in3d(
-      openCLManager.context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
-      region[0], region[1], region[2], 0, 0, imageToProcess->data);
-  cl::Image3D image_out3d(openCLManager.context, CL_MEM_WRITE_ONLY, format,
-                          region[0], region[1], region[2]);
-  kernel.setArg(0, image_in3d);
-  kernel.setArg(1, image_out3d);
+void ProcessingImage3d::performOperation(Image3D &image_out3d) {
   std::cout << "Performing morph operation" << std::endl;
   cl::Event event;
   try {
@@ -142,5 +121,28 @@ void ProcessingImage3d::performMorphologicalOperation() {
   } catch (cl::Error &e) {
     logger.printError(e);
   }
+}
+
+void ProcessingImage3d::performMorphologicalOperation() {
+  const ImageFormat format(CL_R, CL_UNORM_INT8);
+
+  logger.beginOperation();
+  cl::Image3D image_in3d(
+      openCLManager.context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
+      region[0], region[1], region[2], 0, 0, imageToProcess->data);
+  cl::Image3D image_out3d(openCLManager.context, CL_MEM_WRITE_ONLY, format,
+                          region[0], region[1], region[2]);
+  kernel.setArg(0, image_in3d);
+  kernel.setArg(1, image_out3d);
+  if (strElementMap[structuralElementType.c_str()] == ELLIPSEIMG) {
+    cl::Image3D ellipseIn3d(
+        openCLManager.context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
+        structuralElementParams[1] * 2 + 1, structuralElementParams[0] * 2 + 1,
+        structuralElementParams[2] * 2 + 1, 0, 0, ellipsoidImage.data);
+    kernel.setArg(2, ellipseIn3d);
+
+    performOperation(image_out3d);
+  } else
+    performOperation(image_out3d);
 }
 }
