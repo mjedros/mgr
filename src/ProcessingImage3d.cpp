@@ -10,44 +10,38 @@ using namespace cv;
 namespace Mgr {
 static Logger &logger = Logger::getInstance();
 namespace {
-cv::Mat getEllipse(int xRadius, int y, int rows, int cols, int type) {
+cv::Mat getEllipse(const float xRadius, const float yRadius, const int rows,
+                   const int cols, const int type) {
   cv::Mat ellipse(rows, cols, type, cv::Scalar(0, 0, 0));
-
-  cv::Point point(rows / 2, cols / 2);
-  std::cout << "x,y :" << xRadius << ", " << y << std::endl;
-  cv::Size size(y, xRadius);
-
-  cv::ellipse(ellipse, point, size, 0, 0, 360, cv::Scalar(255, 255, 255), -1,
-              0);
+  if ((int)xRadius == 0) {
+    ellipse.at<uchar>(rows / 2, cols / 2) = 255;
+    return ellipse;
+  }
+  for (int i = -xRadius; i <= xRadius; ++i) {
+    for (int j = -yRadius; j <= yRadius; ++j) {
+      if (((i * i) / (xRadius * xRadius) + (j * j) / (yRadius * yRadius) <= 1))
+        ellipse.at<uchar>(rows / 2 + i, cols / 2 + j) = 255;
+    }
+  }
   return ellipse;
 }
 cv::Mat getEllipsoidImage(std::vector<float> params, cv::Mat img) {
   Image3d ellipse3d(params[2] * 2 + 1,
-                    cv::Mat(params[0] * 2 + 1, params[1] * 2 + 1, img.type()));
-  const auto cols = ellipse3d.getCols();
-  const auto rows = ellipse3d.getRows();
+                    cv::Mat(params[1] * 2 + 1, params[0] * 2 + 1, img.type(),
+                            cv::Scalar(0, 0, 0)));
   const float radius = params[2];
   for (float i = 0; i <= radius; i++) {
+    const float param =
+        sqrt(1.0 - (radius - i) * (radius - i) / (radius * radius));
+    float xRadius = (float)params[1] * param;
+    ;
+    float yRadius = (float)params[0] * param;
 
-    float xRadius = (float)params[0] *
-                    sqrt(1.0 - (radius - i) * (radius - i) / (radius * radius));
-    float yRadius = (float)params[1] *
-                    sqrt(1.0 - (radius - i) * (radius - i) / (radius * radius));
-    std::cout << "Radiuses x,y :" << xRadius << ", " << yRadius << std::endl;
-
-    if ((int)xRadius == 0) {
-      cv::Mat xyEllipse(rows, cols, img.type());
-      xyEllipse.at<uchar>(rows / 2, cols / 2) = 255;
-      ellipse3d.setImageAtDepth(i, xyEllipse);
-      ellipse3d.setImageAtDepth(ellipse3d.getDepth() - i - 1, xyEllipse);
-      continue;
-    }
     auto ellipse = getEllipse(xRadius, yRadius, ellipse3d.getRows(),
                               ellipse3d.getCols(), img.type());
     ellipse3d.setImageAtDepth(i, ellipse);
     ellipse3d.setImageAtDepth(ellipse3d.getDepth() - i - 1, ellipse);
   }
-  cv::imwrite("~/ellipseDepth.jpg", ellipse3d.getImageAtDepth(params[2] / 2));
   return ellipse3d.get3dMatImage();
 }
 }
@@ -56,14 +50,14 @@ ProcessingImage3d::ProcessingImage3d(OpenCLManager &openCLManagerRef,
                                      bool processRoi)
   : ProcessingImage(openCLManagerRef, processRoi) {}
 
-void ProcessingImage3d::set3dImageToProcess(const Image3d &image3d) {
+void ProcessingImage3d::set3dImageToProcess(const Image3d &image3dToProcess) {
   image.release();
-  image = image3d.get3dMatImage().clone();
-  region[0] = image3d.getCols();
-  region[1] = image3d.getRows();
-  region[2] = image3d.getDepth();
+  image = image3dToProcess.get3dMatImage().clone();
+  region[0] = image3dToProcess.getCols();
+  region[1] = image3dToProcess.getRows();
+  region[2] = image3dToProcess.getDepth();
   imageToProcess.release();
-  imageToProcess = std::unique_ptr<Mat>(&image);
+  image3d = image3dToProcess;
 }
 
 void ProcessingImage3d::setKernel(const std::string &Operation) {
@@ -89,12 +83,15 @@ void ProcessingImage3d::setStructuralElementArgument() {
   }
   case StructuralElement::ELLIPSEIMG: {
     ellipsoidImage = getEllipsoidImage(structuralElementParams, image).clone();
-
-    cv::imwrite("~/ellipse.jpg", ellipsoidImage);
-
+    const ImageFormat format(CL_R, CL_UNORM_INT8);
+    ellipseIn3d = std::unique_ptr<cl::Image3D>(new cl::Image3D(
+        openCLManager.context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
+        structuralElementParams[0] * 2 + 1, structuralElementParams[1] * 2 + 1,
+        structuralElementParams[2] * 2 + 1, 0, 0, ellipsoidImage.data));
     const cl_float3 ellipseParams = { { structuralElementParams[0],
                                         structuralElementParams[1],
                                         structuralElementParams[2] } };
+    kernel.setArg(2, *ellipseIn3d);
     kernel.setArg(3, ellipseParams);
     break;
   }
@@ -104,7 +101,6 @@ void ProcessingImage3d::setStructuralElementArgument() {
 }
 
 void ProcessingImage3d::performOperation(Image3D &image_out3d) {
-  std::cout << "Performing morph operation" << std::endl;
   cl::Event event;
   try {
     openCLManager.queue.enqueueNDRangeKernel(
@@ -117,15 +113,14 @@ void ProcessingImage3d::performOperation(Image3D &image_out3d) {
     const auto elapsed = event.getProfilingInfo<CL_PROFILING_COMMAND_END>() -
                          event.getProfilingInfo<CL_PROFILING_COMMAND_START>();
     logger.endOperation(elapsed);
-    updateFullImage();
   } catch (cl::Error &e) {
     logger.printError(e);
   }
 }
 
 void ProcessingImage3d::performMorphologicalOperation() {
+  getROIOOutOfMat();
   const ImageFormat format(CL_R, CL_UNORM_INT8);
-
   logger.beginOperation();
   cl::Image3D image_in3d(
       openCLManager.context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
@@ -134,15 +129,37 @@ void ProcessingImage3d::performMorphologicalOperation() {
                           region[0], region[1], region[2]);
   kernel.setArg(0, image_in3d);
   kernel.setArg(1, image_out3d);
-  if (strElementMap[structuralElementType.c_str()] == ELLIPSEIMG) {
-    cl::Image3D ellipseIn3d(
-        openCLManager.context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
-        structuralElementParams[1] * 2 + 1, structuralElementParams[0] * 2 + 1,
-        structuralElementParams[2] * 2 + 1, 0, 0, ellipsoidImage.data);
-    kernel.setArg(2, ellipseIn3d);
+  performOperation(image_out3d);
+  ellipseIn3d.reset();
+  updateFullImage();
+}
 
-    performOperation(image_out3d);
-  } else
-    performOperation(image_out3d);
+void ProcessingImage3d::getROIOOutOfMat() {
+  if (!processROI) {
+    imageToProcess = std::unique_ptr<Mat>(&image);
+    return;
+  }
+  cv::Mat roiDepthImage =
+      Mat(image3d.getImageAtDepth(0),
+          Rect(roi.first.first, roi.second.first,
+               roi.first.second - roi.first.first,
+               roi.second.second - roi.second.first)).clone();
+  Image3d roiImage3d(image3d.getDepth(), roiDepthImage);
+  for (int i = 0; i < image3d.getDepth(); ++i) {
+    roiDepthImage = Mat(image3d.getImageAtDepth(i),
+                        Rect(roi.first.first, roi.second.first,
+                             roi.first.second - roi.first.first,
+                             roi.second.second - roi.second.first)).clone();
+    roiImage3d.setImageAtDepth(i, roiDepthImage);
+  }
+  roiImage = roiImage3d.get3dMatImage();
+  imageToProcess.reset(&roiImage);
+  region[0] = roiImage3d.getCols();
+  region[1] = roiImage3d.getRows();
+  region[2] = roiImage3d.getDepth();
+}
+
+void ProcessingImage3d::updateFullImage() {
+  image = *imageToProcess;
 }
 }

@@ -170,7 +170,6 @@ void ProcessingImage::process(cl::Kernel &kernel, cl::Image2D &image_in,
   logger.endOperation(elapsed);
 }
 void ProcessingImage::getROIOOutOfMat() {
-  //  static int number = 0;
   imageToProcess.release();
   if (!processROI)
     imageToProcess = std::unique_ptr<Mat>(&image);
@@ -180,9 +179,7 @@ void ProcessingImage::getROIOOutOfMat() {
                                roi.second.second - roi.second.first)).clone();
     imageToProcess = std::unique_ptr<Mat>(&roiImage);
   }
-  //  cv::imwrite("/home/michal/otherdata/pic" + std::to_string(number++) +
-  //  ".jpg",
-  //              *imageToProcess);
+
   region[0] = imageToProcess->cols;
   region[1] = imageToProcess->rows;
 }

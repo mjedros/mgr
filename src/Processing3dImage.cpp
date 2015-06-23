@@ -69,7 +69,8 @@ void ProcessDepthIn3D::process(Image3d &image3d, ProcessingImage3d &img,
   (img.*operationFun)();
   image3d.set3dImage(img.getImage());
 }
-std::pair<int, int> ProcessDepthIn3D::getImageSize(const Image3d &) const {
-  return std::make_pair(1, 1);
+std::pair<int, int>
+ProcessDepthIn3D::getImageSize(const Image3d &image3d) const {
+  return std::make_pair(image3d.getRows(), image3d.getCols());
 }
 }

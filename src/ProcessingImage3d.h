@@ -1,12 +1,15 @@
 #pragma once
 
 #include "ProcessingImage.h"
+#include "Image3d.h"
 #include <memory>
 
 namespace Mgr {
 class OpenCLManager;
 class ProcessingImage3d : public ProcessingImage {
   cv::Mat ellipsoidImage;
+  Image3d image3d;
+  std::unique_ptr<cl::Image3D> ellipseIn3d;
 
 public:
   ProcessingImage3d(OpenCLManager &openCLManagerRef, bool processRoi = false);
@@ -15,6 +18,10 @@ public:
   void setKernel(const std::string &Operation) override;
   void setStructuralElementArgument() override;
   void performMorphologicalOperation() override;
-  void performOperation(cl::Image3D& image_out3d);
+
+  void getROIOOutOfMat() override;
+  void updateFullImage() override;
+
+  void performOperation(cl::Image3D &image_out3d);
 };
 } // Mgr namespace

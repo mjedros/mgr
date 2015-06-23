@@ -60,7 +60,7 @@ Image3d &Image3d::operator=(const Image3d &other) {
 Image3d::Image3d(const int &_depth, const cv::Mat &image2d) : depth(_depth) {
   rows = image2d.rows;
   cols = image2d.cols;
-  image = cv::Mat(_depth, rows * cols, image2d.type(), 255);
+  image = cv::Mat(_depth, rows * cols, image2d.type());
 }
 
 Image3d::Image3d(const Image3d &source)

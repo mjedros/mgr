@@ -44,8 +44,8 @@ protected:
   void process(cl::Kernel &kernel, cl::Image2D &image_in,
                cl::Image2D &image_out);
 
-  void getROIOOutOfMat();
-  void updateFullImage();
+  virtual void getROIOOutOfMat();
+  virtual void updateFullImage();
 
   std::map<std::string, StructuralElement> strElementMap;
 

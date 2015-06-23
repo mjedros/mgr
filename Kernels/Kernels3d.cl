@@ -49,18 +49,17 @@ __kernel void Erode3dEllipse(__read_only image3d_t imageIn,
     return;
   }
   for (float k = 0; k <= c; ++k) {
-    float xRadius =
-        (float)structParams.x * sqrt(1.0 - (c - k) * (c - k) / (c * c));
-    float yRadius =
-        (float)structParams.y * sqrt(1.0 - (c - k) * (c - k) / (c * c));
+    const float param = sqrt(1.0f - (c - k) * (c - k) / (c * c));
+    const float xRadius = structParams.x * param;
+    const float yRadius = structParams.y * param;
 
     for (float i = 0; i <= (int)xRadius; ++i) {
       int yRadiusNew =
           yRadius *
-          sqrt(1.0 - (xRadius - i) * (xRadius - i) / (xRadius * xRadius));
+          sqrt(1.0f - (xRadius - i) * (xRadius - i) / (xRadius * xRadius));
       for (int j = 0; j <= yRadiusNew; ++j) {
         if (checkImage((int)xRadius - i, j, (int)c - k, coord, imageIn, 0)) {
-          write_imagef(imageOut, coord, 0);
+          write_imagef(imageOut, coord, 0.0f);
           return;
         }
       }
@@ -86,7 +85,7 @@ __kernel void Dilate3dEllipse(__read_only image3d_t imageIn,
     float yRadius =
         (float)structParams.y * sqrt(1.0 - (c - k) * (c - k) / (c * c));
 
-    for (float i = 0; i <= (int)xRadius; ++i) {
+    for (float i = 0; i <= xRadius; ++i) {
       int yRadiusNew =
           yRadius *
           sqrt(1.0 - (xRadius - i) * (xRadius - i) / (xRadius * xRadius));
@@ -108,20 +107,49 @@ __kernel void Dilate3dEllipseImage(__read_only image3d_t imageIn,
                                    const float3 structParams) {
   int4 coord = (int4){ get_global_id(0), get_global_id(1), get_global_id(2),
                        get_global_id(3) };
-
-  if (coord.x != 40 || coord.y != 40 || coord.z != 40)
-    return;
+  write_imagef(imageOut, coord, 0);
   for (int i = 0; i <= structParams.x * 2; ++i) {
     for (int j = 0; j <= structParams.y * 2; ++j) {
       for (int k = 0; k <= structParams.z * 2; ++k) {
-        float inPixel = read_imagef(ellipse, sampler, (int4){ i, j, k, 0 }).x;
-        if (inPixel == 1)
-          write_imagef(imageOut, coord + (int4){ i, j, k, 0 }, inPixel);
+        if (read_imagef(ellipse, sampler, (int4){ i, j, k, 0 }).x == 1) {
+          if (read_imagef(imageIn, sampler,
+                          coord + (int4){ i - structParams.x,
+                                          j - structParams.y,
+                                          k - structParams.z, 0 }).x == 1) {
+
+            write_imagef(imageOut, coord, 1);
+            return;
+          }
+        }
       }
     }
   }
-  // write_imagef(imageOut, coord, 0);
 }
+__kernel void Erode3dEllipseImage(__read_only image3d_t imageIn,
+                                  __write_only image3d_t imageOut,
+                                  __read_only image3d_t ellipse,
+                                  const float3 structParams) {
+  int4 coord = (int4){ get_global_id(0), get_global_id(1), get_global_id(2),
+                       get_global_id(3) };
+  write_imagef(imageOut, coord, 1);
+  for (int i = 0; i <= structParams.x * 2; ++i) {
+    for (int j = 0; j <= structParams.y * 2; ++j) {
+      for (int k = 0; k <= structParams.z * 2; ++k) {
+        if (read_imagef(ellipse, sampler, (int4){ i, j, k, 0 }).x == 1) {
+          if (read_imagef(imageIn, sampler,
+                          coord + (int4){ i - structParams.x,
+                                          j - structParams.y,
+                                          k - structParams.z, 0 }).x == 0) {
+
+            write_imagef(imageOut, coord, 0);
+            return;
+          }
+        }
+      }
+    }
+  }
+}
+
 __kernel void Erode3dRectangle(__read_only image3d_t imageIn,
                                __write_only image3d_t imageOut,
                                const int3 structParams) {
