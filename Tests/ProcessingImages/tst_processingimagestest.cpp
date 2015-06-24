@@ -241,7 +241,7 @@ void ProcessingImagesTest::image3dDilationWithEllipsoidImage() {
   for (auto i = 0; i < depth; i++)
     image3d.setImageAtDepth(i, img.getImage().clone());
   img3d.set3dImageToProcess(image3d);
-  img3d.setStructuralElement("EllipseImage", { 5, 15, 25 });
+  img3d.setStructuralElement("EllipseImage", { 2, 2, 2 });
   img3d.dilate();
   image3d.set3dImage(img3d.getImage());
 }
