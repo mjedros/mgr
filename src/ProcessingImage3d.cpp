@@ -139,20 +139,17 @@ void ProcessingImage3d::getROIOOutOfMat() {
     imageToProcess = std::unique_ptr<Mat>(&image);
     return;
   }
-  cv::Mat roiDepthImage =
-      Mat(image3d.getImageAtDepth(0),
-          Rect(roi.first.first, roi.second.first,
-               roi.first.second - roi.first.first,
-               roi.second.second - roi.second.first)).clone();
-  Image3d roiImage3d(image3d.getDepth(), roiDepthImage);
+  Rect imageRect(roi.first.first, roi.second.first,
+                 roi.first.second - roi.first.first,
+                 roi.second.second - roi.second.first);
+
+  roiImage3d =
+      Image3d(image3d.getDepth(), Mat(image3d.getImageAtDepth(0), imageRect));
   for (int i = 0; i < image3d.getDepth(); ++i) {
-    roiDepthImage = Mat(image3d.getImageAtDepth(i),
-                        Rect(roi.first.first, roi.second.first,
-                             roi.first.second - roi.first.first,
-                             roi.second.second - roi.second.first)).clone();
-    roiImage3d.setImageAtDepth(i, roiDepthImage);
+    roiImage3d.setImageAtDepth(
+        i, Mat(image3d.getImageAtDepth(i), imageRect).clone());
   }
-  roiImage = roiImage3d.get3dMatImage();
+  roiImage = roiImage3d.get3dMatImage().clone();
   imageToProcess.reset(&roiImage);
   region[0] = roiImage3d.getCols();
   region[1] = roiImage3d.getRows();
@@ -160,6 +157,21 @@ void ProcessingImage3d::getROIOOutOfMat() {
 }
 
 void ProcessingImage3d::updateFullImage() {
-  image = *imageToProcess;
+  if (!processROI) {
+    image = *imageToProcess;
+    return;
+  }
+  roiImage3d.set3dImage(*imageToProcess);
+  Rect imageRect(roi.first.first, roi.second.first, roiImage3d.getCols(),
+                 roiImage3d.getRows());
+  std::cout << "Starting inserting images" << std::endl;
+  for (int i = 0; i < image3d.getDepth(); ++i) {
+    cv::Mat fullImageDepth(image3d.getRows(), image3d.getCols(),
+                           imageToProcess->type(), 0.0);
+    roiImage3d.getImageAtDepth(i).copyTo(fullImageDepth(imageRect));
+    image3d.setImageAtDepth(i, fullImageDepth);
+  }
+  std::cout << "Images set" << std::endl;
+  image = image3d.get3dMatImage();
 }
 }

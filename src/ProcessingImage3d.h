@@ -9,6 +9,7 @@ class OpenCLManager;
 class ProcessingImage3d : public ProcessingImage {
   cv::Mat ellipsoidImage;
   Image3d image3d;
+  Image3d roiImage3d;
   std::unique_ptr<cl::Image3D> ellipseIn3d;
 
 public:
