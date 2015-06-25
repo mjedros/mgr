@@ -34,7 +34,6 @@ cv::Mat getEllipsoidImage(std::vector<float> params, cv::Mat img) {
     const float param =
         sqrt(1.0 - (radius - i) * (radius - i) / (radius * radius));
     float xRadius = (float)params[1] * param;
-    ;
     float yRadius = (float)params[0] * param;
 
     auto ellipse = getEllipse(xRadius, yRadius, ellipse3d.getRows(),
@@ -164,14 +163,12 @@ void ProcessingImage3d::updateFullImage() {
   roiImage3d.set3dImage(*imageToProcess);
   Rect imageRect(roi.first.first, roi.second.first, roiImage3d.getCols(),
                  roiImage3d.getRows());
-  std::cout << "Starting inserting images" << std::endl;
   for (int i = 0; i < image3d.getDepth(); ++i) {
     cv::Mat fullImageDepth(image3d.getRows(), image3d.getCols(),
                            imageToProcess->type(), 0.0);
     roiImage3d.getImageAtDepth(i).copyTo(fullImageDepth(imageRect));
     image3d.setImageAtDepth(i, fullImageDepth);
   }
-  std::cout << "Images set" << std::endl;
   image = image3d.get3dMatImage();
 }
 }

@@ -38,6 +38,7 @@ private Q_SLOTS:
   void image3dDilationEqual();
   void image3dDilationWithEllipsoid();
   void image3dDilationWithEllipsoidImage();
+  void image3dDilationComparison();
 };
 ProcessingImagesTest::ProcessingImagesTest()
   : openCLManager(), img(openCLManager), img3d(openCLManager) {
@@ -244,6 +245,22 @@ void ProcessingImagesTest::image3dDilationWithEllipsoidImage() {
   img3d.setStructuralElement("EllipseImage", { 2, 2, 2 });
   img3d.dilate();
   image3d.set3dImage(img3d.getImage());
+}
+
+void ProcessingImagesTest::image3dDilationComparison() {
+  setToProcessAndBinarizeOriginalImage();
+  ProcessingImage3d img3dCompare(openCLManager);
+  const int depth = 5;
+  Mgr::Image3d image3d(depth, img.getImage().clone());
+  for (auto i = 0; i < depth; i++)
+    image3d.setImageAtDepth(i, img.getImage().clone());
+  img3d.set3dImageToProcess(image3d);
+  img3dCompare.set3dImageToProcess(image3d);
+  img3dCompare.setStructuralElement("Ellipse", { 3, 2, 3 });
+  img3dCompare.dilate();
+  img3d.setStructuralElement("EllipseImage", { 3, 2, 3 });
+  img3d.dilate();
+  CheckImagesEqual(img3dCompare.getImage(), img3d.getImage());
 }
 
 QTEST_APPLESS_MAIN(ProcessingImagesTest)
