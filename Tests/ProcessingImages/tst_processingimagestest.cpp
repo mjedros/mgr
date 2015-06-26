@@ -12,6 +12,7 @@ class ProcessingImagesTest : public QObject {
   Q_OBJECT
   OpenCLManager openCLManager;
   void CheckImagesEqual(cv::Mat one, cv::Mat two);
+  void CheckImagesNotEqual(cv::Mat one, cv::Mat two);
   ProcessingImage img;
   ProcessingImage3d img3d;
 
@@ -21,7 +22,10 @@ class ProcessingImagesTest : public QObject {
 public:
   ProcessingImagesTest();
   void setToProcessAndBinarizeOriginalImage();
+  Mgr::Image3d createImage3d(const int depth);
+
 private Q_SLOTS:
+  void init() { setToProcessAndBinarizeOriginalImage(); }
   void EmptyImageTest();
   void SimpleImageTest();
   void binarizeTest();
@@ -44,7 +48,7 @@ ProcessingImagesTest::ProcessingImagesTest()
   : openCLManager(), img(openCLManager), img3d(openCLManager) {
   auto listPlatforms = openCLManager.listPlatforms();
   std::for_each(listPlatforms.begin(), listPlatforms.end(),
-                [this](std::tuple<int, int, std::string> &platform) {
+                [](std::tuple<int, int, std::string> &platform) {
     std::cout << (std::get<2>(platform)) << std::endl;
   });
   logger.printText("configuring");
@@ -55,13 +59,17 @@ ProcessingImagesTest::ProcessingImagesTest()
   imageOriginal = cv::Mat(220, 350, CV_8UC1);
   for (int i = 0; i < imageOriginal.cols; i++) {
     for (int j = 0; j < imageOriginal.rows; j++) {
-      imageOriginal.at<uchar>(j, i) = i * 2;
+      imageOriginal.at<uchar>(j, i) = i + j;
     }
   }
 }
 void ProcessingImagesTest::CheckImagesEqual(cv::Mat one, cv::Mat two) {
   QCOMPARE(*one.data, *two.data);
   QVERIFY(cv::countNonZero(one != two) == 0);
+}
+void ProcessingImagesTest::CheckImagesNotEqual(cv::Mat one, cv::Mat two) {
+  QCOMPARE(*one.data, *two.data);
+  QVERIFY(cv::countNonZero(one != two) != 0);
 }
 cv::Mat ProcessingImagesTest::skeletonizeOpenCV(cv::Mat img) {
   cv::Mat skel(img.size(), CV_8U, cv::Scalar(0));
@@ -85,9 +93,22 @@ void ProcessingImagesTest::setToProcessAndBinarizeOriginalImage() {
   img.binarize(127);
 }
 
+Image3d ProcessingImagesTest::createImage3d(const int depth) {
+  cv::Mat image2d = img.getImage();
+  Mgr::Image3d image3d(depth, img.getImage().clone());
+  for (auto i = 0; i < depth; i++) {
+    cv::Mat out = cv::Mat::zeros(image2d.size(), image2d.type());
+    image2d(cv::Rect(0, i * 2, image2d.cols, image2d.rows - i * 2))
+        .copyTo(out(cv::Rect(0, i * 2, image2d.cols, image2d.rows - i * 2)));
+    image3d.setImageAtDepth(i, out);
+  }
+
+  return image3d;
+}
 void ProcessingImagesTest::EmptyImageTest() {
+  ProcessingImage emptyImage(openCLManager);
   cv::Mat empty;
-  QCOMPARE(empty.data, (img.getImage()).data);
+  QCOMPARE(empty.data, (emptyImage.getImage()).data);
 }
 
 void ProcessingImagesTest::SimpleImageTest() {
@@ -116,7 +137,6 @@ void ProcessingImagesTest::binarizeTestTwoThresholds() {
   CheckImagesEqual(thresholded, img.getImage());
 }
 void ProcessingImagesTest::DilateCrossTest() {
-  setToProcessAndBinarizeOriginalImage();
   cv::Mat dilated;
   cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
   cv::dilate(img.getImage(), dilated, element);
@@ -126,7 +146,6 @@ void ProcessingImagesTest::DilateCrossTest() {
 }
 
 void ProcessingImagesTest::ErodeCrossTest() {
-  setToProcessAndBinarizeOriginalImage();
   cv::Mat eroded;
   cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
   cv::erode(img.getImage(), eroded, element);
@@ -136,7 +155,6 @@ void ProcessingImagesTest::ErodeCrossTest() {
 }
 
 void ProcessingImagesTest::DilateRectangleTest() {
-  setToProcessAndBinarizeOriginalImage();
   cv::Mat dilated;
   cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
   cv::dilate(img.getImage(), dilated, element);
@@ -146,7 +164,6 @@ void ProcessingImagesTest::DilateRectangleTest() {
 }
 
 void ProcessingImagesTest::ErodeRectangleTest() {
-  setToProcessAndBinarizeOriginalImage();
   cv::Mat eroded;
   cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
   cv::erode(img.getImage(), eroded, element);
@@ -156,7 +173,6 @@ void ProcessingImagesTest::ErodeRectangleTest() {
 }
 
 void ProcessingImagesTest::skeletonizeTest() {
-  setToProcessAndBinarizeOriginalImage();
   cv::Mat skeletonized = skeletonizeOpenCV((img.getImage().clone()));
   img.setStructuralElement("Cross", { 1, 1 });
   img.skeletonize();
@@ -198,7 +214,6 @@ void ProcessingImagesTest::processROI() {
 }
 
 void ProcessingImagesTest::processMorphOperation() {
-  setToProcessAndBinarizeOriginalImage();
   cv::Mat dilated;
   cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
   cv::dilate(img.getImage(), dilated, element);
@@ -209,11 +224,8 @@ void ProcessingImagesTest::processMorphOperation() {
 }
 
 void ProcessingImagesTest::image3dDilationEqual() {
-  setToProcessAndBinarizeOriginalImage();
   const int depth = 12;
-  Mgr::Image3d image3d(depth, img.getImage().clone());
-  for (auto i = 0; i < depth; i++)
-    image3d.setImageAtDepth(i, img.getImage().clone());
+  Mgr::Image3d image3d = createImage3d(depth);
   img3d.set3dImageToProcess(image3d);
   img3d.setStructuralElement("Rectangle", { 1, 2, 0 });
   img.setStructuralElement("Rectangle", { 1, 2 });
@@ -221,14 +233,12 @@ void ProcessingImagesTest::image3dDilationEqual() {
   img3d.dilate();
   image3d.set3dImage(img3d.getImage());
   CheckImagesEqual(img.getImage(), image3d.getImageAtDepth(0));
+  CheckImagesNotEqual(img.getImage(), image3d.getImageAtDepth(depth / 2));
 }
 
 void ProcessingImagesTest::image3dDilationWithEllipsoid() {
-  setToProcessAndBinarizeOriginalImage();
   const int depth = 5;
-  Mgr::Image3d image3d(depth, img.getImage().clone());
-  for (auto i = 0; i < depth; i++)
-    image3d.setImageAtDepth(i, img.getImage().clone());
+  Mgr::Image3d image3d = createImage3d(depth);
   img3d.set3dImageToProcess(image3d);
   img3d.setStructuralElement("Ellipse", { 2, 2, 2 });
   img3d.dilate();
@@ -236,11 +246,8 @@ void ProcessingImagesTest::image3dDilationWithEllipsoid() {
 }
 
 void ProcessingImagesTest::image3dDilationWithEllipsoidImage() {
-  setToProcessAndBinarizeOriginalImage();
   const int depth = 5;
-  Mgr::Image3d image3d(depth, img.getImage().clone());
-  for (auto i = 0; i < depth; i++)
-    image3d.setImageAtDepth(i, img.getImage().clone());
+  Mgr::Image3d image3d = createImage3d(depth);
   img3d.set3dImageToProcess(image3d);
   img3d.setStructuralElement("EllipseImage", { 2, 2, 2 });
   img3d.dilate();
@@ -248,12 +255,9 @@ void ProcessingImagesTest::image3dDilationWithEllipsoidImage() {
 }
 
 void ProcessingImagesTest::image3dDilationComparison() {
-  setToProcessAndBinarizeOriginalImage();
   ProcessingImage3d img3dCompare(openCLManager);
   const int depth = 5;
-  Mgr::Image3d image3d(depth, img.getImage().clone());
-  for (auto i = 0; i < depth; i++)
-    image3d.setImageAtDepth(i, img.getImage().clone());
+  Mgr::Image3d image3d = createImage3d(depth);
   img3d.set3dImageToProcess(image3d);
   img3dCompare.set3dImageToProcess(image3d);
   img3dCompare.setStructuralElement("Ellipse", { 3, 2, 3 });
