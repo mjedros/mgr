@@ -5,6 +5,7 @@
 #include "Normalization.h"
 #include "Processing3dImage.h"
 #include <opencv2/opencv.hpp>
+#include <mutex>
 using namespace cv;
 
 namespace Mgr {
@@ -21,9 +22,7 @@ template <class T, class I>
 void ApplicationManager::process(const OPERATION &operation,
                                  const std::string &structuralElement,
                                  const std::vector<float> &params) {
-  cv::waitKey(1);
   image3dPrevious = *processedImage3d; // save image
-
   I img(openCLManager, processROI);
   T processing3dImage;
   if (!isROISizeValid(processing3dImage.getImageSize(*processedImage3d)))

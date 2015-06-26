@@ -45,7 +45,7 @@ MainWindow::~MainWindow() {}
 void
 MainWindow::on_ChoosePlatform_currentIndexChanged(const QString &description) {
   auto it = std::find_if(listPlatforms.begin(), listPlatforms.end(),
-                         [&](std::tuple<int, int, std::string> &platform) {
+                         [&](auto &platform) {
     return (description.toStdString() == std::get<2>(platform));
   });
   chosenDevice = std::make_pair(std::get<0>(*it), std::get<1>(*it));
@@ -54,7 +54,7 @@ MainWindow::on_ChoosePlatform_currentIndexChanged(const QString &description) {
 void MainWindow::setPlatformsList() {
   listPlatforms = openCLManager.listPlatforms();
   std::for_each(listPlatforms.begin(), listPlatforms.end(),
-                [this](std::tuple<int, int, std::string> &platform) {
+                [this](auto &platform) {
     ui->ChoosePlatform->addItem(QString::fromStdString(std::get<2>(platform)));
   });
 }
@@ -96,6 +96,21 @@ void MainWindow::updateCSVOperations() {
   ui->csvOperations->setModel(&csvOperationsModel);
 }
 
+void MainWindow::process(const std::vector<float> StructElemParams,
+                         const std::string MorphElementType) {
+  try {
+    applicationManager.setProcessingROI(ui->processROI->isChecked());
+    applicationManager.process(ui->ChooseOperation->currentText().toStdString(),
+                               MorphElementType, StructElemParams,
+                               ui->ProcessingWay->currentText().toStdString());
+    ui->Process->show();
+
+  } catch (std::string *error) {
+    ui->ProcessingProgress->setText(QString::fromStdString(*error));
+  }
+  { ui->ProcessingProgress->setText("Done"); }
+}
+
 void MainWindow::on_Process_clicked() {
   ui->ProcessingProgress->setEnabled(true);
   ui->ProcessingProgress->setText("In progress");
@@ -108,16 +123,10 @@ void MainWindow::on_Process_clicked() {
     static_cast<float>(ui->StructElementParam2->value()),
     static_cast<float>(ui->StructElementParam3->value())
   };
-  try {
-    applicationManager.setProcessingROI(ui->processROI->isChecked());
-    applicationManager.process(ui->ChooseOperation->currentText().toStdString(),
-                               MorphElementType, StructElemParams,
-                               ui->ProcessingWay->currentText().toStdString());
-    ui->Process->show();
-    ui->ProcessingProgress->setText("Done");
-  } catch (std::string *error) {
-    ui->ProcessingProgress->setText(QString::fromStdString(*error));
-  }
+
+  processingThread.reset(new std::thread(&MainWindow::process, this,
+                                         StructElemParams, MorphElementType));
+  processingThread->detach();
 }
 
 void MainWindow::openFileToProcess() {

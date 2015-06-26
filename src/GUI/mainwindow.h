@@ -6,6 +6,7 @@
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QStringListModel>
+#include <thread>
 
 namespace Ui {
 class MainWindow;
@@ -27,6 +28,8 @@ public:
   ~MainWindow();
   void initBinaryImage();
 
+  void process(const std::vector<float> StructElemParams,
+               const std::string MorphElementType);
 private slots:
   void on_ChoosePlatform_currentIndexChanged(const QString &description);
   void on_Process_clicked();
@@ -50,6 +53,7 @@ private slots:
   void on_deleteFromCsvFile_clicked();
 
 private:
+  std::unique_ptr<std::thread> processingThread;
   ROI roi;
   std::pair<int, int> chosenDevice;
   std::vector<std::tuple<int, int, std::string>> listPlatforms;
