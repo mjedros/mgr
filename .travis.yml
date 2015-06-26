@@ -23,6 +23,6 @@ before_install:
  - tar -xzf vtk-6.1.0.tar.gz
  - sudo cp -fR VTK-Install/* /usr
  - rm -rf vtk-6.1.0.tar.gz VTK-Install
- - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
- - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+ - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.9; fi
+ - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
  - if [ "$CXX" == "clang++" ]; then sudo add-apt-repository -y ppa:h-rayflood/llvm; fi

@@ -47,8 +47,7 @@ private Q_SLOTS:
 ProcessingImagesTest::ProcessingImagesTest()
   : openCLManager(), img(openCLManager), img3d(openCLManager) {
   auto listPlatforms = openCLManager.listPlatforms();
-  std::for_each(listPlatforms.begin(), listPlatforms.end(),
-                [](std::tuple<int, int, std::string> &platform) {
+  std::for_each(listPlatforms.begin(), listPlatforms.end(), [](auto &platform) {
     std::cout << (std::get<2>(platform)) << std::endl;
   });
   logger.printText("configuring");
