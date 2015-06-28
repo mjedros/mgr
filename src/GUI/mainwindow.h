@@ -1,7 +1,9 @@
 #pragma once
 
 #include "GUI/ApplicationManagerGUI.h"
+#include "ContinuousProcessingMananger.h"
 #include "OpenCLManager.h"
+#include "GUI/cvImageWindow.h"
 
 #include <QMainWindow>
 #include <QMenuBar>
@@ -43,6 +45,8 @@ private slots:
   void on_SaveImage_clicked();
   void on_Revert_clicked();
 
+  void on_CameraAquisition_clicked();
+
   void on_vtkViewButton_clicked();
   void on_addNextVTKImage_clicked();
 
@@ -54,7 +58,9 @@ private slots:
 
 private:
   std::unique_ptr<std::thread> processingThread;
-  std::unique_ptr<std::thread> enqueImagesThread;
+  std::unique_ptr<std::thread> aquisitionThread;
+  Mgr::cvImageWindow originalImage{ "", this };
+
   ROI roi;
   std::pair<int, int> chosenDevice;
   std::vector<std::tuple<int, int, std::string>> listPlatforms;
@@ -71,4 +77,7 @@ private:
   void setPlatformsList(void);
   void initImages(const Mgr::SourceType &source, const std::string &name);
   void updateCSVOperations();
+  void startAquisition();
+public slots:
+  void drawObject(cv::Mat);
 };

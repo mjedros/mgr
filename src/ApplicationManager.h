@@ -38,7 +38,6 @@ public:
                const std::vector<float> &params);
 
   void init(const SourceType &source, const std::string &name);
-  void startCameraAquisition();
   void initProcessedImage(const unsigned int &minumum = 100,
                           const unsigned int &maximum = 255);
   template <class I = ProcessingImage> void setROI(I &processingImage) {

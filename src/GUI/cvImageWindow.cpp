@@ -23,7 +23,7 @@ cvImageWindow::cvImageWindow(QString title, QObject *_parent)
             parentObject,
             SLOT(sliderValueChanged(const int &, const QString &)));
 
-  } else
+  } else if (title.contains("Processed"))
     connect(this, SIGNAL(setRectangle(QPoint, QPoint)), parentObject,
             SLOT(setRectangle(QPoint, QPoint)));
   setScene(&scene);

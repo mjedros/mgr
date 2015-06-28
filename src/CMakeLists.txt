@@ -32,6 +32,7 @@ SET(HEADERS_Qt
   GUI/cvImageWindow.h
   GUI/ApplicationManagerGUI.h
   GUI/vtkview.h
+  ContinuousProcessingMananger.h
 )
 SET(FORMS GUI/mainwindow.ui)
 SET(FORMS_HEADERS GUI/mainwindow.h) 

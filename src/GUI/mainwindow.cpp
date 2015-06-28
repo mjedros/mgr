@@ -3,6 +3,7 @@
 #include "ui_mainwindow.h"
 #include "include/Paths.h"
 #include "GUI/vtkview.h"
+#include "ContinuousProcessingMananger.h"
 #include "Image3d.h"
 #include "ImageSource/SourceFactory.h"
 #include "Logger.h"
@@ -244,6 +245,18 @@ void MainWindow::on_CloseWindows_clicked() {
 
 void MainWindow::on_Revert_clicked() {
   applicationManager.revertLastOperation();
+}
+void MainWindow::startAquisition() {
+  ContinuousProcessingMananger cameraProc(openCLManager, this);
+  cameraProc.process2dImages();
+}
+
+void MainWindow::drawObject(cv::Mat img) {
+  originalImage.draw(img);
+  originalImage.update();
+}
+void MainWindow::on_CameraAquisition_clicked() {
+  aquisitionThread.reset(new std::thread(&MainWindow::startAquisition, this));
 }
 
 void MainWindow::on_deleteFromCsvFile_clicked() {

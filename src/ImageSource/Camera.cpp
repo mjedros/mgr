@@ -14,6 +14,8 @@ cv::Mat Camera::Get() {
   if (videoCapture->isOpened()) {
     cv::Mat outImage;
     *videoCapture >> outImage;
+    if (outImage.empty())
+      Stop();
     return outImage;
   }
   return cv::Mat();
