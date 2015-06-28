@@ -18,8 +18,10 @@ SET(SOURCES
   GUI/VTKData.cpp
   Application.cpp
   ApplicationManager.cpp
+  ContinuousProcessingMananger.cpp
   ImageSource/FileVideo.cpp
   ImageSource/Directory.cpp
+  ImageSource/Camera.cpp
   Processing3dImage.cpp
   Normalization.cpp
 )

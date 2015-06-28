@@ -7,6 +7,8 @@
 #include "csvFileUtils.h"
 #include <QObject>
 #include <QEvent>
+#include <queue>
+
 namespace Mgr {
 class Image3d;
 enum SourceType : u_int8_t;
@@ -24,6 +26,8 @@ protected:
   bool processROI;
   ROI roi;
   bool isROISizeValid(std::pair<int, int> imageSize);
+  std::vector<cv::Mat> imagesVector;
+  std::queue<std::vector<cv::Mat *>> portionsQueue;
 
 public:
   ApplicationManager(OpenCLManager &openCLManagerRef)
@@ -34,6 +38,7 @@ public:
                const std::vector<float> &params);
 
   void init(const SourceType &source, const std::string &name);
+  void startCameraAquisition();
   void initProcessedImage(const unsigned int &minumum = 100,
                           const unsigned int &maximum = 255);
   template <class I = ProcessingImage> void setROI(I &processingImage) {

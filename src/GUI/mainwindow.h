@@ -54,6 +54,7 @@ private slots:
 
 private:
   std::unique_ptr<std::thread> processingThread;
+  std::unique_ptr<std::thread> enqueImagesThread;
   ROI roi;
   std::pair<int, int> chosenDevice;
   std::vector<std::tuple<int, int, std::string>> listPlatforms;

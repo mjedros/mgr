@@ -59,10 +59,11 @@ bool ApplicationManager::isROISizeValid(std::pair<int, int> imageSize) {
 void ApplicationManager::init(const SourceType &source, const string &name) {
   std::unique_ptr<IImageSource> imageSource =
       SourceFactory::GetImageSource(source, name);
+  int i = 0;
   imageSource->Start();
   std::vector<cv::Mat> matVector;
 
-  for (Mat im = imageSource->Get(); !im.empty(); im = imageSource->Get()) {
+  for (Mat im = imageSource->Get(); !im.empty(); im = imageSource->Get(), ++i) {
     cv::cvtColor(im, im, CV_BGR2GRAY);
     matVector.push_back(im);
   }
@@ -75,7 +76,6 @@ void ApplicationManager::init(const SourceType &source, const string &name) {
 
 void ApplicationManager::initProcessedImage(const unsigned int &minumum,
                                             const unsigned int &maximum) {
-  logger.printLine("Init binary image");
   processROI = false;
   processedImage3d.reset(
       new Image3d(image3d.getDepth(), image3d.getImageAtDepth(0)));
@@ -85,7 +85,6 @@ void ApplicationManager::initProcessedImage(const unsigned int &minumum,
     img.binarize(minumum, maximum);
     processedImage3d->setImageAtDepth(i, img.getImage());
   }
-  cv::imwrite("/home/michal/data.jpg", processedImage3d->get3dMatImage());
 }
 void ApplicationManager::normalizeOriginalImage() { normalize(image3d); }
 

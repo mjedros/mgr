@@ -1,8 +1,9 @@
 #pragma once
 
-#include "IImageSource.h"
-#include "FileVideo.h"
-#include "Directory.h"
+#include "ImageSource/Camera.h"
+#include "ImageSource/IImageSource.h"
+#include "ImageSource/FileVideo.h"
+#include "ImageSource/Directory.h"
 namespace Mgr {
 /**
  * @brief Enum with types of image sources
