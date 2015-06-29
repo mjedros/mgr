@@ -4,6 +4,7 @@
 #include <queue>
 #include <thread>
 #include <QObject>
+#include "ImageSource/Camera.h"
 #include <opencv2/opencv.hpp>
 
 namespace Mgr {
@@ -18,11 +19,14 @@ class ContinuousProcessingMananger : public QObject {
   std::unique_ptr<std::thread> aquisitionThread;
   OpenCLManager &openCLManager;
   QObject *parentObject;
+  std::unique_ptr<IImageSource> imagesFromCam;
+  bool active;
 
 public:
   ContinuousProcessingMananger(OpenCLManager &openCLManager, QObject *parent);
-  ~ContinuousProcessingMananger() {}
+
   void process2dImages();
+  void stopProcessing();
 
 private:
   ImagesPortion getNextImagesPortionFromQueue();
@@ -31,5 +35,6 @@ private:
   void pushToQueue(ImagesPortion);
 signals:
   void drawObject(cv::Mat image);
+  void drawProcessed(cv::Mat);
 };
 }

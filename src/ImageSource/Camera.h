@@ -12,6 +12,7 @@ public:
    * @brief Constructor
    */
   Camera();
+  virtual ~Camera();
   virtual void Start() override;
   virtual void Stop() override;
   cv::Mat Get() override;

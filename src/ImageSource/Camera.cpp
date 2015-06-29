@@ -6,6 +6,8 @@ Camera::Camera() {
   videoCapture = std::unique_ptr<cv::VideoCapture>(new cv::VideoCapture());
 }
 
+Camera::~Camera() { Stop(); }
+
 void Camera::Start() { videoCapture->open(0); }
 
 void Camera::Stop() { videoCapture->release(); }

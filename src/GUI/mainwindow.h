@@ -58,8 +58,9 @@ private slots:
 
 private:
   std::unique_ptr<std::thread> processingThread;
-  std::unique_ptr<std::thread> aquisitionThread;
+  std::thread aquisitionThread;
   Mgr::cvImageWindow originalImage{ "", this };
+  Mgr::cvImageWindow processedImage{ "after", this };
 
   ROI roi;
   std::pair<int, int> chosenDevice;
@@ -73,6 +74,7 @@ private:
   std::unique_ptr<VTKView> vtkView;
   Mgr::OpenCLManager openCLManager;
   Mgr::ApplicationManagerGUI applicationManager;
+  Mgr::ContinuousProcessingMananger cameraProc;
   virtual void closeEvent(QCloseEvent *event);
   void setPlatformsList(void);
   void initImages(const Mgr::SourceType &source, const std::string &name);
@@ -80,4 +82,5 @@ private:
   void startAquisition();
 public slots:
   void drawObject(cv::Mat);
+  void drawProcessed(cv::Mat);
 };

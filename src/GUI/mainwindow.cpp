@@ -26,7 +26,7 @@ static Logger &logger = Logger::getInstance();
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent), ui(new Ui::MainWindow), csvOperationsModel(this),
     menu("File"), directory(QString("../Data/")), openCLManager(),
-    applicationManager(openCLManager) {
+    applicationManager(openCLManager), cameraProc(openCLManager, this) {
   ui->setupUi(this);
   setPlatformsList();
   menu.addAction("Open file to process", this, SLOT(openFileToProcess()));
@@ -51,6 +51,11 @@ MainWindow::on_ChoosePlatform_currentIndexChanged(const QString &description) {
   });
   chosenDevice = std::make_pair(std::get<0>(*it), std::get<1>(*it));
 }
+// void
+// MainWindow::on_ChooseOperation_currentIndexChanged(const QString &operation)
+// {
+
+//}
 
 void MainWindow::setPlatformsList() {
   listPlatforms = openCLManager.listPlatforms();
@@ -150,7 +155,10 @@ void MainWindow::on_LoadImages_clicked() {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
+  cameraProc.stopProcessing();
   applicationManager.closeWindows();
+  processedImage.close();
+  originalImage.close();
   vtkView.reset();
   QMainWindow::closeEvent(event);
 }
@@ -240,6 +248,7 @@ void MainWindow::on_processCsvSequence_clicked() {
 }
 
 void MainWindow::on_CloseWindows_clicked() {
+  cameraProc.stopProcessing();
   applicationManager.closeWindows();
 }
 
@@ -247,7 +256,8 @@ void MainWindow::on_Revert_clicked() {
   applicationManager.revertLastOperation();
 }
 void MainWindow::startAquisition() {
-  ContinuousProcessingMananger cameraProc(openCLManager, this);
+  openCLManager.configure(std::string(KERNELS_DIR) + "Kernels.cl",
+                          chosenDevice);
   cameraProc.process2dImages();
 }
 
@@ -255,8 +265,14 @@ void MainWindow::drawObject(cv::Mat img) {
   originalImage.draw(img);
   originalImage.update();
 }
+
+void MainWindow::drawProcessed(cv::Mat img) {
+  processedImage.draw(img);
+  processedImage.update();
+}
 void MainWindow::on_CameraAquisition_clicked() {
-  aquisitionThread.reset(new std::thread(&MainWindow::startAquisition, this));
+  aquisitionThread = std::thread(&MainWindow::startAquisition, this);
+  aquisitionThread.detach();
 }
 
 void MainWindow::on_deleteFromCsvFile_clicked() {

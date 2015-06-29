@@ -30,7 +30,8 @@ SOURCES +=\
     ../src/csvFileUtils.cpp \
     ../src/Logger.cpp \
     ../src/ProcessingImage3d.cpp \
-    ../src/ImageSource/Camera.cpp
+    ../src/ImageSource/Camera.cpp \
+    ../src/ContinuousProcessingMananger.cpp
 
 HEADERS  += ../src/GUI/mainwindow.h\
         ../src/OpenCLManager.h \
@@ -51,7 +52,8 @@ HEADERS  += ../src/GUI/mainwindow.h\
     ../src/Logger.h \
     ../src/ProcessingImage3d.h \
     ../src/include/Paths.h \
-    ../src/ImageSource/Camera.h
+    ../src/ImageSource/Camera.h \
+    ../src/ContinuousProcessingMananger.h
 
 FORMS    += ../src/GUI/mainwindow.ui
 CONFIG += c++0x
