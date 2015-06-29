@@ -26,6 +26,15 @@ ContinuousProcessingMananger::ContinuousProcessingMananger(
           SLOT(drawProcessed(cv::Mat)));
 }
 
+void ContinuousProcessingMananger::setProcessing(
+    const std::string &operationStringNew,
+    const std::string &MorphElementTypeNew,
+    const std::vector<float> StructElemParamsNew) {
+  operationString = operationStringNew;
+  MorphElementType = MorphElementTypeNew;
+  StructElemParams = StructElemParamsNew;
+}
+
 void ContinuousProcessingMananger::startCameraAquisition() {
   imagesVector.clear();
   const int imagesDepth = 5;
@@ -65,6 +74,14 @@ void ContinuousProcessingMananger::start2dAquisition() {
   logger.printLine("End of aquisition thread");
 }
 
+void ContinuousProcessingMananger::process2dImage(cv::Mat image) {
+  ProcessingImage img(openCLManager);
+  img.setImageToProcess(image);
+  img.setStructuralElement(MorphElementType, StructElemParams);
+  img.dilate();
+  emit(drawProcessed(img.getImage()));
+}
+
 void ContinuousProcessingMananger::process2dImages() {
   active = true;
   logger.printLine("Starting processing 2d image from camera");
@@ -78,14 +95,14 @@ void ContinuousProcessingMananger::process2dImages() {
     ProcessingImage img(openCLManager);
     img.setImageToProcess(im.clone());
     img.binarize();
-    img.setStructuralElement("Cross", { 1, 1 });
-    img.dilate();
-    emit(drawProcessed(img.getImage()));
+    process2dImage(img.getImage());
   }
   logger.printLine("End of processing");
 }
 
 void ContinuousProcessingMananger::stopProcessing() {
+  if (!active)
+    return;
   imagesFromCam->Stop();
   active = false;
 }

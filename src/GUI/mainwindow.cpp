@@ -258,6 +258,16 @@ void MainWindow::on_Revert_clicked() {
 void MainWindow::startAquisition() {
   openCLManager.configure(std::string(KERNELS_DIR) + "Kernels.cl",
                           chosenDevice);
+  const std::string MorphElementType =
+      ui->MorphologicalElementType->currentText().toStdString();
+  const std::vector<float> StructElemParams = {
+    static_cast<float>(ui->StructElementParam1->value()),
+    static_cast<float>(ui->StructElementParam2->value()),
+    static_cast<float>(ui->StructElementParam3->value())
+  };
+  // TODO remove copypaiste
+  cameraProc.setProcessing(ui->ChooseOperation->currentText().toStdString(),
+                           MorphElementType, StructElemParams);
   cameraProc.process2dImages();
 }
 

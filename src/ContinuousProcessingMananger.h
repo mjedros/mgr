@@ -22,9 +22,16 @@ class ContinuousProcessingMananger : public QObject {
   std::unique_ptr<IImageSource> imagesFromCam;
   bool active;
 
+  std::string operationString;
+  std::string MorphElementType;
+  std::vector<float> StructElemParams;
+
 public:
   ContinuousProcessingMananger(OpenCLManager &openCLManager, QObject *parent);
 
+  void setProcessing(const std::string &operationStringNew,
+                     const std::string &MorphElementTypeNew,
+                     const std::vector<float> StructElemParamsNew);
   void process2dImages();
   void stopProcessing();
 
@@ -33,6 +40,7 @@ private:
   void startCameraAquisition();
   void start2dAquisition();
   void pushToQueue(ImagesPortion);
+  void process2dImage(cv::Mat image);
 signals:
   void drawObject(cv::Mat image);
   void drawProcessed(cv::Mat);
