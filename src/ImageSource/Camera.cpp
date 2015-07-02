@@ -1,5 +1,5 @@
 #include "ImageSource/Camera.h"
-
+#include "Logger.h"
 #include <opencv2/opencv.hpp>
 namespace Mgr {
 Camera::Camera() {
@@ -8,9 +8,16 @@ Camera::Camera() {
 
 Camera::~Camera() { Stop(); }
 
-void Camera::Start() { videoCapture->open(0); }
+void Camera::Start() {
+  Logger::getInstance().printLine("Start of acquisition");
+  videoCapture->open(0);
+}
 
-void Camera::Stop() { videoCapture->release(); }
+void Camera::Stop() {
+  if (videoCapture) {
+    videoCapture.release();
+  }
+}
 
 cv::Mat Camera::Get() {
   if (videoCapture->isOpened()) {

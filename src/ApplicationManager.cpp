@@ -120,9 +120,14 @@ void ApplicationManager::process(const std::string &operationString,
                                  const std::string &MorphElementType,
                                  const std::vector<float> StructElemParams,
                                  const std::string &operationWay) {
-  logger.printText("Performing " + operationString);
-  logger.printText(", " + operationWay + ", " + MorphElementType);
+  logger.printFancyLine("Performing " + operationString);
+  logger.printLine(operationWay + ", " + MorphElementType);
+  logger.printLine("Struct elem params: " +
+                   std::to_string(StructElemParams[0]) + ", " +
+                   std::to_string(StructElemParams[1]) + ", " +
+                   std::to_string(StructElemParams[2]));
   logger.printProcessingROI(processROI);
+
   const OPERATION &operation = OperationMap[operationString];
 
   if (operationWay == "Process columns")

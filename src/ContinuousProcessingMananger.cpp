@@ -13,7 +13,7 @@
 using cv::Mat;
 
 namespace Mgr {
-
+static const unsigned int depth = 10;
 static Logger &logger = Logger::getInstance();
 
 ContinuousProcessingMananger::ContinuousProcessingMananger(
@@ -34,44 +34,38 @@ void ContinuousProcessingMananger::setProcessing(
   MorphElementType = MorphElementTypeNew;
   StructElemParams = StructElemParamsNew;
 }
+std::mutex aquisitionMutex;
+bool ContinuousProcessingMananger::switchBuffers() {
+  if (imagesCounter % depth != 0 || imagesCounter == 0)
+    return false;
+  std::lock_guard<std::mutex> lock(aquisitionMutex);
+  imagesCounter = 0;
+  if (aquisitionBuffer == &imagesVectorFirstBuffer)
+    aquisitionBuffer = &imagesVectorSeccondBuffer;
+  else
+    aquisitionBuffer = &imagesVectorFirstBuffer;
+  return true;
+}
 
 void ContinuousProcessingMananger::startCameraAquisition() {
-  imagesVector.clear();
-  const int imagesDepth = 5;
-  ImagesPortion imagesPortionVect;
-  int i = 0;
+  imagesVectorFirstBuffer.clear();
+  aquisitionBuffer = &imagesVectorFirstBuffer;
+  imagesVectorSeccondBuffer.clear();
   imagesFromCam = SourceFactory::GetImageSource(CameraSource);
   imagesFromCam->Start();
-  for (Mat im = imagesFromCam->Get(); !im.empty(); im = imagesFromCam->Get()) {
-    cv::cvtColor(im, im, CV_BGR2GRAY);
-    imagesVector.push_back(im);
-    imagesPortionVect.push_back(&imagesVector.back());
-    ++i;
-    if (i == imagesDepth) {
-      pushToQueue(imagesPortionVect);
-      imagesPortionVect.clear();
-      i = 0;
-    }
-  }
-}
-std::mutex images2dMutex;
-void ContinuousProcessingMananger::start2dAquisition() {
-  logger.printLine("Started aquisition thread");
-  std::unique_ptr<IImageSource> imagesFromCam =
-      SourceFactory::GetImageSource(CameraSource);
-
-  imagesFromCam->Start();
+  imagesCounter = 0;
   for (Mat im = imagesFromCam->Get(); !im.empty() && active;
        im = imagesFromCam->Get()) {
     cv::cvtColor(im, im, CV_BGR2GRAY);
     {
-      std::lock_guard<std::mutex> lock(images2dMutex);
-      images2dQueue.push(im);
-      emit(drawObject(im));
-      std::this_thread::yield();
+      std::lock_guard<std::mutex> lock(aquisitionMutex);
+      aquisitionBuffer->push_back(im);
+      ++imagesCounter;
     }
+    emit(drawObject(im));
   }
-  logger.printLine("End of aquisition thread");
+  imagesFromCam->Stop();
+  logger.printLine("End of acquisition");
 }
 
 void ContinuousProcessingMananger::process2dImage(cv::Mat image) {
@@ -83,7 +77,6 @@ void ContinuousProcessingMananger::process2dImage(cv::Mat image) {
 }
 
 void ContinuousProcessingMananger::process2dImages() {
-  active = true;
   logger.printLine("Starting processing 2d image from camera");
   imagesFromCam = SourceFactory::GetImageSource(CameraSource);
 
@@ -100,10 +93,22 @@ void ContinuousProcessingMananger::process2dImages() {
   logger.printLine("End of processing");
 }
 
+void ContinuousProcessingMananger::process3dImages() {
+  active = true;
+  aquisitionThread.reset(new std::thread(
+      &ContinuousProcessingMananger::startCameraAquisition, this));
+  while (active) {
+    std::this_thread::yield();
+    if (switchBuffers()) {
+      std::cout << "Buffers switched" << std::endl;
+    }
+  }
+  aquisitionThread->join();
+}
+
 void ContinuousProcessingMananger::stopProcessing() {
   if (!active)
     return;
-  imagesFromCam->Stop();
   active = false;
 }
 

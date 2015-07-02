@@ -27,7 +27,7 @@ void VTKData::insertPoints(const int &threadNum,
     for (int col = 0; col < image3d->getCols(); ++col) {
       for (int row = 0; row < image3d->getRows(); ++row) {
         if (image.at<uchar>(row, col) == 255) {
-          std::unique_lock<std::mutex> lock(Mutex);
+          std::lock_guard<std::mutex> lock(Mutex);
           vtkIdType pid[1];
           pid[0] = points->InsertNextPoint(col, row, depth);
           vertices->InsertNextCell(1, pid);

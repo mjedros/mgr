@@ -268,7 +268,7 @@ void MainWindow::startAquisition() {
   // TODO remove copypaiste
   cameraProc.setProcessing(ui->ChooseOperation->currentText().toStdString(),
                            MorphElementType, StructElemParams);
-  cameraProc.process2dImages();
+  cameraProc.process3dImages();
 }
 
 void MainWindow::drawObject(cv::Mat img) {

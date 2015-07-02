@@ -12,7 +12,9 @@ class OpenCLManager;
 using ImagesPortion = std::vector<cv::Mat *>;
 class ContinuousProcessingMananger : public QObject {
   Q_OBJECT
-  std::vector<cv::Mat> imagesVector;
+  std::vector<cv::Mat> imagesVectorFirstBuffer;
+  std::vector<cv::Mat> imagesVectorSeccondBuffer;
+  std::vector<cv::Mat> *aquisitionBuffer;
   std::queue<ImagesPortion> portionsQueue;
   std::queue<cv::Mat> images2dQueue;
 
@@ -25,6 +27,7 @@ class ContinuousProcessingMananger : public QObject {
   std::string operationString;
   std::string MorphElementType;
   std::vector<float> StructElemParams;
+  unsigned int imagesCounter = 0;
 
 public:
   ContinuousProcessingMananger(OpenCLManager &openCLManager, QObject *parent);
@@ -33,14 +36,15 @@ public:
                      const std::string &MorphElementTypeNew,
                      const std::vector<float> StructElemParamsNew);
   void process2dImages();
+  void process3dImages();
   void stopProcessing();
 
 private:
   ImagesPortion getNextImagesPortionFromQueue();
   void startCameraAquisition();
-  void start2dAquisition();
   void pushToQueue(ImagesPortion);
   void process2dImage(cv::Mat image);
+  bool switchBuffers();
 signals:
   void drawObject(cv::Mat image);
   void drawProcessed(cv::Mat);
