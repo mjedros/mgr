@@ -7,6 +7,7 @@
 #include <QtGui/QHeaderView>
 #include "GUI/VTKData.h"
 #include <memory>
+#include <mutex>
 QT_BEGIN_NAMESPACE
 
 class Ui_VTKView {
@@ -33,14 +34,15 @@ class VTKView : public Ui_VTKView {};
 
 QT_END_NAMESPACE
 
-VTKView::VTKView(std::unique_ptr<QVTKWidget> parent)
-  : QVTKWidget(parent.get()), ui(new Ui::VTKView) {
+VTKView::VTKView(QObject *parentObj)
+  : QVTKWidget(nullptr), ui(new Ui::VTKView), parentObject(parentObj) {
   ui->setupUi(this);
   vtkData = std::unique_ptr<VTKData>(new VTKData());
   GetRenderWindow()->AddRenderer(vtkData->getVTKRenderer());
   renWin = GetRenderWindow();
   renWin->StereoCapableWindowOn();
   iren = GetInteractor();
+  connect(this, SIGNAL(showVtkImage()), parentObject, SLOT(showVtkImage()));
 }
 
 void VTKView::setImage3d(const std::shared_ptr<Mgr::Image3d> &image) {
@@ -49,12 +51,23 @@ void VTKView::setImage3d(const std::shared_ptr<Mgr::Image3d> &image) {
 
 void VTKView::initImage() {
   vtkData->initVTKImage();
-  renWin->Render();
+  emit(showVtkImage());
 }
 
 void VTKView::renderNewImage(std::tuple<double, double, double> colors) {
   vtkData->addNextImage(colors);
+}
+
+void VTKView::render() {
+  std::lock_guard<std::mutex> lock(vtkData->rendererMutex);
+  std::cout << "render called" << std::endl;
   renWin->Render();
+}
+
+void VTKView::showEvent(QShowEvent *event) {
+  std::lock_guard<std::mutex> lock(vtkData->rendererMutex);
+  renWin->Render();
+  QVTKWidget::showEvent(event);
 }
 
 VTKView::~VTKView() {}

@@ -25,8 +25,9 @@ static Logger &logger = Logger::getInstance();
 
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent), ui(new Ui::MainWindow), csvOperationsModel(this),
-    menu("File"), directory(QString("../Data/")), openCLManager(),
-    applicationManager(openCLManager), cameraProc(openCLManager, this) {
+    menu("File"), directory(QString("../Data/")), vtkView(this),
+    openCLManager(), applicationManager(openCLManager),
+    cameraProc(openCLManager, this) {
   ui->setupUi(this);
   setPlatformsList();
   menu.addAction("Open file to process", this, SLOT(openFileToProcess()));
@@ -159,7 +160,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
   applicationManager.closeWindows();
   processedImage.close();
   originalImage.close();
-  vtkView.reset();
+  vtkView.close();
   QMainWindow::closeEvent(event);
 }
 
@@ -188,15 +189,12 @@ void MainWindow::on_SaveImage_clicked() {
 }
 
 void MainWindow::on_vtkViewButton_clicked() {
-  vtkView.reset(new VTKView());
-  vtkView->setImage3d(applicationManager.getProcessedImage3d());
-  vtkView->initImage();
-  vtkView->show();
+  drawVtkImage(applicationManager.getProcessedImage3d());
 }
 
 void MainWindow::on_addNextVTKImage_clicked() {
-  vtkView->setImage3d(applicationManager.getProcessedImage3d());
-  vtkView->renderNewImage(
+  vtkView.setImage3d(applicationManager.getProcessedImage3d());
+  vtkView.renderNewImage(
       std::make_tuple((double)ui->RedColor->value() / 255.0,
                       (double)ui->GreenColor->value() / 255.0,
                       (double)ui->BlueColor->value() / 255.0));
@@ -279,6 +277,12 @@ void MainWindow::drawObject(cv::Mat img) {
 void MainWindow::drawProcessed(cv::Mat img) {
   processedImage.draw(img);
   processedImage.update();
+}
+
+void MainWindow::drawVtkImage(const std::shared_ptr<Mgr::Image3d> &image3d) {
+  vtkView.setImage3d(image3d);
+  vtkViewThread = std::thread(&VTKView::initImage, &vtkView);
+  vtkViewThread.detach();
 }
 void MainWindow::on_CameraAquisition_clicked() {
   aquisitionThread = std::thread(&MainWindow::startAquisition, this);

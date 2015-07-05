@@ -15,6 +15,7 @@ class MainWindow;
 }
 namespace Mgr {
 class ApplicationManagerGUI;
+class Image3d;
 class OpenCLManager;
 enum SourceType : u_int8_t;
 }
@@ -59,6 +60,8 @@ private slots:
 private:
   std::unique_ptr<std::thread> processingThread;
   std::thread aquisitionThread;
+  std::thread vtkViewThread;
+
   Mgr::cvImageWindow originalImage{ "", this };
   Mgr::cvImageWindow processedImage{ "after", this };
 
@@ -71,7 +74,7 @@ private:
   QMenuBar menu_bar;
   QString filename;
   QString directory;
-  std::unique_ptr<VTKView> vtkView;
+  VTKView vtkView;
   Mgr::OpenCLManager openCLManager;
   Mgr::ApplicationManagerGUI applicationManager;
   Mgr::ContinuousProcessingMananger cameraProc;
@@ -83,4 +86,9 @@ private:
 public slots:
   void drawObject(cv::Mat);
   void drawProcessed(cv::Mat);
+  void drawVtkImage(const std::shared_ptr<Mgr::Image3d> &);
+  void showVtkImage() {
+    vtkView.render();
+    vtkView.show();
+  }
 };

@@ -6,11 +6,13 @@
 #include <QDebug>
 #include <QApplication>
 #include <iostream>
+#include <X11/Xlib.h>
 using namespace cl;
 
 static Mgr::Logger &logger = Mgr::Logger::getInstance();
 
 int main(int argc, char *argv[]) {
+  XInitThreads();
   QApplication a(argc, argv);
   try {
     MainWindow w;

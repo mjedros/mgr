@@ -16,10 +16,12 @@ class VTKView : public QVTKWidget {
   Q_OBJECT
 
 public:
-  explicit VTKView(std::unique_ptr<QVTKWidget> parent = nullptr);
+  explicit VTKView(QObject *parentObj = nullptr);
   void setImage3d(const std::shared_ptr<Mgr::Image3d> &image);
   void initImage();
   void renderNewImage(std::tuple<double, double, double> colors);
+  void render();
+  virtual void showEvent(QShowEvent *);
   ~VTKView();
 
 private:
@@ -28,4 +30,7 @@ private:
   std::unique_ptr<VTKData> vtkData;
   vtkSmartPointer<QVTKInteractor> iren;
   vtkSmartPointer<vtkRenderWindow> renWin;
+  QObject *parentObject;
+signals:
+  void showVtkImage();
 };

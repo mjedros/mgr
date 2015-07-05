@@ -6,25 +6,31 @@
 #include "ProcessingImage.h"
 #include "Processing3dImage.h"
 #include "GUI/cvImageWindow.h"
+#include "GUI/vtkview.h"
+#include "QVTKWidget.h"
 #include "ImageSource/Camera.h"
 #include "ImageSource/SourceFactory.h"
 #include <mutex>
 #include <chrono>
 
 using cv::Mat;
-
 namespace Mgr {
-static const unsigned int depth = 10;
+static const unsigned int depth = 15;
 static Logger &logger = Logger::getInstance();
 
 ContinuousProcessingMananger::ContinuousProcessingMananger(
     OpenCLManager &openCLManager, QObject *parent)
   : openCLManager(openCLManager), parentObject(parent) {
   qRegisterMetaType<cv::Mat>("cv::Mat");
+  qRegisterMetaType<std::shared_ptr<Mgr::Image3d>>(
+      "std::shared_ptr<Mgr::Image3d>");
   connect(this, SIGNAL(drawObject(cv::Mat)), parentObject,
           SLOT(drawObject(cv::Mat)));
   connect(this, SIGNAL(drawProcessed(cv::Mat)), parentObject,
           SLOT(drawProcessed(cv::Mat)));
+  connect(this, SIGNAL(showVtkImage(const std::shared_ptr<Mgr::Image3d> &)),
+          parentObject,
+          SLOT(drawVtkImage(const std::shared_ptr<Mgr::Image3d> &)));
 }
 
 void ContinuousProcessingMananger::setProcessing(
@@ -37,10 +43,10 @@ void ContinuousProcessingMananger::setProcessing(
 }
 void ContinuousProcessingMananger::process3dImages() {
   active = true;
+  image3d = std::shared_ptr<Image3d>(new Image3d);
   std::queue<cv::Mat> *imagesSourceBuffer = &imagesQueueFirstBuffer;
   aquisitionThread.reset(new std::thread(
       &ContinuousProcessingMananger::startCameraAquisition, this));
-  Image3d image3d;
   int currDepth = 0;
   while (active) {
     std::this_thread::yield();
@@ -50,21 +56,22 @@ void ContinuousProcessingMananger::process3dImages() {
     }
     cv::Mat image = imagesSourceBuffer->front();
     imagesSourceBuffer->pop();
-    if (!image3d.isImage3dInitialized())
-      image3d = Image3d(depth, image);
+    if (!image3d->isImage3dInitialized())
+      image3d = std::shared_ptr<Image3d>(new Image3d(depth, image));
     ProcessingImage processing2dImage(openCLManager);
     processing2dImage.setImageToProcess(image);
     processing2dImage.binarize();
-    image3d.setImageAtDepth(currDepth, processing2dImage.getImage());
+    image3d->setImageAtDepth(currDepth, processing2dImage.getImage());
 
     if (++currDepth == depth) {
       currDepth = 0;
       ProcessingImage3d imageOut(openCLManager);
       imageOut.setStructuralElement("Ellipse", { 2, 2, 2 });
       logger.resetTimer();
-      ProcessDepthIn3D{}.process(image3d, imageOut, OPERATION::DILATION);
+      ProcessDepthIn3D{}.process(*image3d, imageOut, OPERATION::DILATION);
+      std::this_thread::yield();
       logger.printAvarageTime();
-      emit(drawProcessed(image3d.getImageAtDepth(0)));
+      emit(showVtkImage(image3d));
     }
   }
   aquisitionThread->join();

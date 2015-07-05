@@ -5,7 +5,10 @@
 #include <thread>
 #include <QObject>
 #include "ImageSource/Camera.h"
+#include "GUI/vtkview.h"
 #include <opencv2/opencv.hpp>
+
+class VTKView;
 
 namespace Mgr {
 class OpenCLManager;
@@ -16,7 +19,9 @@ class ContinuousProcessingMananger : public QObject {
   std::queue<cv::Mat> imagesQueueSeccondBuffer;
   std::queue<cv::Mat> *aquisitionBuffer;
   std::queue<ImagesPortion> portionsQueue;
-  std::queue<cv::Mat> images2dQueue;
+
+  std::unique_ptr<VTKView> vtkView;
+  std::shared_ptr<Image3d> image3d;
 
   std::unique_ptr<std::thread> aquisitionThread;
   OpenCLManager &openCLManager;
@@ -48,5 +53,6 @@ private:
 signals:
   void drawObject(cv::Mat image);
   void drawProcessed(cv::Mat);
+  void showVtkImage(const std::shared_ptr<Mgr::Image3d> &);
 };
 }
