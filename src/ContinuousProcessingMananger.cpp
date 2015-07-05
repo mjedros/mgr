@@ -4,6 +4,7 @@
 #include "Logger.h"
 #include "OpenCLManager.h"
 #include "ProcessingImage.h"
+#include "Processing3dImage.h"
 #include "GUI/cvImageWindow.h"
 #include "ImageSource/Camera.h"
 #include "ImageSource/SourceFactory.h"
@@ -34,33 +35,61 @@ void ContinuousProcessingMananger::setProcessing(
   MorphElementType = MorphElementTypeNew;
   StructElemParams = StructElemParamsNew;
 }
-std::mutex aquisitionMutex;
-bool ContinuousProcessingMananger::switchBuffers() {
-  if (imagesCounter % depth != 0 || imagesCounter == 0)
-    return false;
-  std::lock_guard<std::mutex> lock(aquisitionMutex);
-  imagesCounter = 0;
-  if (aquisitionBuffer == &imagesVectorFirstBuffer)
-    aquisitionBuffer = &imagesVectorSeccondBuffer;
-  else
-    aquisitionBuffer = &imagesVectorFirstBuffer;
-  return true;
+void ContinuousProcessingMananger::process3dImages() {
+  active = true;
+  std::queue<cv::Mat> *imagesSourceBuffer = &imagesQueueFirstBuffer;
+  aquisitionThread.reset(new std::thread(
+      &ContinuousProcessingMananger::startCameraAquisition, this));
+  Image3d image3d;
+  int currDepth = 0;
+  while (active) {
+    std::this_thread::yield();
+    if (imagesSourceBuffer->empty()) {
+      imagesSourceBuffer = switchBuffers();
+      continue;
+    }
+    cv::Mat image = imagesSourceBuffer->front();
+    imagesSourceBuffer->pop();
+    if (!image3d.isImage3dInitialized())
+      image3d = Image3d(depth, image);
+    ProcessingImage processing2dImage(openCLManager);
+    processing2dImage.setImageToProcess(image);
+    processing2dImage.binarize();
+    image3d.setImageAtDepth(currDepth, processing2dImage.getImage());
+
+    if (++currDepth == depth) {
+      currDepth = 0;
+      ProcessingImage3d imageOut(openCLManager);
+      imageOut.setStructuralElement("Ellipse", { 2, 2, 2 });
+      logger.resetTimer();
+      ProcessDepthIn3D{}.process(image3d, imageOut, OPERATION::DILATION);
+      logger.printAvarageTime();
+      emit(drawProcessed(image3d.getImageAtDepth(0)));
+    }
+  }
+  aquisitionThread->join();
+}
+std::mutex bufferMutex;
+std::queue<cv::Mat> *ContinuousProcessingMananger::switchBuffers() {
+  std::lock_guard<std::mutex> lock(bufferMutex);
+  if (aquisitionBuffer == &imagesQueueFirstBuffer) {
+    aquisitionBuffer = &imagesQueueSeccondBuffer;
+    return &imagesQueueFirstBuffer;
+  }
+  aquisitionBuffer = &imagesQueueFirstBuffer;
+  return &imagesQueueSeccondBuffer;
 }
 
 void ContinuousProcessingMananger::startCameraAquisition() {
-  imagesVectorFirstBuffer.clear();
-  aquisitionBuffer = &imagesVectorFirstBuffer;
-  imagesVectorSeccondBuffer.clear();
+  aquisitionBuffer = &imagesQueueFirstBuffer;
   imagesFromCam = SourceFactory::GetImageSource(CameraSource);
   imagesFromCam->Start();
-  imagesCounter = 0;
   for (Mat im = imagesFromCam->Get(); !im.empty() && active;
        im = imagesFromCam->Get()) {
     cv::cvtColor(im, im, CV_BGR2GRAY);
     {
-      std::lock_guard<std::mutex> lock(aquisitionMutex);
-      aquisitionBuffer->push_back(im);
-      ++imagesCounter;
+      std::lock_guard<std::mutex> lock(bufferMutex);
+      aquisitionBuffer->push(im);
     }
     emit(drawObject(im));
   }
@@ -91,19 +120,6 @@ void ContinuousProcessingMananger::process2dImages() {
     process2dImage(img.getImage());
   }
   logger.printLine("End of processing");
-}
-
-void ContinuousProcessingMananger::process3dImages() {
-  active = true;
-  aquisitionThread.reset(new std::thread(
-      &ContinuousProcessingMananger::startCameraAquisition, this));
-  while (active) {
-    std::this_thread::yield();
-    if (switchBuffers()) {
-      std::cout << "Buffers switched" << std::endl;
-    }
-  }
-  aquisitionThread->join();
 }
 
 void ContinuousProcessingMananger::stopProcessing() {

@@ -5,9 +5,9 @@ namespace Mgr {
 class Image3d {
 private:
   cv::Mat image;
-  int depth;
-  int rows;
-  int cols;
+  int depth = 0;
+  int rows = 0;
+  int cols = 0;
 
 public:
   inline const int &getDepth() const { return depth; }
@@ -21,6 +21,7 @@ public:
   const cv::Mat getImageAtRow(const int &row) const;
   const cv::Mat getImageAtCol(const int &col) const;
   const cv::Mat get3dMatImage() const { return image; }
+  bool isImage3dInitialized() { return depth != 0; }
   Image3d(const int &_depth, const cv::Mat &image2d);
   Image3d(const Image3d &source);
   Image3d(const int newRows, const int newCols, const cv::Mat &image3d);

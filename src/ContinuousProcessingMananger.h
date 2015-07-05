@@ -12,9 +12,9 @@ class OpenCLManager;
 using ImagesPortion = std::vector<cv::Mat *>;
 class ContinuousProcessingMananger : public QObject {
   Q_OBJECT
-  std::vector<cv::Mat> imagesVectorFirstBuffer;
-  std::vector<cv::Mat> imagesVectorSeccondBuffer;
-  std::vector<cv::Mat> *aquisitionBuffer;
+  std::queue<cv::Mat> imagesQueueFirstBuffer;
+  std::queue<cv::Mat> imagesQueueSeccondBuffer;
+  std::queue<cv::Mat> *aquisitionBuffer;
   std::queue<ImagesPortion> portionsQueue;
   std::queue<cv::Mat> images2dQueue;
 
@@ -44,7 +44,7 @@ private:
   void startCameraAquisition();
   void pushToQueue(ImagesPortion);
   void process2dImage(cv::Mat image);
-  bool switchBuffers();
+  std::queue<cv::Mat> *switchBuffers();
 signals:
   void drawObject(cv::Mat image);
   void drawProcessed(cv::Mat);
