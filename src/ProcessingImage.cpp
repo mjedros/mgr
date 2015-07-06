@@ -10,7 +10,12 @@ using namespace cl;
 namespace Mgr {
 
 static Logger &logger = Logger::getInstance();
-
+std::map<std::string, OPERATION> ProcessingImage::OperationMap = {
+  { "Dilation", OPERATION::DILATION },
+  { "Erosion", OPERATION::EROSION },
+  { "Contour", OPERATION::CONTOUR },
+  { "Skeletonize", OPERATION::SKELETONIZATION }
+};
 void ProcessingImage::setKernel(const std::string &Operation) {
   setKernelOperation(Operation);
 }

@@ -10,13 +10,6 @@ using namespace cv;
 
 namespace Mgr {
 
-std::map<std::string, OPERATION> OperationMap = {
-  { "Dilation", OPERATION::DILATION },
-  { "Erosion", OPERATION::EROSION },
-  { "Contour", OPERATION::CONTOUR },
-  { "Skeletonize", OPERATION::SKELETONIZATION }
-};
-
 static Logger &logger = Logger::getInstance();
 template <class T, class I>
 void ApplicationManager::process(const OPERATION &operation,
@@ -120,15 +113,10 @@ void ApplicationManager::process(const std::string &operationString,
                                  const std::string &MorphElementType,
                                  const std::vector<float> StructElemParams,
                                  const std::string &operationWay) {
-  logger.printFancyLine("Performing " + operationString);
-  logger.printLine(operationWay + ", " + MorphElementType);
-  logger.printLine("Struct elem params: " +
-                   std::to_string(StructElemParams[0]) + ", " +
-                   std::to_string(StructElemParams[1]) + ", " +
-                   std::to_string(StructElemParams[2]));
-  logger.printProcessingROI(processROI);
+  logger.printProcessing(operationString, MorphElementType, StructElemParams,
+                         operationWay, processROI);
 
-  const OPERATION &operation = OperationMap[operationString];
+  const OPERATION &operation = ProcessingImage::OperationMap[operationString];
 
   if (operationWay == "Process columns")
     process<ProcessCols>(operation, MorphElementType, StructElemParams);

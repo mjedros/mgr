@@ -11,7 +11,7 @@
 #include <thread>
 #include <mutex>
 static Mgr::Logger &logger = Mgr::Logger::getInstance();
-static const u_int8_t THREAD_NUMBER = 1;
+static const u_int8_t THREAD_NUMBER = 3;
 VTKData::VTKData() : renderer(vtkRenderer::New()) {
   renderer->SetBackground(.1, .1, .1);
 }
@@ -47,16 +47,14 @@ VTKData::createActorOutOf3dImage(std::tuple<double, double, double> colors) {
   logger.printFancyLine("Inserting 3d points");
   logger.resetTimer();
   logger.beginOperation();
-  insertPoints(0, image3d, vertices, points);
-  //  std::thread t[THREAD_NUMBER];
-  //  for (int i = 0; i < THREAD_NUMBER; ++i) {
-  //    t[i] = std::thread(&VTKData::insertPoints, i, image3d, vertices,
-  //    points);
-  //  }
+  std::thread t[THREAD_NUMBER];
+  for (int i = 0; i < THREAD_NUMBER; ++i) {
+    t[i] = std::thread(&VTKData::insertPoints, i, image3d, vertices, points);
+  }
 
-  //  for (int i = 0; i < THREAD_NUMBER; ++i) {
-  //    t[i].join();
-  //  }
+  for (int i = 0; i < THREAD_NUMBER; ++i) {
+    t[i].join();
+  }
   logger.endOperation();
   logger.printAvarageTime();
   polyData->SetPoints(points);
@@ -71,18 +69,13 @@ void VTKData::initVTKImage() {
   std::lock_guard<std::mutex> lock(rendererMutex);
   auto actors = renderer->GetActors();
   auto prevActor = actors->GetLastActor();
-  std::cout << "deleting" << std::endl;
   while (prevActor != NULL) {
     renderer->RemoveActor(prevActor);
     prevActor = actors->GetLastActor();
-    std::cout << "one" << std::endl;
   }
-  std::cout << "deleted" << std::endl;
   vtkSmartPointer<vtkActor> actor =
       createActorOutOf3dImage(std::make_tuple(0.9, 0.9, 0.9));
-  std::cout << "Actor created" << std::endl;
   renderer->AddActor(actor);
-  std::cout << "Actor added" << std::endl;
 }
 
 void VTKData::addNextImage(std::tuple<double, double, double> colors) {

@@ -31,8 +31,7 @@ public:
   ~MainWindow();
   void initBinaryImage();
 
-  void process(const std::vector<float> StructElemParams,
-               const std::string MorphElementType);
+  void process();
 private slots:
   void on_ChoosePlatform_currentIndexChanged(const QString &description);
   void on_Process_clicked();
@@ -47,6 +46,7 @@ private slots:
   void on_Revert_clicked();
 
   void on_CameraAquisition_clicked();
+  void on_UpdateOperation_clicked();
 
   void on_vtkViewButton_clicked();
   void on_addNextVTKImage_clicked();
@@ -83,6 +83,8 @@ private:
   void initImages(const Mgr::SourceType &source, const std::string &name);
   void updateCSVOperations();
   void startAquisition();
+  std::tuple<std::string, std::string, const std::vector<float>>
+  getProcessingValues();
 public slots:
   void drawObject(cv::Mat);
   void drawProcessed(cv::Mat);

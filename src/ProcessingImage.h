@@ -50,6 +50,7 @@ protected:
   std::map<std::string, StructuralElement> strElementMap;
 
 public:
+  static std::map<std::string, OPERATION> OperationMap;
   /**
    * @brief Performs binary operation with mininum and maximum value
    * @param minimum

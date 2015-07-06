@@ -65,6 +65,18 @@ void Logger::printFancyLine(string line) {
   printLine(line);
 }
 
+void Logger::printProcessing(const std::string &operationString,
+                             const std::string &MorphElementType,
+                             const std::vector<float> StructElemParams,
+                             const std::string &operationWay, bool processROI) {
+  printFancyLine("Performing " + operationString);
+  printLine(operationWay + ", " + MorphElementType);
+  printLine("Struct elem params: " + std::to_string(StructElemParams[0]) +
+            ", " + std::to_string(StructElemParams[1]) + ", " +
+            std::to_string(StructElemParams[2]));
+  printProcessingROI(processROI);
+}
+
 Logger::Logger() {
   file.open("logMgr.txt", ios::out | fstream::app);
   file << "***************** New log *****************" << endl;

@@ -60,8 +60,15 @@ void VTKView::renderNewImage(std::tuple<double, double, double> colors) {
 
 void VTKView::render() {
   std::lock_guard<std::mutex> lock(vtkData->rendererMutex);
-  std::cout << "render called" << std::endl;
   renWin->Render();
+}
+
+void VTKView::mousePressEvent(QMouseEvent *event) {
+  QVTKWidget::mousePressEvent(event);
+}
+
+void VTKView::mouseReleaseEvent(QMouseEvent *event) {
+  QVTKWidget::mouseReleaseEvent(event);
 }
 
 void VTKView::showEvent(QShowEvent *event) {

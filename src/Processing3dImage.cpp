@@ -4,7 +4,6 @@
 #include "ProcessingImage3d.h"
 #include "Image3d.h"
 namespace Mgr {
-typedef void (ProcessingImage::*ptrToMethodType)();
 const std::map<OPERATION, ptrToMethodType> OperationToMethodPtr = {
   { OPERATION::DILATION, &ProcessingImage::performMorphologicalOperation },
   { OPERATION::EROSION, &ProcessingImage::performMorphologicalOperation },

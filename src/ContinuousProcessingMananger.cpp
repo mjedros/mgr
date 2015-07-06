@@ -41,44 +41,61 @@ void ContinuousProcessingMananger::setProcessing(
   MorphElementType = MorphElementTypeNew;
   StructElemParams = StructElemParamsNew;
 }
-void ContinuousProcessingMananger::process3dImages() {
-  active = true;
-  image3d = std::shared_ptr<Image3d>(new Image3d);
-  std::queue<cv::Mat> *imagesSourceBuffer = &imagesQueueFirstBuffer;
-  aquisitionThread.reset(new std::thread(
-      &ContinuousProcessingMananger::startCameraAquisition, this));
+
+std::mutex bufferMutex;
+void ContinuousProcessingMananger::process3dImage() {
+  logger.printProcessing(operationString, MorphElementType, StructElemParams,
+                         "3d processing");
+  ProcessingImage3d imageOut(openCLManager);
+  imageOut.setStructuralElement(MorphElementType, StructElemParams);
+  logger.resetTimer();
+  ProcessDepthIn3D{}.process(*image3d, imageOut,
+                             ProcessingImage3d::OperationMap[operationString]);
+  std::this_thread::yield();
+  logger.printAvarageTime();
+  emit(showVtkImage(image3d));
+}
+
+void ContinuousProcessingMananger::processing3dLoop() {
+  MatQueue *imagesSourceBuffer = &imagesQueueFirstBuffer;
   int currDepth = 0;
   while (active) {
     std::this_thread::yield();
-    if (imagesSourceBuffer->empty()) {
-      imagesSourceBuffer = switchBuffers();
-      continue;
+    {
+      std::lock_guard<std::mutex> lock(bufferMutex);
+      if (imagesSourceBuffer->empty()) {
+        imagesSourceBuffer = switchBuffers();
+        continue;
+      }
     }
     cv::Mat image = imagesSourceBuffer->front();
     imagesSourceBuffer->pop();
     if (!image3d->isImage3dInitialized())
       image3d = std::shared_ptr<Image3d>(new Image3d(depth, image));
     ProcessingImage processing2dImage(openCLManager);
-    processing2dImage.setImageToProcess(image);
+    processing2dImage.setImageToProcess(image.clone());
     processing2dImage.binarize();
     image3d->setImageAtDepth(currDepth, processing2dImage.getImage());
 
     if (++currDepth == depth) {
       currDepth = 0;
-      ProcessingImage3d imageOut(openCLManager);
-      imageOut.setStructuralElement("Ellipse", { 2, 2, 2 });
-      logger.resetTimer();
-      ProcessDepthIn3D{}.process(*image3d, imageOut, OPERATION::DILATION);
-      std::this_thread::yield();
-      logger.printAvarageTime();
-      emit(showVtkImage(image3d));
+      process3dImage();
     }
   }
-  aquisitionThread->join();
 }
-std::mutex bufferMutex;
-std::queue<cv::Mat> *ContinuousProcessingMananger::switchBuffers() {
-  std::lock_guard<std::mutex> lock(bufferMutex);
+
+void ContinuousProcessingMananger::process3dImages() {
+  active = true;
+  image3d = std::shared_ptr<Image3d>(new Image3d);
+
+  aquisitionThread.reset(new std::thread(
+      &ContinuousProcessingMananger::startCameraAquisition, this));
+  processing3dLoop();
+  aquisitionThread->join();
+  logger.printLine("End of processing");
+}
+
+MatQueue *ContinuousProcessingMananger::switchBuffers() {
   if (aquisitionBuffer == &imagesQueueFirstBuffer) {
     aquisitionBuffer = &imagesQueueSeccondBuffer;
     return &imagesQueueFirstBuffer;
@@ -108,7 +125,9 @@ void ContinuousProcessingMananger::process2dImage(cv::Mat image) {
   ProcessingImage img(openCLManager);
   img.setImageToProcess(image);
   img.setStructuralElement(MorphElementType, StructElemParams);
-  img.dilate();
+  auto operation = ProcessingImage3d::OperationMap[operationString];
+  img.setKernelWithOperation(operation);
+  (img.*OperationToMethodPtr.at(operation))();
   emit(drawProcessed(img.getImage()));
 }
 
@@ -133,20 +152,5 @@ void ContinuousProcessingMananger::stopProcessing() {
   if (!active)
     return;
   active = false;
-}
-
-std::mutex imagesPortionMutex;
-ImagesPortion ContinuousProcessingMananger::getNextImagesPortionFromQueue() {
-  std::lock_guard<std::mutex> lock(imagesPortionMutex);
-  if (portionsQueue.empty())
-    return ImagesPortion();
-  ImagesPortion imagesPortion = portionsQueue.front();
-  portionsQueue.pop();
-  return imagesPortion;
-}
-void
-ContinuousProcessingMananger::pushToQueue(ImagesPortion imagesPortionVect) {
-  std::lock_guard<std::mutex> lock(imagesPortionMutex);
-  portionsQueue.push(imagesPortionVect);
 }
 }

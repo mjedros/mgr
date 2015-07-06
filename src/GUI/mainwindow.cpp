@@ -52,11 +52,6 @@ MainWindow::on_ChoosePlatform_currentIndexChanged(const QString &description) {
   });
   chosenDevice = std::make_pair(std::get<0>(*it), std::get<1>(*it));
 }
-// void
-// MainWindow::on_ChooseOperation_currentIndexChanged(const QString &operation)
-// {
-
-//}
 
 void MainWindow::setPlatformsList() {
   listPlatforms = openCLManager.listPlatforms();
@@ -103,12 +98,13 @@ void MainWindow::updateCSVOperations() {
   ui->csvOperations->setModel(&csvOperationsModel);
 }
 
-void MainWindow::process(const std::vector<float> StructElemParams,
-                         const std::string MorphElementType) {
+void MainWindow::process() {
+  auto processingValues = getProcessingValues();
   try {
     applicationManager.setProcessingROI(ui->processROI->isChecked());
-    applicationManager.process(ui->ChooseOperation->currentText().toStdString(),
-                               MorphElementType, StructElemParams,
+    applicationManager.process(std::get<0>(processingValues),
+                               std::get<1>(processingValues),
+                               std::get<2>(processingValues),
                                ui->ProcessingWay->currentText().toStdString());
     ui->Process->show();
 
@@ -123,16 +119,7 @@ void MainWindow::on_Process_clicked() {
   ui->ProcessingProgress->setText("In progress");
   cv::waitKey(1);
 
-  const std::string MorphElementType =
-      ui->MorphologicalElementType->currentText().toStdString();
-  const std::vector<float> StructElemParams = {
-    static_cast<float>(ui->StructElementParam1->value()),
-    static_cast<float>(ui->StructElementParam2->value()),
-    static_cast<float>(ui->StructElementParam3->value())
-  };
-
-  processingThread.reset(new std::thread(&MainWindow::process, this,
-                                         StructElemParams, MorphElementType));
+  processingThread.reset(new std::thread(&MainWindow::process, this));
   processingThread->detach();
 }
 
@@ -156,6 +143,8 @@ void MainWindow::on_LoadImages_clicked() {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
+  if (aquisitionThread.joinable())
+    aquisitionThread.join();
   cameraProc.stopProcessing();
   applicationManager.closeWindows();
   processedImage.close();
@@ -250,22 +239,30 @@ void MainWindow::on_CloseWindows_clicked() {
   applicationManager.closeWindows();
 }
 
+std::tuple<std::string, std::string, const std::vector<float>>
+MainWindow::getProcessingValues() {
+
+  const std::vector<float> StructElemParams = {
+    static_cast<float>(ui->StructElementParam1->value()),
+    static_cast<float>(ui->StructElementParam2->value()),
+    static_cast<float>(ui->StructElementParam3->value())
+  };
+  return std::make_tuple(
+      ui->ChooseOperation->currentText().toStdString(),
+      ui->MorphologicalElementType->currentText().toStdString(),
+      StructElemParams);
+}
+
 void MainWindow::on_Revert_clicked() {
   applicationManager.revertLastOperation();
 }
 void MainWindow::startAquisition() {
   openCLManager.configure(std::string(KERNELS_DIR) + "Kernels.cl",
                           chosenDevice);
-  const std::string MorphElementType =
-      ui->MorphologicalElementType->currentText().toStdString();
-  const std::vector<float> StructElemParams = {
-    static_cast<float>(ui->StructElementParam1->value()),
-    static_cast<float>(ui->StructElementParam2->value()),
-    static_cast<float>(ui->StructElementParam3->value())
-  };
-  // TODO remove copypaiste
-  cameraProc.setProcessing(ui->ChooseOperation->currentText().toStdString(),
-                           MorphElementType, StructElemParams);
+
+  auto values = getProcessingValues();
+  cameraProc.setProcessing(std::get<0>(values), std::get<1>(values),
+                           std::get<2>(values));
   cameraProc.process3dImages();
 }
 
@@ -287,6 +284,12 @@ void MainWindow::drawVtkImage(const std::shared_ptr<Mgr::Image3d> &image3d) {
 void MainWindow::on_CameraAquisition_clicked() {
   aquisitionThread = std::thread(&MainWindow::startAquisition, this);
   aquisitionThread.detach();
+}
+
+void MainWindow::on_UpdateOperation_clicked() {
+  auto values = getProcessingValues();
+  cameraProc.setProcessing(std::get<0>(values), std::get<1>(values),
+                           std::get<2>(values));
 }
 
 void MainWindow::on_deleteFromCsvFile_clicked() {

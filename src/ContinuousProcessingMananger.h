@@ -12,13 +12,12 @@ class VTKView;
 
 namespace Mgr {
 class OpenCLManager;
-using ImagesPortion = std::vector<cv::Mat *>;
+using MatQueue = std::queue<cv::Mat>;
 class ContinuousProcessingMananger : public QObject {
   Q_OBJECT
-  std::queue<cv::Mat> imagesQueueFirstBuffer;
-  std::queue<cv::Mat> imagesQueueSeccondBuffer;
-  std::queue<cv::Mat> *aquisitionBuffer;
-  std::queue<ImagesPortion> portionsQueue;
+  MatQueue imagesQueueFirstBuffer;
+  MatQueue imagesQueueSeccondBuffer;
+  MatQueue *aquisitionBuffer;
 
   std::unique_ptr<VTKView> vtkView;
   std::shared_ptr<Image3d> image3d;
@@ -45,11 +44,11 @@ public:
   void stopProcessing();
 
 private:
-  ImagesPortion getNextImagesPortionFromQueue();
   void startCameraAquisition();
-  void pushToQueue(ImagesPortion);
   void process2dImage(cv::Mat image);
-  std::queue<cv::Mat> *switchBuffers();
+  void process3dImage();
+  void processing3dLoop();
+  MatQueue *switchBuffers();
 signals:
   void drawObject(cv::Mat image);
   void drawProcessed(cv::Mat);

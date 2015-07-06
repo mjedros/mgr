@@ -21,8 +21,12 @@ public:
   void initImage();
   void renderNewImage(std::tuple<double, double, double> colors);
   void render();
-  virtual void showEvent(QShowEvent *);
   ~VTKView();
+
+protected:
+  virtual void showEvent(QShowEvent *);
+  virtual void mousePressEvent(QMouseEvent *);
+  virtual void mouseReleaseEvent(QMouseEvent *);
 
 private:
   std::shared_ptr<Mgr::Image3d> image3d;
