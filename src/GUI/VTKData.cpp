@@ -3,6 +3,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkActor.h>
+#include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkContourFilter.h>
@@ -15,12 +16,24 @@ static const u_int8_t THREAD_NUMBER = 3;
 VTKData::VTKData() : renderer(vtkRenderer::New()) {
   renderer->SetBackground(.1, .1, .1);
 }
+
+VTKData::~VTKData() {
+  auto actors = renderer->GetActors();
+  auto prevActor = actors ? actors->GetLastActor() : nullptr;
+  while (prevActor != nullptr) {
+    renderer->RemoveActor(prevActor);
+    dataMemHolder.erase(std::remove_if(
+        dataMemHolder.begin(), dataMemHolder.end(), [prevActor](auto &data) {
+          return data.mapper == prevActor->GetMapper();
+        }));
+    prevActor = actors->GetLastActor();
+  }
+}
 static std::mutex Mutex;
 
 void VTKData::insertPoints(const int &threadNum,
                            const std::shared_ptr<Mgr::Image3d> &image3d,
-                           vtkSmartPointer<vtkCellArray> vertices,
-                           vtkSmartPointer<vtkPoints> points) {
+                           vtkCellArray *vertices, vtkPoints *points) {
   for (int depth = threadNum * image3d->getDepth() / THREAD_NUMBER;
        depth < (1 + threadNum) * image3d->getDepth() / THREAD_NUMBER; ++depth) {
     const cv::Mat image = image3d->getImageAtDepth(depth);
@@ -37,13 +50,13 @@ void VTKData::insertPoints(const int &threadNum,
   }
 }
 
-vtkSmartPointer<vtkActor>
+vtkActor *
 VTKData::createActorOutOf3dImage(std::tuple<double, double, double> colors) {
-  vtkSmartPointer<vtkPolyData> polyData = vtkPolyData::New();
-  vtkSmartPointer<vtkPoints> points = vtkPoints::New();
-  vtkSmartPointer<vtkPolyDataMapper> mapper = vtkPolyDataMapper::New();
+  vtkPolyData *polyData = vtkPolyData::New();
+  vtkPoints *points = vtkPoints::New();
+  vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
   vtkActor *actor = vtkActor::New();
-  vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
+  vtkCellArray *vertices = vtkCellArray::New();
   logger.printFancyLine("Inserting 3d points");
   logger.resetTimer();
   logger.beginOperation();
@@ -63,23 +76,34 @@ VTKData::createActorOutOf3dImage(std::tuple<double, double, double> colors) {
   actor->SetMapper(mapper);
   actor->GetProperty()->SetColor(std::get<0>(colors), std::get<1>(colors),
                                  std::get<2>(colors));
+  dataMemHolder.push_back({ vertices, mapper, points });
   return actor;
 }
 void VTKData::initVTKImage() {
   std::lock_guard<std::mutex> lock(rendererMutex);
+
   auto actors = renderer->GetActors();
   auto prevActor = actors->GetLastActor();
-  while (prevActor != NULL) {
+  while (prevActor != nullptr) {
     renderer->RemoveActor(prevActor);
+    dataMemHolder.erase(std::remove_if(
+        dataMemHolder.begin(), dataMemHolder.end(), [prevActor](auto &data) {
+          return data.mapper == prevActor->GetMapper();
+        }));
     prevActor = actors->GetLastActor();
   }
-  vtkSmartPointer<vtkActor> actor =
-      createActorOutOf3dImage(std::make_tuple(0.9, 0.9, 0.9));
+  vtkActor *actor = createActorOutOf3dImage(std::make_tuple(0.9, 0.9, 0.9));
   renderer->AddActor(actor);
 }
 
 void VTKData::addNextImage(std::tuple<double, double, double> colors) {
-  vtkSmartPointer<vtkActor> actor = createActorOutOf3dImage(colors);
+  vtkActor* actor = createActorOutOf3dImage(colors);
   renderer->AddActor(actor);
   renderer->Render();
+}
+
+VTKData::dataMem::~dataMem() {
+  vertices->Delete();
+  mapper->Delete();
+  points->Delete();
 }

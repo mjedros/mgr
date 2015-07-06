@@ -23,11 +23,6 @@ public:
   void render();
   ~VTKView();
 
-protected:
-  virtual void showEvent(QShowEvent *);
-  virtual void mousePressEvent(QMouseEvent *);
-  virtual void mouseReleaseEvent(QMouseEvent *);
-
 private:
   std::shared_ptr<Mgr::Image3d> image3d;
   std::unique_ptr<Ui::VTKView> ui;

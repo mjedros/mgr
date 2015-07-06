@@ -51,9 +51,9 @@ void ContinuousProcessingMananger::process3dImage() {
   logger.resetTimer();
   ProcessDepthIn3D{}.process(*image3d, imageOut,
                              ProcessingImage3d::OperationMap[operationString]);
-  std::this_thread::yield();
+  logger.endOperation();
   logger.printAvarageTime();
-  emit(showVtkImage(image3d));
+  std::this_thread::yield();
 }
 
 void ContinuousProcessingMananger::processing3dLoop() {
@@ -80,6 +80,7 @@ void ContinuousProcessingMananger::processing3dLoop() {
     if (++currDepth == depth) {
       currDepth = 0;
       process3dImage();
+      emit(showVtkImage(image3d));
     }
   }
 }

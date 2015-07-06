@@ -63,18 +63,4 @@ void VTKView::render() {
   renWin->Render();
 }
 
-void VTKView::mousePressEvent(QMouseEvent *event) {
-  QVTKWidget::mousePressEvent(event);
-}
-
-void VTKView::mouseReleaseEvent(QMouseEvent *event) {
-  QVTKWidget::mouseReleaseEvent(event);
-}
-
-void VTKView::showEvent(QShowEvent *event) {
-  std::lock_guard<std::mutex> lock(vtkData->rendererMutex);
-  renWin->Render();
-  QVTKWidget::showEvent(event);
-}
-
 VTKView::~VTKView() {}
