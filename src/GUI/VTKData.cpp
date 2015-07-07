@@ -58,8 +58,6 @@ VTKData::createActorOutOf3dImage(std::tuple<double, double, double> colors) {
   vtkActor *actor = vtkActor::New();
   vtkCellArray *vertices = vtkCellArray::New();
   logger.printFancyLine("Inserting 3d points");
-  logger.resetTimer();
-  logger.beginOperation();
   std::thread t[THREAD_NUMBER];
   for (int i = 0; i < THREAD_NUMBER; ++i) {
     t[i] = std::thread(&VTKData::insertPoints, i, image3d, vertices, points);
@@ -68,8 +66,6 @@ VTKData::createActorOutOf3dImage(std::tuple<double, double, double> colors) {
   for (int i = 0; i < THREAD_NUMBER; ++i) {
     t[i].join();
   }
-  logger.endOperation();
-  logger.printAvarageTime();
   polyData->SetPoints(points);
   polyData->SetVerts(vertices);
   mapper->SetInputData(polyData);
@@ -97,7 +93,7 @@ void VTKData::initVTKImage() {
 }
 
 void VTKData::addNextImage(std::tuple<double, double, double> colors) {
-  vtkActor* actor = createActorOutOf3dImage(colors);
+  vtkActor *actor = createActorOutOf3dImage(colors);
   renderer->AddActor(actor);
   renderer->Render();
 }

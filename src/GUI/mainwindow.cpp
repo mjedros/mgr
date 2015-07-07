@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
       { "Cross", "Rectangle", "Ellipse", "EllipseImage" });
   ui->ProcessingWay->addItems(
       { "Process depth", "Process columns", "Process rows", "Process in 3d" });
+  ui->CameraDimension->addItems({ "2D", "3D" });
   setMenuBar(&menu_bar);
 }
 
@@ -263,7 +264,10 @@ void MainWindow::startAquisition() {
   auto values = getProcessingValues();
   cameraProc.setProcessing(std::get<0>(values), std::get<1>(values),
                            std::get<2>(values));
-  cameraProc.process3dImages();
+  if (ui->CameraDimension->currentText() == "3D")
+    cameraProc.process3dImages();
+  else
+    cameraProc.process2dImages();
 }
 
 void MainWindow::drawObject(cv::Mat img) {

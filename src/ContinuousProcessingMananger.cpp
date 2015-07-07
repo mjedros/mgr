@@ -134,18 +134,29 @@ void ContinuousProcessingMananger::process2dImage(cv::Mat image) {
 
 void ContinuousProcessingMananger::process2dImages() {
   logger.printLine("Starting processing 2d image from camera");
-  imagesFromCam = SourceFactory::GetImageSource(CameraSource);
+  active = true;
+  aquisitionThread.reset(new std::thread(
+      &ContinuousProcessingMananger::startCameraAquisition, this));
 
-  imagesFromCam->Start();
-  for (Mat im = imagesFromCam->Get(); !im.empty() && active;
-       im = imagesFromCam->Get()) {
-    cv::cvtColor(im, im, CV_BGR2GRAY);
-    emit(drawObject(im));
+  MatQueue *imagesSourceBuffer = &imagesQueueFirstBuffer;
+  while (active) {
+    std::this_thread::yield();
+    {
+      std::lock_guard<std::mutex> lock(bufferMutex);
+      if (imagesSourceBuffer->empty()) {
+        imagesSourceBuffer = switchBuffers();
+        continue;
+      }
+    }
+    cv::Mat image = imagesSourceBuffer->front();
+    imagesSourceBuffer->pop();
     ProcessingImage img(openCLManager);
-    img.setImageToProcess(im.clone());
+    img.setImageToProcess(image.clone());
     img.binarize();
     process2dImage(img.getImage());
   }
+
+  aquisitionThread->join();
   logger.printLine("End of processing");
 }
 
