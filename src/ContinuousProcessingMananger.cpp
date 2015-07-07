@@ -116,6 +116,7 @@ void ContinuousProcessingMananger::startCameraAquisition() {
       std::lock_guard<std::mutex> lock(bufferMutex);
       aquisitionBuffer->push(im);
     }
+    std::this_thread::yield();
     emit(drawObject(im));
   }
   imagesFromCam->Stop();
@@ -145,6 +146,7 @@ void ContinuousProcessingMananger::process2dImages() {
       std::lock_guard<std::mutex> lock(bufferMutex);
       if (imagesSourceBuffer->empty()) {
         imagesSourceBuffer = switchBuffers();
+        std::this_thread::yield();
         continue;
       }
     }

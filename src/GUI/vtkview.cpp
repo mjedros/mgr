@@ -51,6 +51,10 @@ void VTKView::setImage3d(const std::shared_ptr<Mgr::Image3d> &image) {
 
 void VTKView::initImage() {
   vtkData->initVTKImage();
+  {
+    std::lock_guard<std::mutex> lock(vtkData->rendererMutex);
+    renWin->Render();
+  }
   emit(showVtkImage());
 }
 
@@ -58,9 +62,6 @@ void VTKView::renderNewImage(std::tuple<double, double, double> colors) {
   vtkData->addNextImage(colors);
 }
 
-void VTKView::render() {
-  std::lock_guard<std::mutex> lock(vtkData->rendererMutex);
-  renWin->Render();
-}
+void VTKView::render() { renWin->Finalize(); }
 
 VTKView::~VTKView() {}
