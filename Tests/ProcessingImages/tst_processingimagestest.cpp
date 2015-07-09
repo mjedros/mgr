@@ -83,7 +83,7 @@ cv::Mat ProcessingImagesTest::skeletonizeOpenCV(cv::Mat img) {
     cv::subtract(img, temp, temp);
     cv::bitwise_or(skel, temp, skel);
     eroded.copyTo(img);
-  } while (!cv::countNonZero(eroded) == 0);
+  } while (cv::countNonZero(eroded) != 0);
   return skel;
 }
 

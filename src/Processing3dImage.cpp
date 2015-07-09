@@ -8,7 +8,8 @@ const std::map<OPERATION, ptrToMethodType> OperationToMethodPtr = {
   { OPERATION::DILATION, &ProcessingImage::performMorphologicalOperation },
   { OPERATION::EROSION, &ProcessingImage::performMorphologicalOperation },
   { OPERATION::CONTOUR, &ProcessingImage::contour },
-  { OPERATION::SKELETONIZATION, &ProcessingImage::skeletonize }
+  { OPERATION::SKELETONIZATION, &ProcessingImage::skeletonize },
+  { OPERATION::SKELETONIZATION2, &ProcessingImage::skeletonize2 }
 };
 
 namespace {

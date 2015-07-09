@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
   menu.addAction("Open directory to process", this, SLOT(openDirToProcess()));
   menu_bar.addMenu(&menu);
   ui->ChooseOperation->addItems(
-      { "Dilation", "Erosion", "Contour", "Skeletonize" });
+      { "Dilation", "Erosion", "Contour", "Skeletonize", "Skeletonize2" });
   ui->MorphologicalElementType->addItems(
       { "Cross", "Rectangle", "Ellipse", "EllipseImage" });
   ui->ProcessingWay->addItems(

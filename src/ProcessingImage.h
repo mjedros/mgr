@@ -19,7 +19,8 @@ enum class OPERATION : uint8_t {
   DILATIONIMG,
   EROSION,
   CONTOUR,
-  SKELETONIZATION
+  SKELETONIZATION,
+  SKELETONIZATION2
 };
 
 /**
@@ -74,6 +75,8 @@ public:
    * @brief Performs skeletonization
    */
   void skeletonize();
+
+  void skeletonize2();
   /**
    * @brief Performs specific morphological operation
    * @param Operation - name of operation in kernel file

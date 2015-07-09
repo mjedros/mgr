@@ -14,7 +14,8 @@ std::map<std::string, OPERATION> ProcessingImage::OperationMap = {
   { "Dilation", OPERATION::DILATION },
   { "Erosion", OPERATION::EROSION },
   { "Contour", OPERATION::CONTOUR },
-  { "Skeletonize", OPERATION::SKELETONIZATION }
+  { "Skeletonize", OPERATION::SKELETONIZATION },
+  { "Skeletonize2", OPERATION::SKELETONIZATION2 }
 };
 void ProcessingImage::setKernel(const std::string &Operation) {
   setKernelOperation(Operation);
@@ -94,8 +95,21 @@ void ProcessingImage::skeletonize() {
 
     cv::bitwise_or(skel, img, skel);
     image = eroded;
-  } while (!(cv::countNonZero(eroded) == 0));
+  } while (cv::countNonZero(eroded) != 0);
   image = skel;
+}
+
+void ProcessingImage::skeletonize2() {
+  kernel = cl::Kernel(openCLManager.program, "Skeletonize");
+  cv::Mat img;
+  int i = 0;
+  do {
+    kernel.setArg(2, i++);
+    img = image.clone();
+    performMorphologicalOperation();
+    if (i > 3)
+      i = 0;
+  } while (cv::countNonZero(img != image) != 0);
 }
 
 void ProcessingImage::setStructuralElement(const std::string &element,
