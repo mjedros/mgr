@@ -79,13 +79,13 @@ public:
   void skeletonize2();
   /**
    * @brief Performs specific morphological operation
-   * @param Operation - name of operation in kernel file
+   * @param Operation  name of operation in kernel file
    */
   virtual void performMorphologicalOperation();
   /**
    * @brief Set structural element for morphological operations
-   * @param element - Type of element
-   * @param params - sizes of element
+   * @param element Type of element
+   * @param params sizes of element
    */
 
   void setStructuralElement(const std::string &element,

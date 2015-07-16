@@ -18,7 +18,7 @@ class Directory : public IImageSource {
    */
   std::string directory;
   /**
-   * @brief Video capture ptr
+   * @brief set of files
    */
   std::set<std::string> files;
 

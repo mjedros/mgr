@@ -15,6 +15,10 @@ enum SourceType : u_int8_t;
 enum class OPERATION : u_int8_t;
 class Image3d;
 
+/**
+ * @brief Application Manager
+ *
+ */
 class ApplicationManager {
 protected:
   OpenCLManager &openCLManager;
@@ -33,20 +37,54 @@ public:
   ApplicationManager(OpenCLManager &openCLManagerRef)
     : openCLManager(openCLManagerRef), processROI(false) {}
 
+  /**
+   * @brief Template method performing processing
+   * @param operation type of morphological operation
+   * @param structuralElement kind of structural element
+   * @param params structural element params
+   */
   template <class T, class I = ProcessingImage>
   void process(const OPERATION &operation, const std::string &structuralElement,
                const std::vector<float> &params);
 
+  /**
+   * @brief Init image from source
+   * @param source source of image
+   * @param name string of movie or directory
+   */
   void init(const SourceType &source, const std::string &name);
+
+  /**
+   * @brief Method initing processed image.
+   * Performs binarization with threshold
+   * @param minumum
+   * @param maximum
+   */
   void initProcessedImage(const unsigned int &minumum = 100,
                           const unsigned int &maximum = 255);
+
+  /**
+   * @brief Template method setting region of interest
+   * @param processingImage
+   */
   template <class I = ProcessingImage> void setROI(I &processingImage) {
     if (!processROI)
       return;
     processingImage.setROI(roi);
   }
+  /**
+   * @brief Method setting region of interest member
+   * @param roi
+   */
   void setROI(const ROI &newROI) { roi = newROI; }
+  /**
+   * @brief Gets ROI
+   */
   const ROI &getROI() { return roi; }
+  /**
+   * @brief Template method setting region of interest
+   * @param processingImage
+   */
   void setProcessingROI(bool processROINew) { processROI = processROINew; }
 
   void normalizeOriginalImage();
