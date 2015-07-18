@@ -124,7 +124,7 @@ void ContinuousProcessingMananger::startCameraAquisition() {
     emit(drawObject(im));
   }
   imagesFromCam->Stop();
-  // active = false; TODO
+  active = false;
   logger.printLine("End of acquisition");
 }
 
