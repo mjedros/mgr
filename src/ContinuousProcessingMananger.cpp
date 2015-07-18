@@ -107,10 +107,14 @@ MatQueue *ContinuousProcessingMananger::switchBuffers() {
 
 void ContinuousProcessingMananger::startCameraAquisition() {
   aquisitionBuffer = &imagesQueueFirstBuffer;
-  imagesFromCam = SourceFactory::GetImageSource(CameraSource);
+  // imagesFromCam = SourceFactory::GetImageSource(CameraSource);
+  imagesFromCam =
+      SourceFactory::GetImageSource(DirectorySource, "/home/michal/pathdata");
   imagesFromCam->Start();
+  Mat emptyImage = imagesFromCam->Get();
   for (Mat im = imagesFromCam->Get(); !im.empty() && active;
        im = imagesFromCam->Get()) {
+    im -= emptyImage;
     cv::cvtColor(im, im, CV_BGR2GRAY);
     {
       std::lock_guard<std::mutex> lock(bufferMutex);
@@ -120,6 +124,7 @@ void ContinuousProcessingMananger::startCameraAquisition() {
     emit(drawObject(im));
   }
   imagesFromCam->Stop();
+  active = false;
   logger.printLine("End of acquisition");
 }
 
