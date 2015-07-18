@@ -48,6 +48,7 @@ void OpenCLManager::configure(
   } catch (...) {
     throw std::string("Configure error!");
   }
+  configured = true;
 }
 
 void OpenCLManager::readPrograms(const std::string &kernelFileName) {

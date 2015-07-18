@@ -135,8 +135,9 @@ void MainWindow::openDirToProcess() {
 
 void MainWindow::on_LoadImages_clicked() {
   ui->ImagesLoaded->setText("Images not loaded!");
-  openCLManager.configure(std::string(KERNELS_DIR) + "Kernels.cl",
-                          chosenDevice);
+  if (!openCLManager.isConfigured())
+    openCLManager.configure(std::string(KERNELS_DIR) + "Kernels.cl",
+                            chosenDevice);
   if (ui->File->isChecked() && filename.size() != 0)
     initImages(VideoFile, filename.toStdString());
   else if (ui->Directory->isChecked() && directory.size() != 0)
@@ -258,8 +259,9 @@ void MainWindow::on_Revert_clicked() {
   applicationManager.revertLastOperation();
 }
 void MainWindow::startAquisition() {
-  openCLManager.configure(std::string(KERNELS_DIR) + "Kernels.cl",
-                          chosenDevice);
+  if (!openCLManager.isConfigured())
+    openCLManager.configure(std::string(KERNELS_DIR) + "Kernels.cl",
+                            chosenDevice);
 
   auto values = getProcessingValues();
   cameraProc.setProcessing(std::get<0>(values), std::get<1>(values),
