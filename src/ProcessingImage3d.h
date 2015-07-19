@@ -19,6 +19,7 @@ public:
   void setKernel(const std::string &Operation) override;
   void setStructuralElementArgument() override;
   void performMorphologicalOperation() override;
+  void skeletonize2() override;
 
   void getROIOOutOfMat() override;
   void updateFullImage() override;

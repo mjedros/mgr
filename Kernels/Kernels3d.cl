@@ -219,3 +219,11 @@ __kernel void Dilate3dCross(__read_only image3d_t imageIn,
     }
   }
 }
+__kernel void Skeletonize3d(__read_only image3d_t imageIn,
+                            __write_only image3d_t imageOut,
+                            int structElVersion) {
+  int4 coord = (int4){ get_global_id(0), get_global_id(1), get_global_id(2),
+                       get_global_id(3) };
+  float outValue = read_imagef(imageIn, sampler, coord).x;
+  write_imagef(imageOut, coord, outValue);
+}

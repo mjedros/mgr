@@ -95,7 +95,7 @@ void ProcessingImage::skeletonize() {
 
     cv::bitwise_or(skel, img, skel);
     image = eroded;
-  } while (cv::countNonZero(eroded) != 0);
+  } while (cv::countNonZero(eroded) != 0.0);
   image = skel;
 }
 

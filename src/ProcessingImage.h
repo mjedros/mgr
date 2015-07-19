@@ -76,7 +76,7 @@ public:
    */
   void skeletonize();
 
-  void skeletonize2();
+  virtual void skeletonize2();
   /**
    * @brief Performs specific morphological operation
    * @param Operation  name of operation in kernel file

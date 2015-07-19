@@ -133,6 +133,19 @@ void ProcessingImage3d::performMorphologicalOperation() {
   updateFullImage();
 }
 
+void ProcessingImage3d::skeletonize2() {
+  kernel = cl::Kernel(openCLManager.program, "Skeletonize3d");
+  cv::Mat img;
+  int i = 0;
+  do {
+    kernel.setArg(2, i++);
+    img = image.clone();
+    performMorphologicalOperation();
+    if (i > 7)
+      i = 0;
+  } while (cv::countNonZero(img != image) != 0);
+}
+
 void ProcessingImage3d::getROIOOutOfMat() {
   if (!processROI) {
     imageToProcess = std::unique_ptr<Mat>(&image);
