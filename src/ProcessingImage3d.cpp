@@ -134,6 +134,9 @@ void ProcessingImage3d::performMorphologicalOperation() {
 }
 
 void ProcessingImage3d::skeletonize2() {
+  const std::map<int, int> structToIter = {
+    { 0, 6 }, { 1, 12 }, { 2, 8 }, { 3, 12 }
+  };
   kernel = cl::Kernel(openCLManager.program, "Skeletonize3d");
   cv::Mat img;
   do {
@@ -141,9 +144,7 @@ void ProcessingImage3d::skeletonize2() {
     for (int j = 0; j < 2; j++) {
 
       kernel.setArg(2, j);
-      int structElements = 6;
-      if (j == 1)
-        structElements = 12;
+      const int structElements = structToIter.at(j);
       for (int i = 0; i < structElements; ++i) {
         kernel.setArg(3, i);
         performMorphologicalOperation();

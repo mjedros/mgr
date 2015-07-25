@@ -49,6 +49,7 @@ void Logger::printAvarageTime() {
   unsigned int allSumTime =
       chrono::duration_cast<chrono::microseconds>(end - allSum).count();
   double inMiliseconds = timeSum / 1000.0;
+  file << "Operations count: " << operationsCounter << endl;
   file << "All time: " << allSumTime << " us, " << allSumTime / 1000.0 << " ms"
        << endl;
   file << "Full time: " << timeSum << " us, " << inMiliseconds << " ms" << endl;
