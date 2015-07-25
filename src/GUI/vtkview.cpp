@@ -58,10 +58,6 @@ void VTKView::initImage() {
   emit(showVtkImage());
 }
 
-void VTKView::renderNewImage(std::tuple<double, double, double> colors) {
-  vtkData->addNextImage(colors);
-}
-
 void VTKView::render() { renWin->Finalize(); }
 
 VTKView::~VTKView() {}

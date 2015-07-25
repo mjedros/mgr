@@ -238,12 +238,16 @@ bool checkA(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
   bool result = false;
   switch (structElVersion) {
   case 0: {
-    int4 valueOne[1] = {(int4){ 1, 0, 0, 0 } };
-    int4 valueZero[9] = {(int4){ -1, 1, 1, 0 },  (int4){ -1, 1, 0, 0 },
-                         (int4){ -1, 1, -1, 0 }, (int4){ -1, 0, 1, 0 },
-                         (int4){ -1, 0, 0, 0 },  (int4){ -1, 0, -1, 0 },
-                         (int4){ -1, -1, 1, 0 }, (int4){ -1, -1, 0, 0 },
-                         (int4){ -1, -1, -1, 0 } };
+    int4 valueOne[1] = { { 1, 0, 0, 0 } };
+    int4 valueZero[9] = { { -1, 1, 1, 0 },
+                          { -1, 1, 0, 0 },
+                          { -1, 1, -1, 0 },
+                          { -1, 0, 1, 0 },
+                          { -1, 0, 0, 0 },
+                          { -1, 0, -1, 0 },
+                          { -1, -1, 1, 0 },
+                          { -1, -1, 0, 0 },
+                          { -1, -1, -1, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 1) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -251,12 +255,16 @@ bool checkA(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
     break;
   }
   case 1: {
-    int4 valueOne[2] = {(int4){ -1, 0, 0, 0 }, (int4){ -2, 0, 0, 0 } };
-    int4 valueZero[9] = {(int4){ 1, 1, 1, 0 },  (int4){ 1, 1, 0, 0 },
-                         (int4){ 1, 1, -1, 0 }, (int4){ 1, 0, 1, 0 },
-                         (int4){ 1, 0, 0, 0 },  (int4){ 1, 0, -1, 0 },
-                         (int4){ 1, -1, 1, 0 }, (int4){ 1, -1, 0, 0 },
-                         (int4){ 1, -1, -1, 0 } };
+    int4 valueOne[2] = { { -1, 0, 0, 0 }, { -2, 0, 0, 0 } };
+    int4 valueZero[9] = { { 1, 1, 1, 0 },
+                          { 1, 1, 0, 0 },
+                          { 1, 1, -1, 0 },
+                          { 1, 0, 1, 0 },
+                          { 1, 0, 0, 0 },
+                          { 1, 0, -1, 0 },
+                          { 1, -1, 1, 0 },
+                          { 1, -1, 0, 0 },
+                          { 1, -1, -1, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 2) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -264,12 +272,16 @@ bool checkA(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
     break;
   }
   case 2: {
-    int4 valueOne[1] = {(int4){ 0, 1, 0, 0 } };
-    int4 valueZero[9] = {(int4){ 1, -1, 1, 0 },  (int4){ 1, -1, 0, 0 },
-                         (int4){ 1, -1, -1, 0 }, (int4){ 0, -1, 1, 0 },
-                         (int4){ 0, -1, 0, 0 },  (int4){ 0, -1, -1, 0 },
-                         (int4){ -1, -1, 1, 0 }, (int4){ -1, -1, 0, 0 },
-                         (int4){ -1, -1, -1, 0 } };
+    int4 valueOne[1] = { { 0, 1, 0, 0 } };
+    int4 valueZero[9] = { { 1, -1, 1, 0 },
+                          { 1, -1, 0, 0 },
+                          { 1, -1, -1, 0 },
+                          { 0, -1, 1, 0 },
+                          { 0, -1, 0, 0 },
+                          { 0, -1, -1, 0 },
+                          { -1, -1, 1, 0 },
+                          { -1, -1, 0, 0 },
+                          { -1, -1, -1, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 1) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -277,12 +289,16 @@ bool checkA(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
     break;
   }
   case 3: {
-    int4 valueOne[2] = {(int4){ 0, -1, 0, 0 }, (int4){ 0, -2, 0, 0 } };
-    int4 valueZero[9] = {(int4){ 1, 1, 1, 0 },  (int4){ 1, 1, 0, 0 },
-                         (int4){ 1, 1, -1, 0 }, (int4){ 0, 1, 1, 0 },
-                         (int4){ 0, 1, 0, 0 },  (int4){ 0, 1, -1, 0 },
-                         (int4){ -1, 1, 1, 0 }, (int4){ -1, 1, 0, 0 },
-                         (int4){ -1, 1, -1, 0 } };
+    int4 valueOne[2] = { { 0, -1, 0, 0 }, { 0, -2, 0, 0 } };
+    int4 valueZero[9] = { { 1, 1, 1, 0 },
+                          { 1, 1, 0, 0 },
+                          { 1, 1, -1, 0 },
+                          { 0, 1, 1, 0 },
+                          { 0, 1, 0, 0 },
+                          { 0, 1, -1, 0 },
+                          { -1, 1, 1, 0 },
+                          { -1, 1, 0, 0 },
+                          { -1, 1, -1, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 2) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -290,12 +306,16 @@ bool checkA(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
     break;
   }
   case 4: {
-    int4 valueOne[1] = {(int4){ 0, 0, 1, 0 } };
-    int4 valueZero[9] = {(int4){ 0, -1, -1, 0 }, (int4){ 0, 0, -1, 0 },
-                         (int4){ 0, 1, -1, 0 },  (int4){ -1, 0, -1, 0 },
-                         (int4){ -1, 1, -1, 0 }, (int4){ -1, -1, -1, 0 },
-                         (int4){ 1, 0, -1, 0 },  (int4){ 1, 1, -1, 0 },
-                         (int4){ 1, -1, -1, 0 } };
+    int4 valueOne[1] = { { 0, 0, 1, 0 } };
+    int4 valueZero[9] = { { 0, -1, -1, 0 },
+                          { 0, 0, -1, 0 },
+                          { 0, 1, -1, 0 },
+                          { -1, 0, -1, 0 },
+                          { -1, 1, -1, 0 },
+                          { -1, -1, -1, 0 },
+                          { 1, 0, -1, 0 },
+                          { 1, 1, -1, 0 },
+                          { 1, -1, -1, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 1) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -303,12 +323,16 @@ bool checkA(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
     break;
   }
   case 5: {
-    int4 valueOne[2] = {(int4){ 0, 0, -1, 0 }, (int4){ 0, 0, -2, 0 } };
-    int4 valueZero[9] = {(int4){ 0, -1, 1, 0 }, (int4){ 0, 0, 1, 0 },
-                         (int4){ 0, 1, 1, 0 },  (int4){ -1, 0, 1, 0 },
-                         (int4){ -1, 1, 1, 0 }, (int4){ -1, -1, 1, 0 },
-                         (int4){ 1, 0, 1, 0 },  (int4){ 1, 1, 1, 0 },
-                         (int4){ 1, -1, 1, 0 } };
+    int4 valueOne[2] = { { 0, 0, -1, 0 }, { 0, 0, -2, 0 } };
+    int4 valueZero[9] = { { 0, -1, 1, 0 },
+                          { 0, 0, 1, 0 },
+                          { 0, 1, 1, 0 },
+                          { -1, 0, 1, 0 },
+                          { -1, 1, 1, 0 },
+                          { -1, -1, 1, 0 },
+                          { 1, 0, 1, 0 },
+                          { 1, 1, 1, 0 },
+                          { 1, -1, 1, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 2) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -324,13 +348,17 @@ bool checkB(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
   switch (structElVersion) {
   case 0: {
     int4 valueOne[3] = {
-      (int4){ 1, 0, 0, 0 }, (int4){ 0, -1, 0, 0 }, (int4){ 0, -2, 0, 0 },
+      { 1, 0, 0, 0 }, { 0, -1, 0, 0 }, { 0, -2, 0, 0 },
     };
-    int4 valueZero[9] = {(int4){ -1, 1, 1, 0 },  (int4){ -1, 1, 0, 0 },
-                         (int4){ -1, 1, -1, 0 }, (int4){ 0, 1, 1, 0 },
-                         (int4){ 0, 1, 0, 0 },   (int4){ 0, 1, -1, 0 },
-                         (int4){ -1, 0, -1, 0 }, (int4){ -1, 0, 1, 0 },
-                         (int4){ -1, 0, 1, 0 } };
+    int4 valueZero[9] = { { -1, 1, 1, 0 },
+                          { -1, 1, 0, 0 },
+                          { -1, 1, -1, 0 },
+                          { 0, 1, 1, 0 },
+                          { 0, 1, 0, 0 },
+                          { 0, 1, -1, 0 },
+                          { -1, 0, -1, 0 },
+                          { -1, 0, 1, 0 },
+                          { -1, 0, 1, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 3) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -338,13 +366,18 @@ bool checkB(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
     break;
   }
   case 1: {
-    int4 valueOne[4] = {(int4){ -1, 0, 0, 0 }, (int4){ -2, 0, 0, 0 },
-                        (int4){ 0, -1, 0, 0 }, (int4){ 0, -2, 0, 0 } };
-    int4 valueZero[9] = {(int4){ 0, 1, 1, 0 },  (int4){ 0, 1, 0, 0 },
-                         (int4){ 0, 1, -1, 0 }, (int4){ 1, 1, 1, 0 },
-                         (int4){ 1, 1, 0, 0 },  (int4){ 1, 1, -1, 0 },
-                         (int4){ 1, 0, -1, 0 }, (int4){ 1, 0, 1, 0 },
-                         (int4){ 1, 0, 1, 0 } };
+    int4 valueOne[4] = {
+      { -1, 0, 0, 0 }, { -2, 0, 0, 0 }, { 0, -1, 0, 0 }, { 0, -2, 0, 0 }
+    };
+    int4 valueZero[9] = { { 0, 1, 1, 0 },
+                          { 0, 1, 0, 0 },
+                          { 0, 1, -1, 0 },
+                          { 1, 1, 1, 0 },
+                          { 1, 1, 0, 0 },
+                          { 1, 1, -1, 0 },
+                          { 1, 0, -1, 0 },
+                          { 1, 0, 1, 0 },
+                          { 1, 0, 1, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 4) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -352,13 +385,16 @@ bool checkB(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
     break;
   }
   case 2: {
-    int4 valueOne[3] = {(int4){ -1, 0, 0, 0 }, (int4){ -2, 0, 0, 0 },
-                        (int4){ 0, 1, 0, 0 } };
-    int4 valueZero[9] = {(int4){ 0, -1, 1, 0 },  (int4){ 0, -1, 0, 0 },
-                         (int4){ 0, -1, -1, 0 }, (int4){ 1, -1, 1, 0 },
-                         (int4){ 1, -1, 0, 0 },  (int4){ 1, -1, -1, 0 },
-                         (int4){ 1, 0, -1, 0 },  (int4){ 1, 0, 1, 0 },
-                         (int4){ 1, 0, 1, 0 } };
+    int4 valueOne[3] = { { -1, 0, 0, 0 }, { -2, 0, 0, 0 }, { 0, 1, 0, 0 } };
+    int4 valueZero[9] = { { 0, -1, 1, 0 },
+                          { 0, -1, 0, 0 },
+                          { 0, -1, -1, 0 },
+                          { 1, -1, 1, 0 },
+                          { 1, -1, 0, 0 },
+                          { 1, -1, -1, 0 },
+                          { 1, 0, -1, 0 },
+                          { 1, 0, 1, 0 },
+                          { 1, 0, 1, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 3) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -366,12 +402,16 @@ bool checkB(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
     break;
   }
   case 3: {
-    int4 valueOne[2] = {(int4){ 0, 1, 0, 0 }, (int4){ 1, 0, 0, 0 } };
-    int4 valueZero[9] = {(int4){ 0, -1, 1, 0 },  (int4){ 0, -1, 0, 0 },
-                         (int4){ 0, -1, -1, 0 }, (int4){ -1, -1, 1, 0 },
-                         (int4){ -1, -1, 0, 0 }, (int4){ -1, -1, -1, 0 },
-                         (int4){ -1, 0, -1, 0 }, (int4){ -1, 0, 1, 0 },
-                         (int4){ -1, 0, 1, 0 } };
+    int4 valueOne[2] = { { 0, 1, 0, 0 }, { 1, 0, 0, 0 } };
+    int4 valueZero[9] = { { 0, -1, 1, 0 },
+                          { 0, -1, 0, 0 },
+                          { 0, -1, -1, 0 },
+                          { -1, -1, 1, 0 },
+                          { -1, -1, 0, 0 },
+                          { -1, -1, -1, 0 },
+                          { -1, 0, -1, 0 },
+                          { -1, 0, 1, 0 },
+                          { -1, 0, 1, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 2) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -379,13 +419,16 @@ bool checkB(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
     break;
   }
   case 4: {
-    int4 valueOne[3] = {(int4){ 0, 0, 1, 0 }, (int4){ 0, -1, 0, 0 },
-                        (int4){ 0, -2, 0, 0 } };
-    int4 valueZero[9] = {(int4){ 1, 0, -1, 0 },  (int4){ 0, 0, -1, 0 },
-                         (int4){ -1, 0, -1, 0 }, (int4){ -1, 1, -1, 0 },
-                         (int4){ 0, 1, -1, 0 },  (int4){ 1, 1, -1, 0 },
-                         (int4){ -1, 1, 0, 0 },  (int4){ 0, 1, 0, 0 },
-                         (int4){ 1, 1, 0, 0 } };
+    int4 valueOne[3] = { { 0, 0, 1, 0 }, { 0, -1, 0, 0 }, { 0, -2, 0, 0 } };
+    int4 valueZero[9] = { { 1, 0, -1, 0 },
+                          { 0, 0, -1, 0 },
+                          { -1, 0, -1, 0 },
+                          { -1, 1, -1, 0 },
+                          { 0, 1, -1, 0 },
+                          { 1, 1, -1, 0 },
+                          { -1, 1, 0, 0 },
+                          { 0, 1, 0, 0 },
+                          { 1, 1, 0, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 3) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -393,12 +436,16 @@ bool checkB(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
     break;
   }
   case 5: {
-    int4 valueOne[2] = {(int4){ 0, 1, 0, 0 }, (int4){ 0, 0, 1, 0 } };
-    int4 valueZero[9] = {(int4){ 1, 0, -1, 0 },  (int4){ 0, 0, -1, 0 },
-                         (int4){ -1, 0, -1, 0 }, (int4){ -1, -1, -1, 0 },
-                         (int4){ 0, -1, -1, 0 }, (int4){ 1, -1, -1, 0 },
-                         (int4){ -1, -1, 0, 0 }, (int4){ 0, -1, 0, 0 },
-                         (int4){ 1, -1, 0, 0 } };
+    int4 valueOne[2] = { { 0, 1, 0, 0 }, { 0, 0, 1, 0 } };
+    int4 valueZero[9] = { { 1, 0, -1, 0 },
+                          { 0, 0, -1, 0 },
+                          { -1, 0, -1, 0 },
+                          { -1, -1, -1, 0 },
+                          { 0, -1, -1, 0 },
+                          { 1, -1, -1, 0 },
+                          { -1, -1, 0, 0 },
+                          { 0, -1, 0, 0 },
+                          { 1, -1, 0, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 2) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -407,13 +454,18 @@ bool checkB(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
   }
 
   case 6: {
-    int4 valueOne[4] = {(int4){ 0, -1, 0, 0 }, (int4){ 0, -2, 0, 0 },
-                        (int4){ 0, 0, -1, 0 }, (int4){ 0, 0, -2, 0 } };
-    int4 valueZero[9] = {(int4){ 1, 0, 1, 0 },  (int4){ 0, 0, 1, 0 },
-                         (int4){ -1, 0, 1, 0 }, (int4){ -1, 1, 1, 0 },
-                         (int4){ 0, 1, 1, 0 },  (int4){ 1, 1, 1, 0 },
-                         (int4){ -1, 1, 0, 0 }, (int4){ 0, 1, 0, 0 },
-                         (int4){ 1, 1, 0, 0 } };
+    int4 valueOne[4] = {
+      { 0, -1, 0, 0 }, { 0, -2, 0, 0 }, { 0, 0, -1, 0 }, { 0, 0, -2, 0 }
+    };
+    int4 valueZero[9] = { { 1, 0, 1, 0 },
+                          { 0, 0, 1, 0 },
+                          { -1, 0, 1, 0 },
+                          { -1, 1, 1, 0 },
+                          { 0, 1, 1, 0 },
+                          { 1, 1, 1, 0 },
+                          { -1, 1, 0, 0 },
+                          { 0, 1, 0, 0 },
+                          { 1, 1, 0, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 4) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -421,13 +473,16 @@ bool checkB(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
     break;
   }
   case 7: {
-    int4 valueOne[3] = {(int4){ 0, 1, 0, 0 }, (int4){ 0, 0, -1, 0 },
-                        (int4){ 0, 0, -2, 0 } };
-    int4 valueZero[9] = {(int4){ 1, 0, 1, 0 },   (int4){ 0, 0, 1, 0 },
-                         (int4){ -1, 0, 1, 0 },  (int4){ -1, -1, 1, 0 },
-                         (int4){ 0, -1, 1, 0 },  (int4){ 1, -1, 1, 0 },
-                         (int4){ -1, -1, 0, 0 }, (int4){ 0, -1, 0, 0 },
-                         (int4){ 1, -1, 0, 0 } };
+    int4 valueOne[3] = { { 0, 1, 0, 0 }, { 0, 0, -1, 0 }, { 0, 0, -2, 0 } };
+    int4 valueZero[9] = { { 1, 0, 1, 0 },
+                          { 0, 0, 1, 0 },
+                          { -1, 0, 1, 0 },
+                          { -1, -1, 1, 0 },
+                          { 0, -1, 1, 0 },
+                          { 1, -1, 1, 0 },
+                          { -1, -1, 0, 0 },
+                          { 0, -1, 0, 0 },
+                          { 1, -1, 0, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 3) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -435,13 +490,16 @@ bool checkB(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
     break;
   }
   case 8: {
-    int4 valueOne[3] = {(int4){ 0, -1, 0, 0 }, (int4){ 0, -2, 0, 0 },
-                        (int4){ 0, 0, 1, 0 } };
-    int4 valueZero[9] = {(int4){ 1, 1, 0, 0 },  (int4){ 1, 0, 0, 0 },
-                         (int4){ 1, -1, 0, 0 }, (int4){ 0, 1, -1, 0 },
-                         (int4){ 0, 0, -1, 0 }, (int4){ 0, -1, -1, 0 },
-                         (int4){ 1, 1, -1, 0 }, (int4){ 1, 0, -1, 0 },
-                         (int4){ 1, -1, -1, 0 } };
+    int4 valueOne[3] = { { 0, -1, 0, 0 }, { 0, -2, 0, 0 }, { 0, 0, 1, 0 } };
+    int4 valueZero[9] = { { 1, 1, 0, 0 },
+                          { 1, 0, 0, 0 },
+                          { 1, -1, 0, 0 },
+                          { 0, 1, -1, 0 },
+                          { 0, 0, -1, 0 },
+                          { 0, -1, -1, 0 },
+                          { 1, 1, -1, 0 },
+                          { 1, 0, -1, 0 },
+                          { 1, -1, -1, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 3) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -449,12 +507,16 @@ bool checkB(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
     break;
   }
   case 9: {
-    int4 valueOne[2] = {(int4){ 0, 0, 1, 0 }, (int4){ 1, 0, 0, 0 } };
-    int4 valueZero[9] = {(int4){ -1, 1, 0, 0 },  (int4){ -1, 0, 0, 0 },
-                         (int4){ -1, -1, 0, 0 }, (int4){ 0, 1, -1, 0 },
-                         (int4){ 0, 0, -1, 0 },  (int4){ 0, -1, -1, 0 },
-                         (int4){ -1, 1, -1, 0 }, (int4){ -1, 0, -1, 0 },
-                         (int4){ -1, -1, -1, 0 } };
+    int4 valueOne[2] = { { 0, 0, 1, 0 }, { 1, 0, 0, 0 } };
+    int4 valueZero[9] = { { -1, 1, 0, 0 },
+                          { -1, 0, 0, 0 },
+                          { -1, -1, 0, 0 },
+                          { 0, 1, -1, 0 },
+                          { 0, 0, -1, 0 },
+                          { 0, -1, -1, 0 },
+                          { -1, 1, -1, 0 },
+                          { -1, 0, -1, 0 },
+                          { -1, -1, -1, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 2) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -462,13 +524,18 @@ bool checkB(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
     break;
   }
   case 10: {
-    int4 valueOne[4] = {(int4){ -1, 0, 0, 0 }, (int4){ -2, 0, 0, 0 },
-                        (int4){ 0, 0, -1, 0 }, (int4){ 0, 0, -2, 0 } };
-    int4 valueZero[9] = {(int4){ 1, 1, 1, 0 },  (int4){ 1, 0, 1, 0 },
-                         (int4){ 1, -1, 1, 0 }, (int4){ 0, 1, 1, 0 },
-                         (int4){ 0, 0, 1, 0 },  (int4){ 0, -1, 1, 0 },
-                         (int4){ 1, 1, 0, 0 },  (int4){ 1, 0, 0, 0 },
-                         (int4){ 1, -1, 0, 0 } };
+    int4 valueOne[4] = {
+      { -1, 0, 0, 0 }, { -2, 0, 0, 0 }, { 0, 0, -1, 0 }, { 0, 0, -2, 0 }
+    };
+    int4 valueZero[9] = { { 1, 1, 1, 0 },
+                          { 1, 0, 1, 0 },
+                          { 1, -1, 1, 0 },
+                          { 0, 1, 1, 0 },
+                          { 0, 0, 1, 0 },
+                          { 0, -1, 1, 0 },
+                          { 1, 1, 0, 0 },
+                          { 1, 0, 0, 0 },
+                          { 1, -1, 0, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 4) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -476,13 +543,16 @@ bool checkB(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
     break;
   }
   case 11: {
-    int4 valueOne[3] = {(int4){ 1, 0, 0, 0 }, (int4){ 0, 0, -1, 0 },
-                        (int4){ 0, 0, -2, 0 } };
-    int4 valueZero[9] = {(int4){ -1, 1, 1, 0 },  (int4){ -1, 0, 1, 0 },
-                         (int4){ -1, -1, 1, 0 }, (int4){ 0, 1, 1, 0 },
-                         (int4){ 0, 0, 1, 0 },   (int4){ 0, -1, 1, 0 },
-                         (int4){ -1, 1, 0, 0 },  (int4){ -1, 0, 0, 0 },
-                         (int4){ -1, -1, 0, 0 } };
+    int4 valueOne[3] = { { 1, 0, 0, 0 }, { 0, 0, -1, 0 }, { 0, 0, -2, 0 } };
+    int4 valueZero[9] = { { -1, 1, 1, 0 },
+                          { -1, 0, 1, 0 },
+                          { -1, -1, 1, 0 },
+                          { 0, 1, 1, 0 },
+                          { 0, 0, 1, 0 },
+                          { 0, -1, 1, 0 },
+                          { -1, 1, 0, 0 },
+                          { -1, 0, 0, 0 },
+                          { -1, -1, 0, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 3) ||
         !checkZero(imageIn, coord, valueZero, 9))
       return false;
@@ -496,14 +566,18 @@ bool checkC(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
   bool result = false;
   switch (structElVersion) {
   case 0: {
-    int4 valueOne[4] = {(int4){ 0, 0, 1, 0 }, (int4){ 0, 1, 0, 0 },
-                        (int4){ -1, 0, 0, 0 }, (int4){ -2, 0, 0, 0 } };
+    int4 valueOne[4] = {
+      { 0, 0, 1, 0 }, { 0, 1, 0, 0 }, { -1, 0, 0, 0 }, { -2, 0, 0, 0 }
+    };
 
-    int4 valueZero[7] = {(int4){ 1, 0, 0, 0 },   (int4){ 0, -1, 0, 0 },
-                         (int4){ 1, -1, 0, 0 },
+    int4 valueZero[7] = { { 1, 0, 0, 0 },
+                          { 0, -1, 0, 0 },
+                          { 1, -1, 0, 0 },
 
-                         (int4){ 0, 0, -1, 0 },  (int4){ 0, -1, -1, 0 },
-                         (int4){ 1, -1, -1, 0 }, (int4){ 1, 0, -1, 0 } };
+                          { 0, 0, -1, 0 },
+                          { 0, -1, -1, 0 },
+                          { 1, -1, -1, 0 },
+                          { 1, 0, -1, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 4) ||
         !checkZero(imageIn, coord, valueZero, 7))
       return false;
@@ -511,14 +585,16 @@ bool checkC(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
     break;
   }
   case 1: {
-    int4 valueOne[3] = {(int4){ 0, 0, 1, 0 }, (int4){ 0, 1, 0, 0 },
-                        (int4){ 1, 0, 0, 0 } };
+    int4 valueOne[3] = { { 0, 0, 1, 0 }, { 0, 1, 0, 0 }, { 1, 0, 0, 0 } };
 
-    int4 valueZero[7] = {(int4){ -1, 0, 0, 0 },   (int4){ 0, -1, 0, 0 },
-                         (int4){ -1, -1, 0, 0 },
+    int4 valueZero[7] = { { -1, 0, 0, 0 },
+                          { 0, -1, 0, 0 },
+                          { -1, -1, 0, 0 },
 
-                         (int4){ 0, 0, -1, 0 },   (int4){ 0, -1, -1, 0 },
-                         (int4){ -1, -1, -1, 0 }, (int4){ -1, 0, -1, 0 } };
+                          { 0, 0, -1, 0 },
+                          { 0, -1, -1, 0 },
+                          { -1, -1, -1, 0 },
+                          { -1, 0, -1, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 3) ||
         !checkZero(imageIn, coord, valueZero, 7))
       return false;
@@ -526,14 +602,18 @@ bool checkC(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
     break;
   }
   case 2: {
-    int4 valueOne[4] = {(int4){ 0, 0, 1, 0 }, (int4){ 1, 0, 0, 0 },
-                        (int4){ 0, -1, 0, 0 }, (int4){ 0, -2, 0, 0 } };
+    int4 valueOne[4] = {
+      { 0, 0, 1, 0 }, { 1, 0, 0, 0 }, { 0, -1, 0, 0 }, { 0, -2, 0, 0 }
+    };
 
-    int4 valueZero[7] = {(int4){ 0, 1, 0, 0 },   (int4){ -1, 1, 0, 0 },
-                         (int4){ -1, 0, 0, 0 },
+    int4 valueZero[7] = { { 0, 1, 0, 0 },
+                          { -1, 1, 0, 0 },
+                          { -1, 0, 0, 0 },
 
-                         (int4){ 0, 0, -1, 0 },  (int4){ 0, 1, -1, 0 },
-                         (int4){ -1, 1, -1, 0 }, (int4){ -1, 0, -1, 0 } };
+                          { 0, 0, -1, 0 },
+                          { 0, 1, -1, 0 },
+                          { -1, 1, -1, 0 },
+                          { -1, 0, -1, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 4) ||
         !checkZero(imageIn, coord, valueZero, 7))
       return false;
@@ -548,11 +628,93 @@ bool checkC(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
                          { 0, -2, 0, 0 },
                          { 0, 0, 1, 0 } };
 
-    int4 valueZero[7] = {(int4){ 0, 1, 0, 0 },  (int4){ -1, 1, 0, 0 },
-                         (int4){ -1, 0, 0, 0 }, (int4){ 0, 0, -1, 0 },
-                         (int4){ 0, 1, -1, 0 }, (int4){ -1, 1, -1, 0 },
-                         (int4){ -1, 0, -1, 0 } };
+    int4 valueZero[7] = { { 0, 1, 0, 0 },
+                          { 1, 1, 0, 0 },
+                          { 1, 0, 0, 0 },
+                          { 0, 0, -1, 0 },
+                          { 0, 1, -1, 0 },
+                          { 1, 1, -1, 0 },
+                          { 1, 0, -1, 0 } };
     if (!checkOne(imageIn, coord, valueOne, 5) ||
+        !checkZero(imageIn, coord, valueZero, 7))
+      return false;
+    result = true;
+    break;
+  }
+  case 4: {
+    int4 valueOne[5] = { { -1, 0, 0, 0 },
+                         { -2, 0, 0, 0 },
+                         { 0, 1, 0, 0 },
+                         { 0, 0, -1, 0 },
+                         { 0, 0, -2, 0 } };
+
+    int4 valueZero[7] = { { 0, -1, 0, 0 },
+                          { 1, -1, 0, 0 },
+                          { 1, 0, 0, 0 },
+                          { 0, 0, 1, 0 },
+                          { 0, -1, 1, 0 },
+                          { 1, -1, 1, 0 },
+                          { 1, 0, 1, 0 } };
+    if (!checkOne(imageIn, coord, valueOne, 5) ||
+        !checkZero(imageIn, coord, valueZero, 7))
+      return false;
+    result = true;
+    break;
+  }
+  case 5: {
+    int4 valueOne[4] = {
+      { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, -1, 0 }, { 0, 0, -2, 0 }
+    };
+
+    int4 valueZero[7] = { { 0, -1, 0, 0 },
+                          { -1, -1, 0, 0 },
+                          { -1, 0, 0, 0 },
+                          { 0, 0, 1, 0 },
+                          { 0, -1, 1, 0 },
+                          { -1, -1, 1, 0 },
+                          { -1, 0, 1, 0 } };
+    if (!checkOne(imageIn, coord, valueOne, 4) ||
+        !checkZero(imageIn, coord, valueZero, 7))
+      return false;
+    result = true;
+    break;
+  }
+  case 6: {
+    int4 valueOne[5] = { { 1, 0, 0, 0 },
+                         { 0, -1, 0, 0 },
+                         { 0, -2, 0, 0 },
+                         { 0, 0, -1, 0 },
+                         { 0, 0, -2, 0 } };
+
+    int4 valueZero[7] = { { 0, 1, 0, 0 },
+                          { -1, 1, 0, 0 },
+                          { -1, 0, 0, 0 },
+                          { 0, 0, 1, 0 },
+                          { 0, 1, 1, 0 },
+                          { -1, 1, 1, 0 },
+                          { -1, 0, 1, 0 } };
+    if (!checkOne(imageIn, coord, valueOne, 5) ||
+        !checkZero(imageIn, coord, valueZero, 7))
+      return false;
+    result = true;
+    break;
+  }
+  case 7: {
+    int4 valueOne[6] = { { -1, 0, 0, 0 },
+                         { -2, 0, 0, 0 },
+                         { 0, -1, 0, 0 },
+                         { 0, -2, 0, 0 },
+                         { 0, 0, -1, 0 },
+                         { 0, 0, -2, 0 } };
+
+    int4 valueZero[7] = { { 0, 1, 0, 0 },
+                          { 1, 1, 0, 0 },
+                          { 1, 0, 0, 0 },
+                          { 0, 0, 1, 0 },
+                          { 0, 1, 1, 0 },
+                          { 1, 1, 1, 0 },
+                          { 1, 0, 1, 0 } };
+    if (!checkOne(imageIn, coord, valueOne, 6) ||
         !checkZero(imageIn, coord, valueZero, 7))
       return false;
     result = true;

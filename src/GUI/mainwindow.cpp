@@ -180,15 +180,8 @@ void MainWindow::on_SaveImage_clicked() {
 }
 
 void MainWindow::on_vtkViewButton_clicked() {
-  drawVtkImage(applicationManager.getProcessedImage3d());
-}
-
-void MainWindow::on_addNextVTKImage_clicked() {
   vtkView.setImage3d(applicationManager.getProcessedImage3d());
-  vtkView.renderNewImage(
-      std::make_tuple((double)ui->RedColor->value() / 255.0,
-                      (double)ui->GreenColor->value() / 255.0,
-                      (double)ui->BlueColor->value() / 255.0));
+  vtkView.initImage();
 }
 
 void MainWindow::on_saveCsvFile_clicked() {

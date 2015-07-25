@@ -92,12 +92,6 @@ void VTKData::initVTKImage() {
   renderer->AddActor(actor);
 }
 
-void VTKData::addNextImage(std::tuple<double, double, double> colors) {
-  vtkActor *actor = createActorOutOf3dImage(colors);
-  renderer->AddActor(actor);
-  renderer->Render();
-}
-
 VTKData::dataMem::~dataMem() {
   vertices->Delete();
   mapper->Delete();

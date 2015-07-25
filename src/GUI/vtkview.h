@@ -19,7 +19,6 @@ public:
   explicit VTKView(QObject *parentObj = nullptr);
   void setImage3d(const std::shared_ptr<Mgr::Image3d> &image);
   void initImage();
-  void renderNewImage(std::tuple<double, double, double> colors);
   void render();
   ~VTKView();
 

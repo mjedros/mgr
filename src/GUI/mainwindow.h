@@ -49,7 +49,6 @@ private slots:
   void on_UpdateOperation_clicked();
 
   void on_vtkViewButton_clicked();
-  void on_addNextVTKImage_clicked();
 
   void on_saveCsvFile_clicked();
   void on_addToCsvFile_clicked();

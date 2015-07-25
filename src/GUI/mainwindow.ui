@@ -358,27 +358,14 @@
    <widget class="QPushButton" name="vtkViewButton">
     <property name="geometry">
      <rect>
-      <x>540</x>
-      <y>390</y>
+      <x>530</x>
+      <y>280</y>
       <width>181</width>
       <height>27</height>
      </rect>
     </property>
     <property name="text">
      <string>Visualize 3d</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="addNextVTKImage">
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>340</y>
-      <width>181</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Add next 3d Image</string>
     </property>
    </widget>
    <widget class="QPushButton" name="addToCsvFile">
@@ -501,75 +488,14 @@
      <string>ROI</string>
     </property>
    </widget>
-   <widget class="QSpinBox" name="RedColor">
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>310</y>
-      <width>51</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>255</number>
-    </property>
-    <property name="value">
-     <number>80</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="GreenColor">
-    <property name="geometry">
-     <rect>
-      <x>600</x>
-      <y>310</y>
-      <width>51</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>255</number>
-    </property>
-    <property name="value">
-     <number>80</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="BlueColor">
-    <property name="geometry">
-     <rect>
-      <x>660</x>
-      <y>310</y>
-      <width>51</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>255</number>
-    </property>
-    <property name="value">
-     <number>80</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>600</x>
-      <y>290</y>
-      <width>67</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>RGB</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="CameraAquisition">
     <property name="enabled">
      <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>490</y>
+      <x>580</x>
+      <y>380</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -584,8 +510,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>640</x>
-      <y>490</y>
+      <x>580</x>
+      <y>410</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -597,8 +523,8 @@
    <widget class="QComboBox" name="CameraDimension">
     <property name="geometry">
      <rect>
-      <x>530</x>
-      <y>520</y>
+      <x>620</x>
+      <y>450</y>
       <width>51</width>
       <height>31</height>
      </rect>
