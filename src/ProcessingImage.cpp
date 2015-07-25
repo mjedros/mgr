@@ -102,13 +102,12 @@ void ProcessingImage::skeletonize() {
 void ProcessingImage::skeletonize2() {
   kernel = cl::Kernel(openCLManager.program, "Skeletonize");
   cv::Mat img;
-  int i = 0;
   do {
-    kernel.setArg(2, i++);
     img = image.clone();
-    performMorphologicalOperation();
-    if (i > 3)
-      i = 0;
+    for (int i = 0; i < 4; ++i) {
+      kernel.setArg(2, i);
+      performMorphologicalOperation();
+    }
   } while (cv::countNonZero(img != image) != 0);
 }
 

@@ -40,7 +40,7 @@ protected:
   OpenCLManager &openCLManager;
   std::string structuralElementType;
   std::vector<float> structuralElementParams;
-  bool processROI;
+  bool processROI = false;
 
   void process(cl::Kernel &kernel, cl::Image2D &image_in,
                cl::Image2D &image_out);

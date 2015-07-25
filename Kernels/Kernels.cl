@@ -142,9 +142,13 @@ __kernel void Skeletonize(__read_only image2d_t imageIn,
                           int structElVersion) {
   int2 coord = (int2){ get_global_id(0), get_global_id(1) };
   float outValue = read_imagef(imageIn, sampler, coord).x;
+  if (outValue == 0) {
+    write_imagef(imageOut, coord, outValue);
+    return;
+  }
   switch (structElVersion) {
   case 0:
-    if ((read_imagef(imageIn, sampler, coord).x) == 1 &&
+    if (outValue == 1 &&
         (read_imagef(imageIn, sampler, coord + (int2){ -1, -1 }).x == 1) &&
         (read_imagef(imageIn, sampler, coord + (int2){ 0, -1 }).x == 1) &&
         (read_imagef(imageIn, sampler, coord + (int2){ 1, -1 }).x == 1) &&
@@ -152,7 +156,7 @@ __kernel void Skeletonize(__read_only image2d_t imageIn,
       outValue = 0;
     break;
   case 1:
-    if ((read_imagef(imageIn, sampler, coord).x) == 1 &&
+    if (outValue == 1 &&
         (read_imagef(imageIn, sampler, coord + (int2){ -1, 1 }).x == 1) &&
         (read_imagef(imageIn, sampler, coord + (int2){ -1, 0 }).x == 1) &&
         (read_imagef(imageIn, sampler, coord + (int2){ -1, -1 }).x == 1) &&
@@ -160,7 +164,7 @@ __kernel void Skeletonize(__read_only image2d_t imageIn,
       outValue = 0;
     break;
   case 2:
-    if ((read_imagef(imageIn, sampler, coord).x) == 1 &&
+    if (outValue == 1 &&
         (read_imagef(imageIn, sampler, coord + (int2){ -1, 1 }).x == 1) &&
         (read_imagef(imageIn, sampler, coord + (int2){ 0, 1 }).x == 1) &&
         (read_imagef(imageIn, sampler, coord + (int2){ 1, 1 }).x == 1) &&
@@ -168,7 +172,7 @@ __kernel void Skeletonize(__read_only image2d_t imageIn,
       outValue = 0;
     break;
   case 3:
-    if ((read_imagef(imageIn, sampler, coord).x) == 1 &&
+    if (outValue == 1 &&
         (read_imagef(imageIn, sampler, coord + (int2){ 1, -1 }).x == 1) &&
         (read_imagef(imageIn, sampler, coord + (int2){ 1, 0 }).x == 1) &&
         (read_imagef(imageIn, sampler, coord + (int2){ 1, 1 }).x == 1) &&

@@ -219,11 +219,425 @@ __kernel void Dilate3dCross(__read_only image3d_t imageIn,
     }
   }
 }
+bool checkOne(__read_only image3d_t imageIn, int4 coord, int4 values[]) {
+  int arraySize = (int)(sizeof(values) / sizeof(values[0]));
+  for (int i = 0; i < arraySize; ++i) {
+    if (read_imagef(imageIn, sampler, coord + values[i]).x != 1)
+      return false;
+  }
+  return true;
+}
+bool checkZero(__read_only image3d_t imageIn, int4 coord, int4 values[]) {
+  int arraySize = (int)(sizeof(values) / sizeof(values[0]));
+  for (int i = 0; i < arraySize; ++i) {
+    if (read_imagef(imageIn, sampler, coord + values[i]).x != 0)
+      return false;
+  }
+  return true;
+}
+bool checkA(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
+  bool result = false;
+  switch (structElVersion) {
+  case 0:
+    int4 valueOne[1] = {(int4){ 1, 0, 0, 0 } };
+    int4 valueZero[9] = {(int4){ -1, 1, 1, 0 },  (int4){ -1, 1, 0, 0 },
+                         (int4){ -1, 1, -1, 0 }, (int4){ -1, 0, 1, 0 },
+                         (int4){ -1, 0, 0, 0 },  (int4){ -1, 0, -1, 0 },
+                         (int4){ -1, -1, 1, 0 }, (int4){ -1, -1, 0, 0 },
+                         (int4){ -1, -1, -1, 0 } };
+    if (!checkOne(imageIn, coord, valueOne) ||
+        !checkZero(imageIn, coord, valueZero))
+      break;
+    result = true;
+    break;
+  case 1:
+    if (read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -2, 0, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, -1, 0 }).x == 0)
+      result = true;
+    break;
+  case 2:
+    if (read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, -1, 0 }).x == 0)
+      result = true;
+    break;
+  case 3:
+    if (read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -2, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, -1, 0 }).x == 0)
+      result = true;
+    break;
+  case 4:
+    if (read_imagef(imageIn, sampler, coord + (int4){ 0, 0, 1, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, -1, 0 }).x == 0)
+      result = true;
+    break;
+  case 5:
+    if (read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -1, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -2, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, 1, 0 }).x == 0)
+      result = true;
+    break;
+  }
+
+  return result;
+}
+bool checkB(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
+  bool result = false;
+  switch (structElVersion) {
+  case 0:
+    if (read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -2, 0, 0 }).x == 1 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, -1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 1, 0 }).x == 0)
+      result = true;
+    break;
+  case 1:
+    if (read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -2, 0, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -2, 0, 0 }).x == 1 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, -1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, -1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 1, 0 }).x == 0)
+      result = true;
+    break;
+  case 2:
+    if (read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -2, 0, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 0, 0 }).x == 1 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, -1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, -1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 1, 0 }).x == 0)
+      result = true;
+    break;
+  case 3:
+    if (read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 0, 0 }).x == 1 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, -1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, -1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 1, 0 }).x == 0)
+      result = true;
+    break;
+  case 4:
+    if (read_imagef(imageIn, sampler, coord + (int4){ 0, 0, 1, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -2, 0, 0 }).x == 1 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, -1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, -1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, 0, 0 }).x == 0)
+      result = true;
+    break;
+  case 5:
+    if (read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, 1, 0 }).x == 1 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, -1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, -1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, 0, 0 }).x == 0)
+      result = true;
+    break;
+
+  case 6:
+    if (read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -2, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -1, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -2, 0 }).x == 1 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, 1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, 0, 0 }).x == 0)
+      result = true;
+    break;
+  case 7:
+    if (read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -1, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -2, 0 }).x == 1 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, 1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, 0, 0 }).x == 0)
+      result = true;
+    break;
+  case 8:
+    if (read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -2, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, 1, 0 }).x == 1 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, 0, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, -1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, -1, 0 }).x == 0)
+      result = true;
+    break;
+  case 9:
+    if (read_imagef(imageIn, sampler, coord + (int4){ 0, 0, 1, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 0, 0 }).x == 1 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, 0, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, -1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, -1, 0 }).x == 0)
+      result = true;
+    break;
+  case 10:
+    if (read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -2, 0, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -1, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -2, 0 }).x == 1 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, 1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, 0, 0 }).x == 0)
+      result = true;
+    break;
+  case 11:
+    if (read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -1, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -2, 0 }).x == 1 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, 1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, 1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 1, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, 0, 0 }).x == 0)
+      result = true;
+    break;
+  }
+  return result;
+}
+bool checkC(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
+  bool result = false;
+  switch (structElVersion) {
+  case 0:
+    if (read_imagef(imageIn, sampler, coord + (int4){ 0, 0, 1, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -2, 0, 0, 0 }).x == 1 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, 0, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, -1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, -1, 0 }).x == 0)
+      result = true;
+    break;
+  case 1:
+    if (read_imagef(imageIn, sampler, coord + (int4){ 0, 0, 1, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 0, 0 }).x == 1 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, 0, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, -1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, -1, 0 }).x == 0)
+      result = true;
+    break;
+  case 2:
+    if (read_imagef(imageIn, sampler, coord + (int4){ 0, 0, 1, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -2, 0, 0 }).x == 1 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 0, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, -1, 0 }).x == 0)
+      result = true;
+    break;
+
+  case 3:
+    if (read_imagef(imageIn, sampler, coord + (int4){ 0, 0, 1, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 1, 0, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -1, 0, 0 }).x == 1 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, -2, 0, 0 }).x == 1 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, 0, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, 0, 0 }).x == 0 &&
+
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 0, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ 0, 1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 1, -1, 0 }).x == 0 &&
+        read_imagef(imageIn, sampler, coord + (int4){ -1, 0, -1, 0 }).x == 0)
+      result = true;
+    break;
+  }
+  return result;
+}
 __kernel void Skeletonize3d(__read_only image3d_t imageIn,
-                            __write_only image3d_t imageOut,
+                            __write_only image3d_t imageOut, int template,
                             int structElVersion) {
   int4 coord = (int4){ get_global_id(0), get_global_id(1), get_global_id(2),
                        get_global_id(3) };
   float outValue = read_imagef(imageIn, sampler, coord).x;
+  if (outValue == 0) {
+    write_imagef(imageOut, coord, outValue);
+    return;
+  }
+  switch (template) {
+  case 0:
+    if (checkA(imageIn, coord, structElVersion))
+      outValue = 0;
+    break;
+  case 1:
+    if (checkB(imageIn, coord, structElVersion))
+      outValue = 0;
+    break;
+  case 2:
+    if (checkC(imageIn, coord, structElVersion))
+      outValue = 0;
+    break;
+  }
+
   write_imagef(imageOut, coord, outValue);
 }

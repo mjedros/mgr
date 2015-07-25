@@ -14,9 +14,10 @@ void Camera::Start() {
 }
 
 void Camera::Stop() {
-  if (videoCapture) {
-    videoCapture.release();
-  }
+  if (!videoCapture)
+    return;
+  videoCapture->release();
+  videoCapture.release();
 }
 
 cv::Mat Camera::Get() {
