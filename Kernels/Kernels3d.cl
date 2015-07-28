@@ -234,6 +234,13 @@ bool checkZero(__read_only image3d_t imageIn, int4 coord, int4 val[],
   }
   return true;
 }
+bool checkAny(__read_only image3d_t imageIn, int4 coord, int4 val[], int size) {
+  for (int i = 0; i < size; ++i) {
+    if (read_imagef(imageIn, sampler, coord + val[i]).x == 1)
+      return true;
+  }
+  return true;
+}
 bool checkA(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
   bool result = false;
   switch (structElVersion) {
@@ -723,6 +730,298 @@ bool checkC(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
   }
   return result;
 }
+bool checkD(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
+  bool result = false;
+  switch (structElVersion) {
+  case 0: {
+    int4 valueOne[1] = { { 0, -1, 1, 0 } };
+    int4 valueAny[5] = { { 0, -2, 0, 0 },
+                         { 0, -2, 1, 0 },
+                         { 0, -2, 2, 0 },
+                         { 0, -1, 2, 0 },
+                         { 0, 0, 2, 0 } };
+    int4 valueZero[17] = { { 0, 0, -1, 0 },
+                           { 1, 0, -1, 0 },
+                           { 1, 1, -1, 0 },
+                           { 0, 1, -1, 0 },
+                           { -1, 0, -1, 0 },
+                           { -1, -1, -1, 0 },
+                           { 0, -1, -1, 0 },
+                           { -1, 1, -1, 0 },
+                           { 1, -1, -1, 0 },
+
+                           { 0, -1, 0, 0 },
+                           { -1, 1, 0, 0 },
+                           { 0, 1, 0, 0 },
+                           { 1, 1, 0, 0 },
+
+                           { 0, 0, 1, 0 },
+                           { 0, 1, 1, 0 },
+                           { 1, 1, 1, 0 },
+                           { -1, 1, 1, 0 } };
+    if (!checkOne(imageIn, coord, valueOne, 1) ||
+        !checkAny(imageIn, coord, valueAny, 5) ||
+        !checkZero(imageIn, coord, valueZero, 17))
+      return false;
+    result = true;
+    break;
+  }
+  case 1: {
+    int4 valueOne[1] = { { 0, -1, -1, 0 } };
+    int4 valueAny[5] = { { 0, -2, 0, 0 },
+                         { 0, -2, -1, 0 },
+                         { 0, -2, -2, 0 },
+                         { 0, -1, -2, 0 },
+                         { 0, 0, -2, 0 } };
+    int4 valueZero[17] = { { 0, 0, 1, 0 },
+                           { 1, 0, 1, 0 },
+                           { 1, 1, 1, 0 },
+                           { 0, 1, 1, 0 },
+                           { -1, 0, 1, 0 },
+                           { -1, -1, 1, 0 },
+                           { 0, -1, 1, 0 },
+                           { -1, 1, 1, 0 },
+                           { 1, -1, 1, 0 },
+
+                           { -1, 1, 0, 0 },
+                           { 0, 1, 0, 0 },
+                           { 1, 1, 0, 0 },
+                           { 0, -1, 0, 0 },
+
+                           { 0, 0, -1, 0 },
+                           { 0, 1, -1, 0 },
+                           { 1, 1, -1, 0 },
+                           { -1, 1, -1, 0 } };
+    if (!checkOne(imageIn, coord, valueOne, 1) ||
+        !checkAny(imageIn, coord, valueAny, 5) ||
+        !checkZero(imageIn, coord, valueZero, 17))
+      return false;
+    result = true;
+    break;
+  }
+  case 2: {
+    int4 valueOne[1] = { { -1, -1, 0, 0 } };
+    int4 valueAny[5] = { { -2, 0, 0, 0 },
+                         { -2, -1, 0, 0 },
+                         { -2, -2, 0, 0 },
+                         { -1, -2, 0, 0 },
+                         { 0, -2, 0, 0 } };
+    int4 valueZero[16] = { { 1, 1, 0, 0 },
+                           { 0, 1, 0, 0 },
+                           { -1, 1, 0, 0 },
+                           { 1, 1, -1, 0 },
+                           { 0, 1, -1, 0 },
+                           { -1, 1, -1, 0 },
+                           { 1, 1, 1, 0 },
+                           { 0, 1, 1, 0 },
+                           { -1, 1, 1, 0 },
+
+                           { 1, -1, -1, 0 },
+                           { 1, 0, -1, 0 },
+                           { 1, 0, 0, 0 },
+                           { 1, -1, 0, 0 },
+                           { 1, 0, 1, 0 },
+
+                           { -1, 0, 0, 0 },
+                           { 0, -1, 0, 0 } };
+    if (!checkOne(imageIn, coord, valueOne, 1) ||
+        !checkAny(imageIn, coord, valueAny, 5) ||
+        !checkZero(imageIn, coord, valueZero, 16))
+      return false;
+    result = true;
+    break;
+  }
+  case 3: {
+    int4 valueOne[1] = { { 1, 1, 0, 0 } };
+    int4 valueAny[5] = { { 2, 0, 0, 0 },
+                         { 2, -1, 0, 0 },
+                         { 2, -2, 0, 0 },
+                         { 1, -2, 0, 0 },
+                         { 0, -2, 0, 0 } };
+    int4 valueZero[17] = { { 1, 1, 0, 0 },
+                           { 0, 1, 0, 0 },
+                           { -1, 1, 0, 0 },
+                           { 1, 1, -1, 0 },
+                           { 0, 1, -1, 0 },
+                           { -1, 1, -1, 0 },
+                           { 1, 1, 1, 0 },
+                           { 0, 1, 1, 0 },
+                           { -1, 1, 1, 0 },
+
+                           { -1, 0, 1, 0 },
+                           { -1, 0, -1, 0 },
+                           { -1, 0, 0, 0 },
+                           { -1, -1, 0, 0 },
+                           { -1, -1, -1, 0 },
+                           { -1, -1, 1, 0 },
+
+                           { 1, 0, 0, 0 },
+                           { 0, -1, 0, 0 } };
+    if (!checkOne(imageIn, coord, valueOne, 1) ||
+        !checkAny(imageIn, coord, valueAny, 5) ||
+        !checkZero(imageIn, coord, valueZero, 17))
+      return false;
+    result = true;
+    break;
+  }
+  case 4: {
+    int4 valueOne[1] = { { -1, 0, 1, 0 } };
+    int4 valueAny[5] = { { 0, 0, 2, 0 },
+                         { -1, 0, 2, 0 },
+                         { -2, 0, 2, 0 },
+                         { -2, 0, 1, 0 },
+                         { -2, 0, 0, 0 } };
+    int4 valueZero[17] = { { 1, 0, 0, 0 },
+                           { 1, 0, 1, 0 },
+                           { 1, 0, -1, 0 },
+                           { 1, 1, 0, 0 },
+                           { 1, 1, 1, 0 },
+                           { 1, 1, -1, 0 },
+                           { 1, -1, 0, 0 },
+                           { 1, -1, 1, 0 },
+                           { 1, -1, -1, 0 },
+
+                           { -1, 0, -1, 0 },
+                           { -1, 1, -1, 0 },
+                           { -1, -1, -1, 0 },
+                           { 0, 0, -1, 0 },
+                           { 0, 1, -1, 0 },
+                           { 0, -1, -1, 0 },
+
+                           { 0, 0, 1, 0 },
+                           { -1, 0, 0, 0 } };
+    if (!checkOne(imageIn, coord, valueOne, 1) ||
+        !checkAny(imageIn, coord, valueAny, 5) ||
+        !checkZero(imageIn, coord, valueZero, 17))
+      return false;
+    result = true;
+    break;
+  }
+  case 5: {
+    int4 valueOne[1] = { { -1, 0, -1, 0 } };
+    int4 valueAny[5] = { { 0, 0, -2, 0 },
+                         { -1, 0, -2, 0 },
+                         { -2, 0, -2, 0 },
+                         { -2, 0, -1, 0 },
+                         { -2, 0, 0, 0 } };
+    int4 valueZero[17] = { { 1, 0, 0, 0 },
+                           { 1, 0, 1, 0 },
+                           { 1, 0, -1, 0 },
+                           { 1, 1, 0, 0 },
+                           { 1, 1, 1, 0 },
+                           { 1, 1, -1, 0 },
+                           { 1, -1, 0, 0 },
+                           { 1, -1, 1, 0 },
+                           { 1, -1, -1, 0 },
+
+                           { -1, 0, 1, 0 },
+                           { -1, 1, 1, 0 },
+                           { -1, -1, 1, 0 },
+                           { 0, 0, 1, 0 },
+                           { 0, 1, 1, 0 },
+                           { 0, -1, 1, 0 },
+
+                           { 0, 0, -1, 0 },
+                           { -1, 0, 0, 0 } };
+    if (!checkOne(imageIn, coord, valueOne, 1) ||
+        !checkAny(imageIn, coord, valueAny, 5) ||
+        !checkZero(imageIn, coord, valueZero, 17))
+      return false;
+    result = true;
+    break;
+  }
+  case 6: {
+    int4 valueOne[3] = { { 0, 0, -1, 0 }, { 0, 0, 1, 0 }, { 1, 1, 0, 0 } };
+    int4 valueZero[7] = { { 0, -1, 0, 0 },
+                          { 1, -1, 0, 0 },
+                          { -1, -1, 0, 0 },
+                          { -1, 0, 0, 0 },
+                          { 1, 0, 0, 0 },
+                          { -1, 1, 0, 0 },
+                          { 0, 1, 0, 0 } };
+    if (!checkOne(imageIn, coord, valueOne, 3) ||
+        !checkZero(imageIn, coord, valueZero, 7))
+      return false;
+    result = true;
+    break;
+  }
+  case 7: {
+    int4 valueOne[3] = { { 0, 0, -1, 0 }, { 0, 0, 1, 0 }, { -1, 1, 0, 0 } };
+    int4 valueZero[7] = { { 0, -1, 0, 0 },
+                          { 1, -1, 0, 0 },
+                          { -1, -1, 0, 0 },
+                          { -1, 0, 0, 0 },
+                          { 1, 0, 0, 0 },
+                          { 1, 1, 0, 0 },
+                          { 0, 1, 0, 0 } };
+    if (!checkOne(imageIn, coord, valueOne, 3) ||
+        !checkZero(imageIn, coord, valueZero, 7))
+      return false;
+    result = true;
+    break;
+  }
+  case 8: {
+    int4 valueOne[3] = { { -1, 0, 0, 0 }, { 1, 0, 0, 0 }, { 0, 1, 1, 0 } };
+    int4 valueZero[7] = { { 0, 0, -1, 0 },
+                          { 0, -1, -1, 0 },
+                          { 0, 1, -1, 0 },
+                          { 0, -1, 0, 0 },
+                          { 0, 1, 0, 0 },
+                          { 0, -1, 1, 0 },
+                          { 0, 0, 1, 0 } };
+    if (!checkOne(imageIn, coord, valueOne, 3) ||
+        !checkZero(imageIn, coord, valueZero, 7))
+      return false;
+    result = true;
+    break;
+  }
+  case 9: {
+    int4 valueOne[3] = { { -1, 0, 0, 0 }, { 1, 0, 0, 0 }, { 0, 1, -1, 0 } };
+    int4 valueZero[7] = { { 0, 0, -1, 0 },
+                          { 0, -1, -1, 0 },
+                          { 0, -1, 0, 0 },
+                          { 0, 1, 0, 0 },
+                          { 0, 1, 1, 0 },
+                          { 0, -1, 1, 0 },
+                          { 0, 0, 1, 0 } };
+    if (!checkOne(imageIn, coord, valueOne, 3) ||
+        !checkZero(imageIn, coord, valueZero, 7))
+      return false;
+    result = true;
+    break;
+  }
+  case 10: {
+    int4 valueOne[3] = { { 0, 1, 0, 0 }, { 0, 1, 0, 0 }, { 1, 0, -1, 0 } };
+    int4 valueZero[7] = { { 0, 0, 1, 0 },
+                          { 1, 0, 1, 0 },
+                          { -1, 0, 1, 0 },
+                          { 1, 0, 0, 0 },
+                          { -1, 0, 0, 0 },
+                          { -1, 0, -1, 0 },
+                          { 0, 0, -1, 0 } };
+    if (!checkOne(imageIn, coord, valueOne, 3) ||
+        !checkZero(imageIn, coord, valueZero, 7))
+      return false;
+    result = true;
+    break;
+  }
+  case 11: {
+    int4 valueOne[3] = { { 0, 1, 0, 0 }, { 0, 1, 0, 0 }, { 1, 0, 1, 0 } };
+    int4 valueZero[6] = { { 0, 0, -1, 0 },
+                          { 1, 0, -1, 0 },
+                          { -1, 0, -1, 0 },
+                          { 1, 0, 0, 0 },
+                          { -1, 0, 0, 0 },
+                          { -1, 0, 1, 0 } };
+    if (!checkOne(imageIn, coord, valueOne, 3) ||
+        !checkZero(imageIn, coord, valueZero, 6))
+      return false;
+    result = true;
+    break;
+  }
+  }
+  return result;
+}
 __kernel void Skeletonize3d(__read_only image3d_t imageIn,
                             __write_only image3d_t imageOut, int template,
                             int structElVersion) {
@@ -744,6 +1043,10 @@ __kernel void Skeletonize3d(__read_only image3d_t imageIn,
     break;
   case 2:
     if (checkC(imageIn, coord, structElVersion))
+      outValue = 0;
+    break;
+  case 3:
+    if (checkD(imageIn, coord, structElVersion))
       outValue = 0;
     break;
   }

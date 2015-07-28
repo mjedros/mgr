@@ -141,10 +141,9 @@ void ProcessingImage3d::skeletonize2() {
   cv::Mat img;
   do {
     img = image.clone();
-    for (int j = 0; j < 3; j++) {
-
-      kernel.setArg(2, j);
-      const int structElements = structToIter.at(j);
+    for (auto &structPair : structToIter) {
+      kernel.setArg(2, structPair.first);
+      const int structElements = structPair.second;
       for (int i = 0; i < structElements; ++i) {
         kernel.setArg(3, i);
         performMorphologicalOperation();
