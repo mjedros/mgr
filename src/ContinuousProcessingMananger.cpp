@@ -107,9 +107,7 @@ MatQueue *ContinuousProcessingMananger::switchBuffers() {
 
 void ContinuousProcessingMananger::startCameraAquisition() {
   aquisitionBuffer = &imagesQueueFirstBuffer;
-  // imagesFromCam = SourceFactory::GetImageSource(CameraSource);
-  imagesFromCam =
-      SourceFactory::GetImageSource(DirectorySource, "/home/michal/pathdata");
+  imagesFromCam = SourceFactory::GetImageSource(CameraSource);
   imagesFromCam->Start();
   Mat emptyImage = imagesFromCam->Get();
   for (Mat im = imagesFromCam->Get(); !im.empty() && active;

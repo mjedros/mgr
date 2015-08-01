@@ -18,8 +18,16 @@ void ApplicationManager::process(const OPERATION &operation,
   image3dPrevious = *processedImage3d; // save image
   I img(openCLManager, processROI);
   T processing3dImage;
-  if (!isROISizeValid(processing3dImage.getImageSize(*processedImage3d)))
+  if (!isROISizeValid(processing3dImage.getImageSize(*processedImage3d))) {
+    logger.printLine("Wrong ROI size");
+    const auto imageSize = processing3dImage.getImageSize(*processedImage3d);
+    std::string sizes = std::to_string(roi.second.second) + " , " +
+                        std::to_string(imageSize.first) + "," +
+                        std::to_string(roi.first.second) + "," +
+                        std::to_string(imageSize.second);
+    logger.printLine(sizes);
     throw new std::string("Wrong ROI size");
+  }
   setROI(img);
   img.setStructuralElement(structuralElement, params);
   logger.resetTimer();
@@ -44,8 +52,8 @@ void saveMovie(const Image3d &image, const std::string &filename) {
 bool ApplicationManager::isROISizeValid(std::pair<int, int> imageSize) {
   if (!processROI)
     return true;
-  return !(roi.first.second > imageSize.first ||
-           roi.second.second > imageSize.second || roi.first.second == 0 ||
+  return !(roi.second.second > imageSize.first ||
+           roi.first.second > imageSize.second || roi.first.second == 0 ||
            roi.second.second == 0);
 }
 
@@ -55,12 +63,21 @@ void ApplicationManager::init(const SourceType &source, const string &name) {
   int i = 0;
   imageSource->Start();
   std::vector<cv::Mat> matVector;
-
+  bool first = true;
+  Mat firstIm;
   for (Mat im = imageSource->Get(); !im.empty(); im = imageSource->Get(), ++i) {
+    if (imagesFromCamera) {
+      if (first) {
+        firstIm = im.clone();
+        first = false;
+        continue;
+      }
+      im = firstIm - im;
+    }
     cv::cvtColor(im, im, CV_BGR2GRAY);
     matVector.push_back(im);
   }
-
+  logger.printLine("Done adding to vector");
   image3d = Image3d(matVector.size(), *matVector.begin());
   for (auto it = matVector.begin(); it != matVector.end(); it++) {
     image3d.setImageAtDepth(std::distance(matVector.begin(), it), *it);

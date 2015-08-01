@@ -27,7 +27,8 @@ protected:
   std::shared_ptr<Image3d> processedImage3d;
   Image3d image3dPrevious;
   CsvFile csvFile;
-  bool processROI;
+  bool processROI = false;
+  bool imagesFromCamera = false;
   ROI roi;
   bool isROISizeValid(std::pair<int, int> imageSize);
   std::vector<cv::Mat> imagesVector;
@@ -35,7 +36,7 @@ protected:
 
 public:
   ApplicationManager(OpenCLManager &openCLManagerRef)
-    : openCLManager(openCLManagerRef), processROI(false) {}
+    : openCLManager(openCLManagerRef) {}
 
   /**
    * @brief Template method performing processing
@@ -80,12 +81,18 @@ public:
   /**
    * @brief Gets ROI
    */
-  const ROI &getROI() { return roi; }
+  const ROI &getROI() const { return roi; }
   /**
    * @brief Template method setting region of interest
    * @param processingImage
    */
-  void setProcessingROI(bool processROINew) { processROI = processROINew; }
+  void setProcessingROI(const bool processROINew) {
+    processROI = processROINew;
+  }
+
+  void setImagesFromCamera(const bool imagesFromCam) {
+    imagesFromCamera = imagesFromCam;
+  }
 
   void normalizeOriginalImage();
   void saveOriginalImage(const std::string &filename);

@@ -65,6 +65,7 @@ void MainWindow::setPlatformsList() {
 void MainWindow::initImages(const Mgr::SourceType &source,
                             const std::string &name) {
   try {
+    applicationManager.setImagesFromCamera(ui->imagesFromCamera->isChecked());
     applicationManager.init(source, name);
   } catch (std::string &err) {
     logger.printLine(err);
