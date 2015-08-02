@@ -31,7 +31,7 @@ void ProcessDepth::process(Image3d &image3d, ProcessingImage &img,
 }
 
 std::pair<int, int> ProcessDepth::getImageSize(const Image3d &image3d) const {
-  return { image3d.getRows(), image3d.getCols() };
+  return { image3d.getCols(), image3d.getRows() };
 }
 
 void ProcessCols::process(Image3d &image3d, ProcessingImage &img,
@@ -71,6 +71,6 @@ void ProcessDepthIn3D::process(Image3d &image3d, ProcessingImage3d &img,
 }
 std::pair<int, int>
 ProcessDepthIn3D::getImageSize(const Image3d &image3d) const {
-  return std::make_pair(image3d.getRows(), image3d.getCols());
+  return { image3d.getCols(), image3d.getRows() };
 }
 }

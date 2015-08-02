@@ -297,4 +297,5 @@ void MainWindow::on_deleteFromCsvFile_clicked() {
     return;
   applicationManager.deleteOperation(ui->csvOperations->currentIndex().row());
   updateCSVOperations();
+  ui->csvOperations->scrollToTop();
 }
