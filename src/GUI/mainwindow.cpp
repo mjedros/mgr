@@ -48,7 +48,7 @@ MainWindow::~MainWindow() {}
 void
 MainWindow::on_ChoosePlatform_currentIndexChanged(const QString &description) {
   auto it = std::find_if(listPlatforms.begin(), listPlatforms.end(),
-                         [&](auto &platform) {
+                         [&description](auto &platform) {
     return (description.toStdString() == std::get<2>(platform));
   });
   chosenDevice = std::make_pair(std::get<0>(*it), std::get<1>(*it));

@@ -115,9 +115,8 @@ void ApplicationManager::processCsvSequence() {
     } else {
       processROI = (tokens[6] == "1" ? true : false);
       if (processROI) {
-        roi = std::make_pair(
-            std::make_pair(std::stoi(tokens[7]), std::stoi(tokens[8])),
-            std::make_pair(std::stoi(tokens[9]), std::stoi(tokens[10])));
+        roi = { { std::stoi(tokens[7]), std::stoi(tokens[8]) },
+                { std::stoi(tokens[9]), std::stoi(tokens[10]) } };
       }
       process(
           tokens[0], tokens[1],
