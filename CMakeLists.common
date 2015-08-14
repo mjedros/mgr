@@ -1,39 +1,39 @@
 find_library(OPENCL_LIB 
 	NAMES OpenCL
-	PATHS "$ENV{AMDAPPSDKROOT}/lib/x86" "$ENV{CUDA_PATH}/lib/Win32" "/usr/lib"
+	PATHS "$ENV{AMDAPPSDKROOT}/lib/x86" "$ENV{CUDA_PATH}/lib/Win32" "/usr/lib" "$ENV{CUDADIR}/lib64"
 	)
 
 find_path(OPENCL_INC
 	NAMES "CL/cl.hpp"
-	PATHS "$ENV{AMDAPPSDKROOT}/include" "$ENV{CUDA_PATH}/include" "../include"
+	PATHS "$ENV{AMDAPPSDKROOT}/include" "$ENV{CUDA_PATH}/include" "../include $ENV{CUDADIR}/include" "~/usr/include"
 )
 find_path(OPENCV_INC
 	 	NAMES "opencv2/opencv.hpp"
-		PATHS "$ENV{OPENCV_DIR}/build/include"
+		PATHS "$ENV{OPENCV_DIR}/build/include" "~/usr/local/include"
 		)
 find_library(OPENCV_CALIB3D_LIB
 		NAMES opencv_calib3d248 opencv_calib3d
-		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib"
+		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib" "~/usr/local/lib"
 		)
 		
 find_library(OPENCV_CORE_LIB
 		NAMES opencv_core248d opencv_core
-		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib"
+		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib" "~/usr/local/lib"
 		)
 		
 find_library(OPENCV_HIGHGUI_LIB
 		NAMES opencv_highgui248d opencv_highgui
-		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib"
+		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib" "~/usr/local/lib"
 		)
 find_library(OPENCV_IMGPROC_LIB
 		NAMES opencv_imgproc248d opencv_imgproc
-		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib"
+		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib" "~/usr/local/lib"
 		)
 find_library(OPENCV_VIDEO_LIB
 		NAMES opencv_video248d opencv_video
-		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib"
+		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib" "~/usr/local/lib"
 		)	
-FIND_PACKAGE(Qt4)
+FIND_PACKAGE(Qt COMPONENTS QtCore QtGui QtNetwork QtOpenGL REQUIRED)
 if(NOT VTK_BINARY_DIR)
   find_package(VTK REQUIRED)
 else()
