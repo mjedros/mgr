@@ -1,6 +1,3 @@
-constant sampler_t sampler =
-    CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
-
 #pragma OPENCL EXTENSION cl_khr_3d_image_writes : enable
 
 void printImage(__write_only image3d_t imageOut, int i, int j, int k,
