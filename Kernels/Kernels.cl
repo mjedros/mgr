@@ -1,5 +1,8 @@
+constant sampler_t sampler =
+    CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
+#if __OPENCL_C_VERSION__ >= 120
 #include "Kernels3d.cl"
-
+#endif
 __kernel void threshold(__read_only image2d_t imageIn,
                         __write_only image2d_t imageOut,
                         const float threshold) {
