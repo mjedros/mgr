@@ -9,6 +9,7 @@ SET(COMMON_SOURCES
   Image3d.cpp 
   Logger.cpp
   csvFileUtils.cpp
+  CpuSkeletonize.cpp
 )
 SET(SOURCES
   GUI/mainwindow.cpp

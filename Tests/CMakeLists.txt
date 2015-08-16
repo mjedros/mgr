@@ -4,7 +4,7 @@ INCLUDE(../CMakeLists.common)
 SET(TESTS
    ProcessingImages/tst_processingimagestest.cpp
 )
-
+find_package (Threads)
 INCLUDE(${QT_USE_FILE})
 set(CMAKE_AUTOMOC ON)
 ADD_EXECUTABLE(Tests ${TESTS})
@@ -16,6 +16,7 @@ TARGET_LINK_LIBRARIES( Tests ${OPENCV_HIGHGUI_LIB})
 TARGET_LINK_LIBRARIES( Tests ${OPENCV_VIDEO_LIB})
 TARGET_LINK_LIBRARIES( Tests ${OPENCL_LIB})
 TARGET_LINK_LIBRARIES( Tests ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
+target_link_libraries (Tests ${CMAKE_THREAD_LIBS_INIT})
 if(NOT MSVC)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall  -Wextra -std=c++14 -fPIC" )
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")

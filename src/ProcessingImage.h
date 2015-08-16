@@ -18,33 +18,41 @@ enum class OPERATION : uint8_t {
   DILATION,
   DILATIONIMG,
   EROSION,
+  OPENING,
+  CLOSING,
   CONTOUR,
   SKELETONIZATION,
   SKELETONIZATION2
 };
-
+using OperationsVector = std::vector<std::vector<std::string>>;
 /**
  * @brief Class representing image that is being processed with OpenCL
  */
 class Image3d;
 class ProcessingImage {
+  std::unique_ptr<cl::Image2D> image_in_ptr = nullptr;
+  std::unique_ptr<cl::Image2D> image_out_ptr = nullptr;
+
 protected:
+  bool processingSequence = false;
   cv::Mat image;
   cv::Mat roiImage;
-  std::unique_ptr<cv::Mat> imageToProcess;
+  cv::Mat *imageToProcess = nullptr;
   cl::size_t<3> origin;
   cl::size_t<3> region;
   cl::NDRange localRange;
   cl::Kernel kernel;
   ROI roi;
+  bool newImage = true;
   OpenCLManager &openCLManager;
   std::string structuralElementType;
+  std::string kernelOperation;
   std::vector<float> structuralElementParams;
   bool processROI = false;
-
+  bool processOpenCV = false;
   void process(cl::Kernel &kernel, cl::Image2D &image_in,
                cl::Image2D &image_out);
-
+  void setNew(bool newim) { newImage = newim; }
   virtual void getROIOOutOfMat();
   virtual void updateFullImage();
 
@@ -71,6 +79,9 @@ public:
    * @brief Derives contour of binary image
    */
   void contour();
+
+  void open();
+  void close();
   /**
    * @brief Performs skeletonization
    */
@@ -99,11 +110,16 @@ public:
    * @brief Set image data
    * @param img - image sent to process
    */
+  virtual void substr();
+  virtual void readImage();
+  void processSequence(OperationsVector vect);
   void setImageToProcess(const cv::Mat &img);
   void setROI(const ROI NewRoi) { roi = NewRoi; }
+  void setProcessCV(const bool processCv) { processOpenCV = processCv; }
   ProcessingImage(OpenCLManager &openCLManagerPtr, bool processRoi = false);
-  ~ProcessingImage() { imageToProcess.release(); }
+  ~ProcessingImage() {}
   inline void setKernelOperation(const std::string &Operation) {
+    kernelOperation = Operation;
     const std::string kernelName = Operation + structuralElementType;
     kernel = cl::Kernel(openCLManager.program, kernelName.c_str());
     setStructuralElementArgument();

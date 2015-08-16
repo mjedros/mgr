@@ -1,8 +1,6 @@
 constant sampler_t sampler =
     CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
-#if __OPENCL_C_VERSION__ >= 120
 #include "Kernels3d.cl"
-#endif
 __kernel void threshold(__read_only image2d_t imageIn,
                         __write_only image2d_t imageOut,
                         const float threshold) {
@@ -19,6 +17,19 @@ __kernel void threshold(__read_only image2d_t imageIn,
   }
   write_imagef(imageOut, coord, out_color);
 }
+
+__kernel void Substract(__read_only image2d_t imageIn,
+
+                        __write_only image2d_t imageOut,
+                        __read_only image2d_t imageIn2) {
+  int2 coord = (int2){ get_global_id(0), get_global_id(1) };
+  if (read_imagef(imageIn, sampler, coord).x == 1 &&
+      read_imagef(imageIn2, sampler, coord).x == 0)
+    write_imagef(imageOut, coord, 1);
+  else
+    write_imagef(imageOut, coord, 0);
+}
+
 __kernel void Binarize(__read_only image2d_t imageIn,
                        __write_only image2d_t imageOut, const uint min,
                        const uint max) {

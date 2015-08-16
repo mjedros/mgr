@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 namespace Mgr {
-typedef std::vector<std::vector<std::string>> OperationsVector;
+using OperationsVector = std::vector<std::vector<std::string>>;
 class CsvFile {
   OperationsVector operationsVector;
 

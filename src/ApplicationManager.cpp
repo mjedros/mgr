@@ -17,6 +17,7 @@ void ApplicationManager::process(const OPERATION &operation,
                                  const std::vector<float> &params) {
   image3dPrevious = *processedImage3d; // save image
   I img(openCLManager, processROI);
+  img.setProcessCV(processOpenCv);
   T processing3dImage;
   if (!isROISizeValid(processing3dImage.getImageSize(*processedImage3d))) {
     logger.printLine("Wrong ROI size");
@@ -48,7 +49,14 @@ void saveMovie(const Image3d &image, const std::string &filename) {
     videowriter << image.getImageAtDepth(j);
   }
 }
-
+void saveFiles(const Image3d &image, const std::string &directory) {
+  std::cout << directory;
+  const std::string dirAndName = directory + "/fileprocessed";
+  for (int j = 0; j < image.getDepth(); j++) {
+    cv::imwrite(dirAndName + std::to_string(j) + ".jpg",
+                image.getImageAtDepth(j));
+  }
+}
 bool ApplicationManager::isROISizeValid(std::pair<int, int> imageSize) {
   if (!processROI)
     return true;
@@ -58,6 +66,9 @@ bool ApplicationManager::isROISizeValid(std::pair<int, int> imageSize) {
 }
 
 void ApplicationManager::init(const SourceType &source, const string &name) {
+  image3d.clear();
+  if (processedImage3d)
+    processedImage3d->clear();
   std::unique_ptr<IImageSource> imageSource =
       SourceFactory::GetImageSource(source, name);
   int i = 0;
@@ -66,7 +77,7 @@ void ApplicationManager::init(const SourceType &source, const string &name) {
   bool first = true;
   Mat firstIm;
   for (Mat im = imageSource->Get(); !im.empty(); im = imageSource->Get(), ++i) {
-    if (imagesFromCamera) {
+    if (backgroundSubstr == BackgroundSubstr::FIRSTIMAGE) {
       if (first) {
         firstIm = im.clone();
         first = false;
@@ -90,8 +101,13 @@ void ApplicationManager::initProcessedImage(const unsigned int &minumum,
   processedImage3d.reset(
       new Image3d(image3d.getDepth(), image3d.getImageAtDepth(0)));
   ProcessingImage img(openCLManager, processROI);
+  cv::BackgroundSubtractorMOG2 bg(6, 10, false);
+  bg.set("nmixtures", 3);
   for (auto i = 0; i < processedImage3d->getDepth(); i++) {
-    img.setImageToProcess(image3d.getImageAtDepth(i).clone());
+    Mat fore = image3d.getImageAtDepth(i);
+    if (backgroundSubstr == BackgroundSubstr::MOG2)
+      bg.operator()(fore, fore);
+    img.setImageToProcess(fore);
     img.binarize(minumum, maximum);
     processedImage3d->setImageAtDepth(i, img.getImage());
   }
@@ -99,31 +115,23 @@ void ApplicationManager::initProcessedImage(const unsigned int &minumum,
 void ApplicationManager::normalizeOriginalImage() { normalize(image3d); }
 
 void ApplicationManager::saveOriginalImage(const std::string &filename) {
-  saveMovie(image3d, filename);
+  saveFiles(*processedImage3d, filename);
 }
 
 void ApplicationManager::saveProcessedImage(const std::string &filename) {
   saveMovie(*processedImage3d, filename);
 }
 
-void ApplicationManager::processCsvSequence() {
-  const auto &operVect = getOperationsVector();
-  for (auto &tokens : operVect) {
-    if (tokens[0] == "Binarize") {
-      setProcessingROI(false);
-      initProcessedImage(std::stoi(tokens[1]), std::stoi(tokens[2]));
-    } else {
-      processROI = (tokens[6] == "1" ? true : false);
-      if (processROI) {
-        roi = { { std::stoi(tokens[7]), std::stoi(tokens[8]) },
-                { std::stoi(tokens[9]), std::stoi(tokens[10]) } };
-      }
-      process(
-          tokens[0], tokens[1],
-          { std::stof(tokens[2]), std::stof(tokens[3]), std::stof(tokens[4]) },
-          tokens[5]);
-    }
-  }
+void ApplicationManager::processCsvSequence(const std::string &operationWay) {
+  if (operationWay == "Process columns")
+    processCsvSequence<ProcessCols>();
+  else if (operationWay == "Process depth")
+    processCsvSequence<ProcessDepth>();
+  else if (operationWay == "Process rows")
+    processCsvSequence<ProcessRows>();
+  else
+    processCsvSequence<ProcessDepthIn3D, ProcessingImage3d>();
+  logger.printLine("Done processing sequence");
 }
 void ApplicationManager::process(const std::string &operationString,
                                  const std::string &MorphElementType,
@@ -131,6 +139,8 @@ void ApplicationManager::process(const std::string &operationString,
                                  const std::string &operationWay) {
   logger.printProcessing(operationString, MorphElementType, StructElemParams,
                          operationWay, processROI);
+  if (processOpenCv)
+    logger.printLine("Opencv processing");
 
   const OPERATION &operation = ProcessingImage::OperationMap[operationString];
 
@@ -143,6 +153,17 @@ void ApplicationManager::process(const std::string &operationString,
   else
     process<ProcessDepthIn3D, ProcessingImage3d>(operation, MorphElementType,
                                                  StructElemParams);
+}
+template <class T, class I> void ApplicationManager::processCsvSequence() {
+  image3dPrevious = *processedImage3d; // save image
+  I img(openCLManager, processROI);
+  img.setProcessCV(processOpenCv);
+  T processing3dImage;
+  setROI(img);
+  logger.resetTimer();
+  processing3dImage.processSequence(*processedImage3d, img,
+                                    getOperationsVector());
+  logger.printAvarageTime();
 }
 template void
 ApplicationManager::process<ProcessCols>(const OPERATION &operation,
@@ -159,4 +180,9 @@ ApplicationManager::process<ProcessRows>(const OPERATION &operation,
 template void ApplicationManager::process<ProcessDepthIn3D, ProcessingImage3d>(
     const OPERATION &operation, const std::string &structuralElement,
     const std::vector<float> &params);
+template void ApplicationManager::processCsvSequence<ProcessCols>();
+template void ApplicationManager::processCsvSequence<ProcessDepth>();
+template void ApplicationManager::processCsvSequence<ProcessRows>();
+template void
+ApplicationManager::processCsvSequence<ProcessDepthIn3D, ProcessingImage3d>();
 }

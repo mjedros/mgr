@@ -30,11 +30,12 @@ const cv::Mat Image3d::getImageAtRow(const int &row) const {
 }
 
 const cv::Mat Image3d::getImageAtCol(const int &col) const {
+
   cv::Mat image2d(rows, depth, image.type());
   for (int i = 0; i < rows; ++i) {
-    cv::Mat colImg = image.col(col + i * rows);
-    cv::transpose(colImg, colImg);
-    colImg.copyTo(image2d.row(i));
+    for (int j = 0; j < depth; ++j) {
+      image2d.at<uchar>(i, j) = image.at<uchar>(j, i * cols + col);
+    }
   }
   return image2d;
 }

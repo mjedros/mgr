@@ -6,23 +6,24 @@ class VideoCapture;
 }
 namespace Mgr {
 /**
- * @brief Image source interface.
+ * @brief Interfejs źródła obrazu
  *
- * @details Abstract class with methods derived by different sources of images.
- *
+ * @details Klasa abstrakcyjna dziedziczona przez typy źródeł obrazu.
+ * Wszystkie źródła obrazu - kamera, folder i film są tworzone przez
+ * fabrykę abstrakcyjną.
  */
 class IImageSource {
 public:
   /**
-   * @brief Start image aquisition.
+   * @brief Start akwizycji obrazu
    */
   virtual void Start() = 0;
   /**
-   * @brief Stop image aquisition.
+   * @brief Koniec akwizycji obrazu
    */
   virtual void Stop() = 0;
   /**
-   * @brief Get next image in queue.
+   * @brief Metoda zwracająca następny obraz ze źródła
    */
   virtual cv::Mat Get() = 0;
 };

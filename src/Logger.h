@@ -22,6 +22,8 @@ public:
   void resetTimer();
   void beginOperation();
   void printAvarageTime();
+  void startReadingImage();
+  void stopReadingImage();
   void printFancyLine(std::string line);
   void printProcessing(const std::string &operationString,
                        const std::string &MorphElementType,
@@ -33,10 +35,11 @@ private:
   std::fstream file;
   unsigned int operationsCounter = 1;
   unsigned int timeSum = 0;
+  unsigned int transferSum = 0;
   std::chrono::time_point<std::chrono::system_clock> allSum;
   unsigned long int clSum = 0;
   std::chrono::time_point<std::chrono::system_clock> start;
-
+  std::chrono::time_point<std::chrono::system_clock> startReading;
   Logger();
   Logger(const Logger &logger) = delete;
   ~Logger();

@@ -33,13 +33,14 @@ MainWindow::MainWindow(QWidget *parent)
   menu.addAction("Open file to process", this, SLOT(openFileToProcess()));
   menu.addAction("Open directory to process", this, SLOT(openDirToProcess()));
   menu_bar.addMenu(&menu);
-  ui->ChooseOperation->addItems(
-      { "Dilation", "Erosion", "Contour", "Skeletonize", "Skeletonize2" });
+  ui->ChooseOperation->addItems({ "Dilation", "Erosion", "Opening", "Closing",
+                                  "Contour", "Skeletonize", "Skeletonize2" });
   ui->MorphologicalElementType->addItems(
       { "Cross", "Rectangle", "Ellipse", "EllipseImage" });
   ui->ProcessingWay->addItems(
       { "Process depth", "Process columns", "Process rows", "Process in 3d" });
   ui->CameraDimension->addItems({ "2D", "3D" });
+  ui->BackgroundSubstraction->addItems({ "None", "Delete first", "Mog2" });
   setMenuBar(&menu_bar);
 }
 
@@ -65,7 +66,12 @@ void MainWindow::setPlatformsList() {
 void MainWindow::initImages(const Mgr::SourceType &source,
                             const std::string &name) {
   try {
-    applicationManager.setImagesFromCamera(ui->imagesFromCamera->isChecked());
+    if (ui->BackgroundSubstraction->currentText().toStdString() == "Mog2")
+      applicationManager.setBackgroundExtraction(BackgroundSubstr::MOG2);
+    else if (ui->BackgroundSubstraction->currentText().toStdString() == "None")
+      applicationManager.setBackgroundExtraction(BackgroundSubstr::NONE);
+    else
+      applicationManager.setBackgroundExtraction(BackgroundSubstr::FIRSTIMAGE);
     applicationManager.init(source, name);
   } catch (std::string &err) {
     logger.printLine(err);
@@ -104,6 +110,7 @@ void MainWindow::process() {
   auto processingValues = getProcessingValues();
   try {
     applicationManager.setProcessingROI(ui->processROI->isChecked());
+    applicationManager.setProcessCv(ui->processCv->isChecked());
     applicationManager.process(std::get<0>(processingValues),
                                std::get<1>(processingValues),
                                std::get<2>(processingValues),
@@ -166,18 +173,13 @@ void MainWindow::on_Normalize_clicked() {
 void MainWindow::initBinaryImage() {
   applicationManager.initProcessedImage(ui->lowLewel->value(),
                                         ui->highLevel->value());
-  applicationManager.addToCSVFile({ "Binarize",
-                                    std::to_string(ui->lowLewel->value()),
-                                    std::to_string(ui->highLevel->value()) });
-  updateCSVOperations();
 }
 
 void MainWindow::on_ResetProcessed_clicked() { initBinaryImage(); }
 
 void MainWindow::on_SaveImage_clicked() {
   applicationManager.saveOriginalImage(
-      QFileDialog::getSaveFileName(this, tr("Save Image"), QDir::currentPath())
-          .toStdString());
+      QFileDialog::getExistingDirectory(this).toStdString());
 }
 
 void MainWindow::on_vtkViewButton_clicked() {
@@ -197,20 +199,8 @@ void MainWindow::on_addToCsvFile_clicked() {
     ui->MorphologicalElementType->currentText().toStdString(),
     getDoubleText(ui->StructElementParam1->text()),
     getDoubleText(ui->StructElementParam2->text()),
-    getDoubleText(ui->StructElementParam3->text()),
-    ui->ProcessingWay->currentText().toStdString(),
-    ui->processROI->isChecked() ? "1" : "0"
+    getDoubleText(ui->StructElementParam3->text())
   };
-  if (ui->processROI->isChecked()) {
-    const ROI &roi = applicationManager.getROI();
-
-    std::vector<std::string> roiString = { std::to_string(roi.first.first),
-                                           std::to_string(roi.first.second),
-                                           std::to_string(roi.second.first),
-                                           std::to_string(roi.second.second) };
-    operationsVector.insert(operationsVector.end(), roiString.begin(),
-                            roiString.end());
-  }
   applicationManager.addToCSVFile(operationsVector);
   updateCSVOperations();
 }
@@ -223,10 +213,24 @@ void MainWindow::on_loadCsvFile_clicked() {
   updateCSVOperations();
 }
 
+void processCsvSequenceThread(ApplicationManagerGUI *appManager,
+                              QLabel *processingLabel,
+                              const std::string &operationWay) {
+  appManager->processCsvSequence(operationWay);
+  processingLabel->setText("Done");
+}
+
 void MainWindow::on_processCsvSequence_clicked() {
   logger.printFancyLine("Starting sequence");
-  applicationManager.processCsvSequence();
-  logger.printLine("Done processing sequence");
+  applicationManager.setProcessCv(ui->processCv->isChecked());
+  applicationManager.setProcessingROI(ui->processROI->isChecked());
+  ui->ProcessingProgress->setEnabled(true);
+  ui->ProcessingProgress->setText("In progress");
+  cv::waitKey(1);
+  processingThread.reset(new std::thread(
+      processCsvSequenceThread, &applicationManager, ui->ProcessingProgress,
+      ui->ProcessingWay->currentText().toStdString()));
+  processingThread->detach();
   logger.printFancyLine("");
 }
 
@@ -259,7 +263,8 @@ void MainWindow::startAquisition() {
 
   auto values = getProcessingValues();
   cameraProc.setProcessing(std::get<0>(values), std::get<1>(values),
-                           std::get<2>(values));
+                           std::get<2>(values), ui->lowLewel->value(),
+                           ui->highLevel->value());
   if (ui->CameraDimension->currentText() == "3D")
     cameraProc.process3dImages();
   else
@@ -289,7 +294,8 @@ void MainWindow::on_CameraAquisition_clicked() {
 void MainWindow::on_UpdateOperation_clicked() {
   auto values = getProcessingValues();
   cameraProc.setProcessing(std::get<0>(values), std::get<1>(values),
-                           std::get<2>(values));
+                           std::get<2>(values), ui->lowLewel->value(),
+                           ui->highLevel->value());
 }
 
 void MainWindow::on_deleteFromCsvFile_clicked() {

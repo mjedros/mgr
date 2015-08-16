@@ -32,13 +32,17 @@ class ContinuousProcessingMananger : public QObject {
   std::string MorphElementType;
   std::vector<float> StructElemParams;
   unsigned int imagesCounter = 0;
+  unsigned int min;
+  unsigned int max;
 
 public:
   ContinuousProcessingMananger(OpenCLManager &openCLManager, QObject *parent);
 
   void setProcessing(const std::string &operationStringNew,
                      const std::string &MorphElementTypeNew,
-                     const std::vector<float> StructElemParamsNew);
+                     const std::vector<float> StructElemParamsNew,
+                     const unsigned int &minumum,
+                     const unsigned int &maximumum);
   void process2dImages();
   void process3dImages();
   void stopProcessing();

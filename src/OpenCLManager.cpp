@@ -86,12 +86,29 @@ void OpenCLManager::chooseDevice(const unsigned int &platformId,
   platforms[platformId].getDevices(CL_DEVICE_TYPE_ALL, &devices);
   processingDevice = devices[DeviceId];
 }
-std::vector<tuple<int, int, std::string>> OpenCLManager::listPlatforms() const {
-  std::vector<tuple<int, int, std::string>> devicesInfo;
+void OpenCLManager::printDeviceInfo(std::string name, unsigned int DeviceId,
+                                    std::vector<Device> devices) const {
+  std::string info;
+  devices[DeviceId].getInfo(CL_DEVICE_EXTENSIONS, &info);
+  if (info.find("cl_khr_3d_image_writes") != std::string::npos)
+    std::cout << name << " Supports 3d images !" << std::endl;
+  else
+    std::cout << name << " Does NOT support 3d images !" << std::endl;
+  std::size_t maxNDRange;
+  std::size_t NDRanges[3];
+  devices[DeviceId].getInfo(CL_DEVICE_MAX_WORK_GROUP_SIZE, &maxNDRange);
+  devices[DeviceId].getInfo(CL_DEVICE_MAX_WORK_ITEM_SIZES, &NDRanges);
+
+  std::cout << "Max NDRange: " << maxNDRange << " " << NDRanges[0] << ","
+            << NDRanges[1] << "," << NDRanges[2] << std::endl;
+}
+
+PlatformList OpenCLManager::listPlatforms() const {
+  PlatformList devicesInfo;
   for (unsigned int id = 0; id < platforms.size(); id++) {
     std::string name, version;
     platforms[id].getInfo(CL_PLATFORM_NAME, &name);
-    platforms[id].getInfo((cl_platform_info)CL_PLATFORM_VERSION, &version);
+    platforms[id].getInfo(CL_PLATFORM_VERSION, &version);
 
     std::vector<Device> devices;
     platforms[id].getDevices(CL_DEVICE_TYPE_ALL, &devices);
@@ -99,9 +116,10 @@ std::vector<tuple<int, int, std::string>> OpenCLManager::listPlatforms() const {
     cl_device_type deviceType;
     for (unsigned int DeviceId = 0; DeviceId < devices.size(); DeviceId++) {
       devices[DeviceId].getInfo(CL_DEVICE_TYPE, &deviceType);
+      printDeviceInfo(name, DeviceId, devices);
       devicesInfo.push_back(
-          make_tuple(id, DeviceId, DeviceNameToStringMap[deviceType] + "-" +
-                                       name + "," + version));
+          std::make_tuple(id, DeviceId, DeviceNameToStringMap[deviceType] +
+                                            "-" + name + "," + version));
     }
   }
   return devicesInfo;

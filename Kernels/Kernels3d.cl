@@ -31,6 +31,17 @@ bool checkImage(int i, int j, int k, int4 coord, __read_only image3d_t image,
     return true;
   return false;
 }
+__kernel void Substract3d(__read_only image3d_t imageIn,
+                          __write_only image3d_t imageOut,
+                          __read_only image3d_t imageIn2) {
+  int4 coord = (int4){ get_global_id(0), get_global_id(1), get_global_id(2),
+                       get_global_id(3) };
+  if (read_imagef(imageIn, sampler, coord).x !=
+      read_imagef(imageIn2, sampler, coord).x)
+    write_imagef(imageOut, coord, 1);
+  else
+    write_imagef(imageOut, coord, 0);
+}
 __kernel void Erode3dEllipse(__read_only image3d_t imageIn,
                              __write_only image3d_t imageOut,
                              const float3 structParams) {
@@ -153,9 +164,9 @@ __kernel void Erode3dRectangle(__read_only image3d_t imageIn,
                                const int3 structParams) {
   int4 image_coord = (int4){ get_global_id(0), get_global_id(1),
                              get_global_id(2), get_global_id(3) };
-  for (int i = -structParams.x; i <= structParams.x; ++i) {
-    for (int j = -structParams.y; j <= structParams.y; ++j) {
-      for (int k = -structParams.z; k <= structParams.z; ++k) {
+  for (int k = -structParams.z; k <= structParams.z; ++k) {
+    for (int i = -structParams.x; i <= structParams.x; ++i) {
+      for (int j = -structParams.y; j <= structParams.y; ++j) {
         int4 ijCoord = image_coord + (int4){ i, j, k, 0 };
         float inPixel = read_imagef(imageIn, sampler, ijCoord).x;
         if (inPixel == 0) {
@@ -174,9 +185,9 @@ __kernel void Dilate3dRectangle(__read_only image3d_t imageIn,
                              get_global_id(2), get_global_id(3) };
 
   write_imagef(imageOut, image_coord, 0);
-  for (int i = -structParams.x; i <= structParams.x; i++) {
-    for (int j = -structParams.y; j <= structParams.y; j++) {
-      for (int k = -structParams.z; k <= structParams.z; k++) {
+  for (int k = -structParams.z; k <= structParams.z; k++) {
+    for (int i = -structParams.x; i <= structParams.x; i++) {
+      for (int j = -structParams.y; j <= structParams.y; j++) {
         int4 ijCoord = image_coord + (int4){ i, j, k, 0 };
         float inPixel = read_imagef(imageIn, sampler, ijCoord).x;
         if (inPixel == 1) {
@@ -193,8 +204,19 @@ __kernel void Erode3dCross(__read_only image3d_t imageIn,
                            const int3 structParams) {
   int4 image_coord = (int4){ get_global_id(0), get_global_id(1),
                              get_global_id(2), get_global_id(3) };
-  float inPixel = read_imagef(imageIn, sampler, image_coord).x;
-  write_imagef(imageOut, image_coord, inPixel);
+  write_imagef(imageOut, image_coord, 1);
+  for (int k = -structParams.z; k <= structParams.z; ++k) {
+    for (int i = -structParams.x; i <= structParams.x; ++i) {
+      int hor = (i == 0 ? hor = structParams.y : 0);
+      for (int j = -hor; j <= hor; ++j) {
+        if (read_imagef(imageIn, sampler, image_coord + (int4){ i, j, k, 0 })
+                .x == 0) {
+          write_imagef(imageOut, image_coord, 0);
+          return;
+        }
+      }
+    }
+  }
 }
 
 __kernel void Dilate3dCross(__read_only image3d_t imageIn,
@@ -236,7 +258,7 @@ bool checkAny(__read_only image3d_t imageIn, int4 coord, int4 val[], int size) {
     if (read_imagef(imageIn, sampler, coord + val[i]).x == 1)
       return true;
   }
-  return true;
+  return false;
 }
 bool checkA(__read_only image3d_t imageIn, int4 coord, int structElVersion) {
   bool result = false;

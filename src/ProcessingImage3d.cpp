@@ -3,6 +3,7 @@
 #include "Image3d.h"
 #include "Logger.h"
 #include "OpenCLManager.h"
+#include "CpuSkeletonize.h"
 
 using namespace cl;
 using namespace cv;
@@ -55,7 +56,6 @@ void ProcessingImage3d::set3dImageToProcess(const Image3d &image3dToProcess) {
   region[0] = image3dToProcess.getCols();
   region[1] = image3dToProcess.getRows();
   region[2] = image3dToProcess.getDepth();
-  imageToProcess.release();
   image3d = image3dToProcess;
 }
 
@@ -105,9 +105,9 @@ void ProcessingImage3d::performOperation(Image3D &image_out3d) {
     openCLManager.queue.enqueueNDRangeKernel(
         kernel, cl::NDRange(0, 0), cl::NDRange(region[0], region[1], region[2]),
         cl::NullRange, NULL, &event);
-
-    openCLManager.queue.enqueueReadImage(image_out3d, CL_TRUE, origin, region,
-                                         0, 0, imageToProcess->data);
+    if (newImage)
+      openCLManager.queue.enqueueReadImage(image_out3d, CL_TRUE, origin, region,
+                                           0, 0, imageToProcess->data);
     event.wait();
     const auto elapsed = event.getProfilingInfo<CL_PROFILING_COMMAND_END>() -
                          event.getProfilingInfo<CL_PROFILING_COMMAND_START>();
@@ -118,26 +118,78 @@ void ProcessingImage3d::performOperation(Image3D &image_out3d) {
 }
 
 void ProcessingImage3d::performMorphologicalOperation() {
-  getROIOOutOfMat();
+  if (newImage)
+    getROIOOutOfMat();
   const ImageFormat format(CL_R, CL_UNORM_INT8);
   logger.beginOperation();
-  cl::Image3D image_in3d(
-      openCLManager.context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
-      region[0], region[1], region[2], 0, 0, imageToProcess->data);
-  cl::Image3D image_out3d(openCLManager.context, CL_MEM_WRITE_ONLY, format,
-                          region[0], region[1], region[2]);
-  kernel.setArg(0, image_in3d);
-  kernel.setArg(1, image_out3d);
-  performOperation(image_out3d);
-  ellipseIn3d.reset();
-  updateFullImage();
+  if (newImage) {
+    cl::Image3D image_in3d(
+        openCLManager.context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, format,
+        region[0], region[1], region[2], 0, 0, imageToProcess->data);
+    cl::Image3D image_out3d(openCLManager.context, CL_MEM_WRITE_ONLY, format,
+                            region[0], region[1], region[2]);
+    kernel.setArg(0, image_in3d);
+    kernel.setArg(1, image_out3d);
+    performOperation(image_out3d);
+    ellipseIn3d.reset();
+    updateFullImage();
+  } else {
+    if (!image_in_ptr3d) {
+
+      getROIOOutOfMat();
+      image_in_ptr3d = std::unique_ptr<cl::Image3D>(
+          new cl::Image3D(openCLManager.context, CL_MEM_READ_ONLY, format,
+                          region[0], region[1], region[2], 0, 0));
+      openCLManager.queue.enqueueWriteImage(*image_in_ptr3d, CL_TRUE, origin,
+                                            region, 0, 0, imageToProcess->data);
+
+    } else {
+      image_in_ptr3d.reset(image_out_ptr3d.release());
+    }
+    image_out_ptr3d = std::unique_ptr<cl::Image3D>(
+        new cl::Image3D(openCLManager.context, CL_MEM_READ_WRITE, format,
+                        region[0], region[1], region[2]));
+    kernel.setArg(0, *image_in_ptr3d);
+    kernel.setArg(1, *image_out_ptr3d);
+    performOperation(*image_out_ptr3d);
+  }
 }
+#include <ctime>
 
 void ProcessingImage3d::skeletonize2() {
   const std::map<int, int> structToIter = {
     { 0, 6 }, { 1, 12 }, { 2, 8 }, { 3, 12 }
   };
+  if (processOpenCV) {
+    auto start = std::chrono::system_clock::now();
+    CPUSkeletonize cpuSkeletonize;
+    cv::Mat img;
+    do {
+      img = image.clone();
+      for (auto &structPair : structToIter) {
+        const int structElements = structPair.second;
+        for (int i = 0; i < structElements; ++i) {
+          getROIOOutOfMat();
+          logger.beginOperation();
+          cpuSkeletonize.perform(structPair.first, i, &image3d);
+          image = image3d.get3dMatImage().clone();
+          logger.endOperation();
+          updateFullImage();
+        }
+      }
+
+      std::cout << "loop " << cv::countNonZero(img != image) << std::endl;
+    } while (cv::countNonZero(img != image) != 0);
+    auto timeSum = std::chrono::duration_cast<std::chrono::seconds>(
+                       std::chrono::system_clock::now() - start).count();
+    std::cout << "Skeletonize time :" << timeSum << "s, " << timeSum / 60.0
+              << "min" << std::endl;
+    return;
+  }
+
+  newImage = false;
   kernel = cl::Kernel(openCLManager.program, "Skeletonize3d");
+  auto start = std::chrono::system_clock::now();
   cv::Mat img;
   do {
     img = image.clone();
@@ -149,13 +201,45 @@ void ProcessingImage3d::skeletonize2() {
         performMorphologicalOperation();
       }
     }
-  } while (cv::countNonZero(img != image) != 0);
+    openCLManager.queue.enqueueReadImage(*image_out_ptr3d, CL_TRUE, origin,
+                                         region, 0, 0, imageToProcess->data);
+    updateFullImage();
+    image_in_ptr3d.reset();
+    std::cout << "One loop " << cv::countNonZero(img != image) << std::endl;
+  } while (cv::countNonZero(img != image) > 1);
+  auto timeSum = std::chrono::duration_cast<std::chrono::milliseconds>(
+                     std::chrono::system_clock::now() - start).count();
+  std::cout << "Skeletonize time :" << timeSum << "ms, " << timeSum / 1000.0
+            << "s" << std::endl;
+  newImage = true;
+}
+
+void ProcessingImage3d::readImage() {
+  if (!processingSequence) {
+    openCLManager.queue.enqueueReadImage(*image_out_ptr3d, CL_TRUE, origin,
+                                         region, 0, 0, imageToProcess->data);
+    updateFullImage();
+    image_in_ptr3d.reset();
+    newImage = true;
+  }
+}
+
+void ProcessingImage3d::substr() {
+  kernel = cl::Kernel(openCLManager.program, "Substract3d");
+  std::unique_ptr<Image3D> image_in2_ptr =
+      std::unique_ptr<Image3D>(image_out_ptr3d.release());
+  image_out_ptr3d = std::unique_ptr<cl::Image3D>(new cl::Image3D(
+      openCLManager.context, CL_MEM_READ_WRITE,
+      ImageFormat(CL_R, CL_UNORM_INT8), region[0], region[1], region[2], 0, 0));
+  kernel.setArg(2, *image_in2_ptr);
+  kernel.setArg(0, *image_in_ptr3d);
+  kernel.setArg(1, *image_out_ptr3d);
+  performOperation(*image_out_ptr3d);
 }
 
 void ProcessingImage3d::getROIOOutOfMat() {
-  imageToProcess.release();
   if (!processROI) {
-    imageToProcess.reset(&image);
+    imageToProcess = &image;
     return;
   }
   Rect imageRect(roi.first.first, roi.second.first,
@@ -169,7 +253,7 @@ void ProcessingImage3d::getROIOOutOfMat() {
         i, Mat(image3d.getImageAtDepth(i), imageRect).clone());
   }
   roiImage = roiImage3d.get3dMatImage().clone();
-  imageToProcess.reset(&roiImage);
+  imageToProcess = &roiImage;
   region[0] = roiImage3d.getCols();
   region[1] = roiImage3d.getRows();
   region[2] = roiImage3d.getDepth();

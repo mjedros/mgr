@@ -36,10 +36,15 @@ ContinuousProcessingMananger::ContinuousProcessingMananger(
 void ContinuousProcessingMananger::setProcessing(
     const std::string &operationStringNew,
     const std::string &MorphElementTypeNew,
-    const std::vector<float> StructElemParamsNew) {
+    const std::vector<float> StructElemParamsNew, const unsigned int &minumum,
+    const unsigned int &maximumum)
+
+{
   operationString = operationStringNew;
   MorphElementType = MorphElementTypeNew;
   StructElemParams = StructElemParamsNew;
+  min = minumum;
+  max = maximumum;
 }
 
 std::mutex bufferMutex;
@@ -74,7 +79,7 @@ void ContinuousProcessingMananger::processing3dLoop() {
       image3d = std::shared_ptr<Image3d>(new Image3d(depth, image));
     ProcessingImage processing2dImage(openCLManager);
     processing2dImage.setImageToProcess(image.clone());
-    processing2dImage.binarize();
+    processing2dImage.binarize(min, max);
     image3d->setImageAtDepth(currDepth, processing2dImage.getImage());
 
     if (++currDepth == depth) {
@@ -112,7 +117,7 @@ void ContinuousProcessingMananger::startCameraAquisition() {
   Mat emptyImage = imagesFromCam->Get();
   for (Mat im = imagesFromCam->Get(); !im.empty() && active;
        im = imagesFromCam->Get()) {
-    im -= emptyImage;
+    // im = emptyImage - im;
     cv::cvtColor(im, im, CV_BGR2GRAY);
     {
       std::lock_guard<std::mutex> lock(bufferMutex);
@@ -143,7 +148,12 @@ void ContinuousProcessingMananger::process2dImages() {
       &ContinuousProcessingMananger::startCameraAquisition, this));
 
   MatQueue *imagesSourceBuffer = &imagesQueueFirstBuffer;
+
+  cv::BackgroundSubtractorMOG2 bg(6, 10, false);
+  bg.set("nmixtures", 3);
+
   while (active) {
+
     std::this_thread::yield();
     {
       std::lock_guard<std::mutex> lock(bufferMutex);
@@ -155,9 +165,11 @@ void ContinuousProcessingMananger::process2dImages() {
     }
     cv::Mat image = imagesSourceBuffer->front();
     imagesSourceBuffer->pop();
+    cv::Mat fore;
+    bg.operator()(image, fore);
     ProcessingImage img(openCLManager);
-    img.setImageToProcess(image.clone());
-    img.binarize();
+    img.setImageToProcess(fore.clone());
+    //    img.binarize(min, max);
     process2dImage(img.getImage());
   }
 
@@ -165,9 +177,5 @@ void ContinuousProcessingMananger::process2dImages() {
   logger.printLine("End of processing");
 }
 
-void ContinuousProcessingMananger::stopProcessing() {
-  if (!active)
-    return;
-  active = false;
-}
+void ContinuousProcessingMananger::stopProcessing() { active = false; }
 }

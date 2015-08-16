@@ -31,7 +31,8 @@ SOURCES +=\
     ../src/Logger.cpp \
     ../src/ProcessingImage3d.cpp \
     ../src/ImageSource/Camera.cpp \
-    ../src/ContinuousProcessingMananger.cpp
+    ../src/ContinuousProcessingMananger.cpp \
+    ../src/CpuSkeletonize.cpp
 
 HEADERS  += ../src/GUI/mainwindow.h\
         ../src/OpenCLManager.h \
@@ -53,7 +54,8 @@ HEADERS  += ../src/GUI/mainwindow.h\
     ../src/ProcessingImage3d.h \
     ../src/include/Paths.h \
     ../src/ImageSource/Camera.h \
-    ../src/ContinuousProcessingMananger.h
+    ../src/ContinuousProcessingMananger.h \
+    ../src/CpuSkeletonize.h
 
 FORMS    += ../src/GUI/mainwindow.ui
 CONFIG += c++0x

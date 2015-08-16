@@ -11,8 +11,8 @@ void ApplicationManagerGUI::showImages() {
   setMaxValues();
 
   showWindows(image3d.getDepth() / 2);
-  showCols(image3d.getCols() / 2);
-  showRows(image3d.getRows() / 2);
+  showCols(0);
+  showRows(0);
 }
 
 void ApplicationManagerGUI::sliderValueChanged(const int &value,

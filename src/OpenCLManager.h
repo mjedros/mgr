@@ -5,6 +5,8 @@
 #include <memory>
 #include <string>
 namespace Mgr {
+using PlatformList = std::vector<std::tuple<int, int, std::string>>;
+
 class Logger;
 class OpenCLManager {
 private:
@@ -21,10 +23,12 @@ public:
   bool isConfigured() { return configured; }
   void configure(const std::string &kernelFileName,
                  const std::pair<unsigned int, unsigned int> &ChosenDevice);
-  std::vector<std::tuple<int, int, std::string>> listPlatforms() const;
+  PlatformList listPlatforms() const;
   void chooseDevice(const unsigned int &platformId,
                     const unsigned int &DeviceId);
   OpenCLManager();
   ~OpenCLManager();
+  void printDeviceInfo(std::string name, unsigned int DeviceId,
+                       std::vector<cl::Device> devices) const;
 };
 }

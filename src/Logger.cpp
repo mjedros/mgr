@@ -35,12 +35,13 @@ void Logger::endOperation(const unsigned long int &clDuration) {
 void Logger::resetTimer() {
   operationsCounter = 0;
   timeSum = 0;
+  transferSum = 0;
+  clSum = 0;
   allSum = chrono::system_clock::now();
 }
 
 void Logger::beginOperation() {
   start = chrono::system_clock::now();
-  clSum = 0;
   operationsCounter++;
 }
 
@@ -56,9 +57,17 @@ void Logger::printAvarageTime() {
   file << "Avarage time: ";
   file << timeSum / operationsCounter << " us, "
        << inMiliseconds / operationsCounter << " ms" << endl;
-  file << "Avarage OpenCL profiling: " << clSum << " ns, " << clSum / 1000000.0
+  file << "Avarage OpenCL profiling: " << clSum / operationsCounter << " ns, "
+       << clSum / operationsCounter / 1000000.0 << " ms" << endl;
+  file << "Avarage Transfer: " << transferSum / operationsCounter / 1000.0
        << " ms" << endl;
   file << endl;
+}
+void Logger::startReadingImage() { startReading = chrono::system_clock::now(); }
+
+void Logger::stopReadingImage() {
+  transferSum += chrono::duration_cast<chrono::microseconds>(
+                     chrono::system_clock::now() - startReading).count();
 }
 
 void Logger::printFancyLine(string line) {

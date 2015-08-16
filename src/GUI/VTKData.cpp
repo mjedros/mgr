@@ -14,7 +14,7 @@
 static Mgr::Logger &logger = Mgr::Logger::getInstance();
 static const u_int8_t THREAD_NUMBER = 3;
 VTKData::VTKData() : renderer(vtkRenderer::New()) {
-  renderer->SetBackground(.1, .1, .1);
+  renderer->SetBackground(0, 0, 0);
 }
 
 VTKData::~VTKData() {
@@ -88,7 +88,7 @@ void VTKData::initVTKImage() {
         }));
     prevActor = actors->GetLastActor();
   }
-  vtkActor *actor = createActorOutOf3dImage(std::make_tuple(0.9, 0.9, 0.9));
+  vtkActor *actor = createActorOutOf3dImage(std::make_tuple(.9, .9, .9));
   renderer->AddActor(actor);
 }
 
