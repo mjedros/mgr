@@ -33,7 +33,7 @@ find_library(OPENCV_VIDEO_LIB
 		NAMES opencv_video248d opencv_video
 		PATHS "$ENV{OPENCV_DIR}/build/x86/vc12/lib" "~/usr/local/lib"
 		)	
-FIND_PACKAGE(Qt COMPONENTS QtCore QtGui QtNetwork QtOpenGL REQUIRED)
+FIND_PACKAGE(Qt4)
 if(NOT VTK_BINARY_DIR)
   find_package(VTK REQUIRED)
 else()
